@@ -1,0 +1,49 @@
+<script type="text/javascript">
+// <![CDATA[
+//Reset checked fields
+$(document).ready(function() {
+	$('#show_results1').prop('checked', true);
+	$('#mms_options').hide();
+	$('#show_results1').prop('checked', true);
+	$('#mms_load2').prop('checked', true);
+	$('#mms_pagination').change(function () {
+		if($('#mms_pagination').val() > 1000 ){
+			$('<div></div>').appendTo('body')
+				.html('<div><span class="ui-icon ui-icon-alert" style="float: left; margin: 0 7px 20px 0;"></span><p>{LA_MMS_SEARCH_WARN}</p></div>')
+				.dialog({
+					modal: true, title: '{LA_CONFIRM}', zIndex: 10000, autoOpen: true,
+					width: '250px', resizable: true,
+					buttons: {
+						"{L_YES}": function () {
+							$(this).dialog("close");
+						},
+						"{L_NO}": function () {
+						$('#mms_pagination').val('50')
+						$(this).dialog("close");
+						}
+					},
+					"{L_QUIT}": function (event, ui) {
+						$(this).remove();
+				}
+			});
+		}
+	});
+	$('#show_results1').click(function (){
+		$('#mms_post_action').show();
+		$('#mms_topic_action').hide();
+		$('#mms_post_action').effect("highlight");
+	});
+	$('#show_results2').click(function (){
+		$('#mms_topic_action').show();
+		$('#mms_post_action').hide();
+		$('#mms_topic_action').effect("highlight");
+	});
+	$('#mms_load1').click(function (){
+		$('#mms_options').show();
+	});
+	$('#mms_load2').click(function (){
+		$('#mms_options').hide();
+	});
+});
+// ]]>
+</script>

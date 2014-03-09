@@ -1,0 +1,280 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<?xml-stylesheet type="text/xsl" href="modx.prosilver.en.xsl"?>
+<!--NOTICE: Please open this file in your web browser. If presented with a security warning, you may safely tell it to allow the blocked content.-->
+<!--For security purposes, please check: http://www.phpbb.com/mods/ for the latest version of this MOD.\nAlthough MODs are checked before being allowed in the MODs Database there is no guarantee that there are no security problems within the MOD.\nNo support will be given for MODs not found within the MODs Database which can be found at http://www.phpbb.com/mods/-->
+<mod xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="https://www.phpbb.com/mods/xml/modx-1.2.6.xsd">
+	<header>
+		<meta name="generator" content="MODX file generated with PP MODX Creator by tumba25 (online version)"/>
+		<license><![CDATA[http://opensource.org/licenses/gpl-license.php GNU General Public License v2]]></license>
+		<title lang="en"><![CDATA[Mass Moderation in Search]]></title>
+		<title lang="fr"><![CDATA[Modération de masse dans la recherche]]></title>
+		<description lang="en"><![CDATA[This MOD will give you the possibility to have a Mass Moderation tool in the search.]]></description>
+		<description lang="fr"><![CDATA[Ce MOD vous donneras la possibilité d'avoir un outil de Modération de masse dans la recherche.]]></description>
+		<author-group>
+			<author>
+				<realname><![CDATA[Georges.L]]></realname>
+				<username><![CDATA[Geolim4]]></username>
+				<homepage><![CDATA[http://geolim4.com]]></homepage>
+			</author>
+			<author>
+				<username><![CDATA[Jester]]></username>
+				<homepage><![CDATA[http://jesterstyles.free.fr/]]></homepage>
+				<contributions-group>
+					<contributions status="current" from="2013-05-14" position="Logo creator"/>
+				</contributions-group>
+			</author>
+		</author-group>
+		<mod-version>1.1.0</mod-version>
+		<installation>
+			<level>intermediate</level>
+			<time>1500</time>
+			<target-version>3.0.11</target-version>
+		</installation>
+		<link-group>
+			<link type="contrib" href="fr.xml" lang="en">French Translation</link>
+			<link type="contrib" href="fr.xml" lang="fr">Traduction Française</link>
+		</link-group>
+	</header>
+	<action-group>
+		<copy>
+			<file from="root/*.*" to="*.*"/>
+		</copy>
+		<open src="search.php">
+			<edit>
+				<find><![CDATA[				//Begin Mod: Mass Moderation in Search
+				if($auth->acl_get('m_mms') && $mms->mms_load)
+				{
+					if( !isset($mms->uids[$row['topic_poster']]) )
+					{
+						$mms->uids[$row['topic_poster']]['username'] = $row['topic_first_poster_name'];
+						$mms->uids[$row['topic_poster']]['user_colour'] = $row['topic_first_poster_colour'];
+						$tpl_ary += array('TOPIC_ID', $result_topic_id);
+					}
+				}
+				//End Mod: Mass Moderation in Search]]></find>
+				<action type="replace-with"><![CDATA[				//Begin Mod: Mass Moderation in Search
+				if($auth->acl_get('m_mms') && $mms->mms_load)
+				{
+					if( !isset($mms->uids[$row['topic_poster']]) )
+					{
+						$mms->uids[$row['topic_poster']]['username'] = $row['topic_first_poster_name'];
+						$mms->uids[$row['topic_poster']]['user_colour'] = $row['topic_first_poster_colour'];
+						$tpl_ary += array('TOPIC_ID' => $result_topic_id);
+					}
+					if( !isset($mms->fids[$forum_id]) )
+					{
+						$mms->fids[$forum_id] = $forum_id;
+						$tpl_ary += array('FORUM_ID' => $forum_id);
+					}
+				}
+				//End Mod: Mass Moderation in Search]]></action>
+			</edit>
+			<edit>
+				<find><![CDATA[				//Begin Mod: Mass Moderation in Search
+				if($auth->acl_get('m_mms') && $mms->mms_load)
+				{
+					if( !isset($mms->uids[$row['poster_id']]) )
+					{
+						$mms->uids[$row['poster_id']]['username'] = $row['username'];
+						$mms->uids[$row['poster_id']]['user_colour'] = $row['user_colour'];
+					}
+				}
+				//End Mod: Mass Moderation in Search]]></find>
+				<action type="replace-with"><![CDATA[				//Begin Mod: Mass Moderation in Search
+				if($auth->acl_get('m_mms') && $mms->mms_load)
+				{
+					if( !isset($mms->uids[$row['poster_id']]) )
+					{
+						$mms->uids[$row['poster_id']]['username'] = $row['username'];
+						$mms->uids[$row['poster_id']]['user_colour'] = $row['user_colour'];
+					}
+					if( !isset($mms->fids[$forum_id]) )
+					{
+						$mms->fids[$forum_id] = $forum_id;
+						$tpl_ary += array('FORUM_ID' => $forum_id);
+					}
+				}
+				//End Mod: Mass Moderation in Search]]></action>
+			</edit>
+		</open>
+		<open src="styles/prosilver/template/search_body.html">
+			<edit>
+				<find><![CDATA[<!-- IF S_MMS_SEARCH -->
+<div class="panel bg1">
+	<div class="inner"><span class="corners-top"><span></span></span>
+
+	<fieldset>
+	<h3>{L_MMS_TITLE}</h3>
+	<dl>
+		<dt><label for="mms_load1">{L_MMS_LOAD}:</label></dt>
+		<dd>
+			<label for="mms_load1"><input type="radio" name="mms_load" id="mms_load1" value="1" /> {L_YES}</label>
+			<label for="mms_load2"><input type="radio" name="mms_load" id="mms_load2" value="0" checked="checked" /> {L_NO}</label>
+		</dd>
+	</dl>
+	<div id="mms_options">
+		<dl>
+			<dt><label for="mms_post_action">{L_MMS_ACTION}:</label><br /><span>{L_MMS_ACTION_EXPLAIN}</span></dt>
+			<dd><select name="mms_topic_action" id="mms_topic_action" title="{L_MMS_ACTION}" style="display: none;">{S_MMS_TOPIC_ACTION}</select></dd>
+			<dd><select name="mms_post_action" id="mms_post_action" title="{L_MMS_ACTION}">{S_MMS_POST_ACTION}</select></dd>
+		</dl>
+		<dl>
+			<dt><label>{L_MMS_PAGINATION}:</label><br /><span>{L_MMS_PAGINATION_EXP}</span></dt>
+			<dd><select id="mms_pagination" name="mms_pagination" title="{L_RETURN_FIRST}">{S_MMS_MAGINATION}</select> {L_MMS_PAGINATION_POSTS_TOPICS}</dd>
+		</dl>
+	</div>
+	<span class="corners-bottom"><span></span></span></div>
+</div>
+<!-- ENDIF -->]]></find>
+				<action type="replace-with"><![CDATA[<!-- IF S_MMS_SEARCH -->
+<div class="panel bg1">
+	<div class="inner"><span class="corners-top"><span></span></span>
+	<h3>{L_MMS_TITLE}</h3>
+	<fieldset>
+		<dl>
+			<dt><label for="mms_load1">{L_MMS_LOAD}:</label></dt>
+			<dd>
+				<label for="mms_load1"><input type="radio" name="mms_load" id="mms_load1" value="1" /> {L_YES}</label>
+				<label for="mms_load2"><input type="radio" name="mms_load" id="mms_load2" value="0" checked="checked" /> {L_NO}</label>
+			</dd>
+		</dl>
+		<div id="mms_options">
+			<dl>
+				<dt><label for="mms_post_action">{L_MMS_ACTION}:</label><br /><span>{L_MMS_ACTION_EXPLAIN}</span></dt>
+				<dd><select name="mms_topic_action" id="mms_topic_action" title="{L_MMS_ACTION}" style="display: none;">{S_MMS_TOPIC_ACTION}</select></dd>
+				<dd><select name="mms_post_action" id="mms_post_action" title="{L_MMS_ACTION}">{S_MMS_POST_ACTION}</select></dd>
+			</dl>
+			<dl>
+				<dt><label>{L_MMS_PAGINATION}:</label><br /><span>{L_MMS_PAGINATION_EXP}</span></dt>
+				<dd><select id="mms_pagination" name="mms_pagination" title="{L_RETURN_FIRST}">{S_MMS_MAGINATION}</select> {L_MMS_PAGINATION_POSTS_TOPICS}</dd>
+			</dl>
+		</div>
+	</fieldset>
+	<span class="corners-bottom"><span></span></span></div>
+</div>
+<!-- ENDIF -->]]></action>
+			</edit>
+		</open>
+		<open src="styles/prosilver/template/search_results.html">
+			<edit>
+				<find><![CDATA[	<!-- IF S_MMS_SEARCH and S_MMS_LOAD and .searchresults -->
+	<div id="sticky-mms_tools"></div>
+	<div class="panel bg3" id="mms_tools" style="z-index: 1500;">
+		<div class="inner"><span class="corners-top"><span></span></span>
+		<div id="mms_doc_loading"><h2><img src="{T_THEME_PATH}/images/mms_loading.gif" alt="{L_MMS_PRELOADING}"/>&nbsp;{L_MMS_PRELOADING}</h2><p>{L_MMS_PRELOADING_EXP}</p></div>
+		<fieldset class="display-options">
+		<h3>{L_MMS_TITLE}: {S_MMS_MASS_TOOL}</h3>
+			<a href="#" onclick="return mmsmark(true);">{L_MARK_ALL}</a> &bull; <a href="#" onclick="return mmsmark(false);">{L_UNMARK_ALL}</a>
+			<br /><!-- IF S_MMS_USER_SELECTOR -->{L_MMS_SELECT_USER}: <select name="mms_uname" id="mms_uname" title="{L_RETURN_FIRST}">{S_MMS_USER_SELECTOR}</select>&nbsp;<input type="submit" class="button2" name="mms_sel_user" id="mms_sel_user" title="{L_GO}" value="{L_GO}" onclick="return mmsumark(getElementById('mms_uname').value);"/><!-- ENDIF -->
+			&nbsp;{L_MMS_SELECT_TYPE}:
+			<select name="mms_check_type" id="mms_check_type" title="{L_MMS_SELECT_TYPE}" >
+				<option selected="selected" value="rectangle">{L_MMS_SELECT_RECTANGLE}</option>
+				<option value="checktopic">{L_MMS_SELECT_CHECKTOPIC}</option>
+				<option value="checkbox">{L_MMS_SELECT_CHECKBOX}</option>
+			</select>&nbsp;<input type="submit" class="button2" name="mms_sub_user" id="mms_sub_user" title="{L_GO}" value="{L_GO}" onclick="return mms_type(getElementById('mms_check_type').value)"/>
+			<hr /><input type="submit" class="button1" name="mms_submit" id="mms_submit" title="{L_SUBMIT}" value="{L_SUBMIT} (0 {L_MMS_SELECTED})"/>
+		</fieldset>
+		<span class="corners-bottom"><span></span></span></div>
+	</div>
+	<form onsubmit="return mss_stringify();" method="post" action="{S_MMS_ACTION}" id="mms_form">
+	<!-- ENDIF -->]]></find>
+				<action type="replace-with"><![CDATA[	<!-- IF S_MMS_SEARCH and S_MMS_LOAD and .searchresults -->
+	<div id="sticky-mms_tools"></div>
+	<div class="panel bg3" id="mms_tools" style="z-index: 1500;">
+		<div class="inner"><span class="corners-top"><span></span></span>
+		<div id="mms_doc_loading"><h2><img src="{T_THEME_PATH}/images/mms_loading.gif" alt="{L_MMS_PRELOADING}"/>&nbsp;{L_MMS_PRELOADING}</h2><p>{L_MMS_PRELOADING_EXP}</p></div>
+		<fieldset class="display-options">
+		<h3>{L_MMS_TITLE}: {S_MMS_MASS_TOOL}</h3>
+			<a href="#" onclick="return mmsmark(true);">{L_MARK_ALL}</a> &bull; <a href="#" onclick="return mmsmark(false);">{L_UNMARK_ALL}</a>
+			<br />
+			<!-- IF S_MMS_USER_SELECTOR -->{L_MMS_SELECT_USER}: <select name="mms_uname" id="mms_uname" title="{L_RETURN_FIRST}">{S_MMS_USER_SELECTOR}</select>&nbsp;<input type="submit" class="button2" name="mms_sel_user" id="mms_sel_user" title="{L_GO}" value="{L_GO}" onclick="return mmsumark(getElementById('mms_uname').value, 'uname');"/><!-- ENDIF -->
+			<!-- IF S_MMS_FORUM_SELECTOR -->&nbsp;&nbsp;{L_MMS_SELECT_FORUM}: <select name="mms_fname" id="mms_fname" title="{L_RETURN_FIRST}">{S_MMS_FORUM_SELECTOR}</select>&nbsp;<input type="submit" class="button2" name="mms_sel_forum" id="mms_sel_forum" title="{L_GO}" value="{L_GO}" onclick="return mmsumark(getElementById('mms_fname').value, 'fname');"/><!-- ENDIF -->
+			&nbsp;&nbsp;{L_MMS_SELECT_TYPE}:
+			<select name="mms_check_type" id="mms_check_type" title="{L_MMS_SELECT_TYPE}" >
+				<option selected="selected" value="rectangle">{L_MMS_SELECT_RECTANGLE}</option>
+				<option value="checktopic">{L_MMS_SELECT_CHECKTOPIC}</option>
+				<option value="checkbox">{L_MMS_SELECT_CHECKBOX}</option>
+			</select>&nbsp;<input type="submit" class="button2" name="mms_sub_user" id="mms_sub_user" title="{L_GO}" value="{L_GO}" onclick="return mms_type(getElementById('mms_check_type').value)"/>
+			<hr /><input type="submit" class="button1" name="mms_submit" id="mms_submit" title="{L_SUBMIT}" value="{L_SUBMIT} (0 {L_MMS_SELECTED})"/>
+		</fieldset>
+		<span class="corners-bottom"><span></span></span></div>
+	</div>
+	<form onsubmit="return mss_stringify();" method="post" action="{S_MMS_ACTION}" id="mms_form">
+	<!-- ENDIF -->]]></action>
+			</edit>
+			<edit>
+				<find><![CDATA[					<dd>
+						<input class="mms_input mms_Sinput" onclick="mms_select('li_topic_{searchresults.TOPIC_ID}', this.checked, 'single')" type="checkbox" name="mms_topic_{searchresults.TOPIC_ID}" id="mms_topic_{searchresults.TOPIC_ID}" />
+						<input type="hidden" class="mms_input_uname" name="user_topic_{searchresults.TOPIC_ID}" value="{searchresults.TOPIC_AUTHOR}" />
+					</dd>]]></find>
+				<action type="replace-with"><![CDATA[						<!-- IF S_MMS_SEARCH and S_MMS_LOAD and .searchresults -->
+						<input class="mms_input mms_Sinput" onclick="mms_select('li_topic_{searchresults.TOPIC_ID}', this.checked, 'single')" type="checkbox" name="mms_topic_{searchresults.TOPIC_ID}" id="mms_topic_{searchresults.TOPIC_ID}" />
+						<input type="hidden" class="mms_input_uname" name="user_topic_{searchresults.TOPIC_ID}" value="{searchresults.TOPIC_AUTHOR}" />
+						<input type="hidden" class="mms_input_fname" name="forum_topic_{searchresults.TOPIC_ID}" value="{searchresults.FORUM_ID}" />
+						<!-- ENDIF -->]]></action>
+			</edit>
+			<edit>
+				<find><![CDATA[	<!-- IF S_MMS_SEARCH and S_MMS_LOAD and .searchresults -->
+	<div id="sticky-mms_tools"></div>
+	<div class="panel bg3" id="mms_tools" style="z-index: 1500;">
+		<div class="inner"><span class="corners-top"><span></span></span>
+		<div id="mms_doc_loading"><h2><img src="{T_THEME_PATH}/images/mms_loading.gif" alt="{L_MMS_PRELOADING}"/>&nbsp;{L_MMS_PRELOADING}</h2><p>{L_MMS_PRELOADING_EXP}</p></div>
+		<fieldset class="display-options">
+			<h3>{L_MMS_TITLE}: {S_MMS_MASS_TOOL}</h3>
+				<a href="#" onclick="return mmsmark(true);">{L_MARK_ALL}</a> &bull; <a href="#" onclick="return mmsmark(false);">{L_UNMARK_ALL}</a>
+				<br /><!-- IF S_MMS_USER_SELECTOR --><label for="mms_uname">{L_MMS_SELECT_USER}:</label> <select name="mms_uname" id="mms_uname" title="{L_RETURN_FIRST}">{S_MMS_USER_SELECTOR}</select>&nbsp;<input type="submit" class="button2" name="mms_sel_user" id="mms_sel_user" value="{L_GO}" title="{L_GO}" onclick="return mmsumark(getElementById('mms_uname').value);"/><!-- ENDIF -->
+				&nbsp;<label for="mms_check_type">{L_MMS_SELECT_TYPE}:</label>
+				<select name="mms_check_type" id="mms_check_type" title="{L_MMS_SELECT_TYPE}" >
+					<option selected="selected" value="rectangle">{L_MMS_SELECT_RECTANGLE}</option>
+					<option value="checktopic">{L_MMS_SELECT_CHECKTOPIC}</option>
+					<option value="checkbox">{L_MMS_SELECT_CHECKBOX}</option>
+				</select>&nbsp;<input type="submit" class="button2" name="mms_sub_user" id="mms_sub_user" value="{L_GO}" title="{L_GO}" onclick="return mms_type(getElementById('mms_check_type').value)"/>
+				<hr /><input type="submit" class="button1" name="mms_submit" id="mms_submit" title="{L_SUBMIT}" value="{L_SUBMIT} (0 {L_MMS_SELECTED})"/>
+		</fieldset>
+		<span class="corners-bottom"><span></span></span></div>
+	</div>
+	<form onsubmit="return mss_stringify();" method="post" action="{S_MMS_ACTION}" id="mms_form">
+	<!-- ENDIF -->]]></find>
+				<action type="replace-with"><![CDATA[	<!-- IF S_MMS_SEARCH and S_MMS_LOAD and .searchresults -->
+	<div id="sticky-mms_tools"></div>
+	<div class="panel bg3" id="mms_tools" style="z-index: 1500;">
+		<div class="inner"><span class="corners-top"><span></span></span>
+		<div id="mms_doc_loading"><h2><img src="{T_THEME_PATH}/images/mms_loading.gif" alt="{L_MMS_PRELOADING}"/>&nbsp;{L_MMS_PRELOADING}</h2><p>{L_MMS_PRELOADING_EXP}</p></div>
+		<fieldset class="display-options">
+			<h3>{L_MMS_TITLE}: {S_MMS_MASS_TOOL}</h3>
+				<a href="#" onclick="return mmsmark(true);">{L_MARK_ALL}</a> &bull; <a href="#" onclick="return mmsmark(false);">{L_UNMARK_ALL}</a>
+				<br />
+				<!-- IF S_MMS_USER_SELECTOR --><label for="mms_uname">{L_MMS_SELECT_USER}:</label> <select name="mms_uname" id="mms_uname" title="{L_RETURN_FIRST}">{S_MMS_USER_SELECTOR}</select>&nbsp;<input type="submit" class="button2" name="mms_sel_user" id="mms_sel_user" value="{L_GO}" title="{L_GO}" onclick="return mmsumark(getElementById('mms_uname').value, 'uname');"/><!-- ENDIF -->
+				<!-- IF S_MMS_FORUM_SELECTOR -->&nbsp;&nbsp;<label for="mms_uname">{L_MMS_SELECT_FORUM}:</label> <select name="mms_fname" id="mms_fname" title="{L_RETURN_FIRST}">{S_MMS_FORUM_SELECTOR}</select>&nbsp;<input type="submit" class="button2" name="mms_sel_forum" id="mms_sel_forum" value="{L_GO}" title="{L_GO}" onclick="return mmsumark(getElementById('mms_fname').value, 'fname');"/><!-- ENDIF -->
+				&nbsp;&nbsp;<label for="mms_check_type">{L_MMS_SELECT_TYPE}:</label>
+				<select name="mms_check_type" id="mms_check_type" title="{L_MMS_SELECT_TYPE}" >
+					<option selected="selected" value="rectangle">{L_MMS_SELECT_RECTANGLE}</option>
+					<option value="checktopic">{L_MMS_SELECT_CHECKTOPIC}</option>
+					<option value="checkbox">{L_MMS_SELECT_CHECKBOX}</option>
+				</select>&nbsp;<input type="submit" class="button2" name="mms_sub_user" id="mms_sub_user" value="{L_GO}" title="{L_GO}" onclick="return mms_type(getElementById('mms_check_type').value)"/>
+				<hr /><input type="submit" class="button1" name="mms_submit" id="mms_submit" title="{L_SUBMIT}" value="{L_SUBMIT} (0 {L_MMS_SELECTED})"/>
+		</fieldset>
+		<span class="corners-bottom"><span></span></span></div>
+	</div>
+	<form onsubmit="return mss_stringify();" method="post" action="{S_MMS_ACTION}" id="mms_form">
+	<!-- ENDIF -->]]></action>
+			</edit>
+			<edit>
+				<find><![CDATA[			<!-- IF S_MMS_SEARCH and S_MMS_LOAD -->
+			<fieldset>
+				<input class="mms_input mms_Sinput" onclick="mms_select('div_post_{searchresults.POST_ID}', this.checked, 'single')" type="checkbox" name="mms_post_{searchresults.POST_ID}" id="mms_post_{searchresults.POST_ID}" />
+				<input type="hidden" class="mms_input_uname" name="user_post_{searchresults.POST_ID}" value="{searchresults.POST_AUTHOR}" />
+			</fieldset>
+			<!-- ENDIF -->]]></find>
+				<action type="replace-with"><![CDATA[			<!-- IF S_MMS_SEARCH and S_MMS_LOAD -->
+			<fieldset>
+				<input class="mms_input mms_Sinput" onclick="mms_select('div_post_{searchresults.POST_ID}', this.checked, 'single')" type="checkbox" name="mms_post_{searchresults.POST_ID}" id="mms_post_{searchresults.POST_ID}" />
+				<input type="hidden" class="mms_input_uname" name="user_post_{searchresults.POST_ID}" value="{searchresults.POST_AUTHOR}" />
+				<input type="hidden" class="mms_input_fname" name="forum_post_{searchresults.POST_ID}" value="{searchresults.FORUM_ID}" />
+			</fieldset>
+			<!-- ENDIF -->]]></action>
+			</edit>
+		</open>
+		<php-installer><![CDATA[mms_install.php]]></php-installer>
+	</action-group>
+</mod>

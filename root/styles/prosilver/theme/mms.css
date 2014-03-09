@@ -1,0 +1,128 @@
+/* @package Cascading Style Sheets Mass Moderation in Search
+^>@version $Id: mms.css v1.1.0 22h14 06/07/2013 Geolim4 Exp $
+-------------------------------------------------*/
+
+.ui-selectable-helper {
+	position: absolute;
+	z-index: 100;
+	background-color: #96DFFE;
+	opacity: 0.4 !important;
+	border: 1px dashed black;
+}
+.mms_div{
+	position: relative;
+}
+.mms_tiny{
+	width: 20% !important;
+}
+.mms_tooltip{
+	visibility: none;
+}
+
+.mms_url_loading{
+	background-image: url("./images/mms_loading.gif");
+	background-repeat: no-repeat;
+	background-size: 18px auto;
+	padding-left: 18px !important;
+}
+.ui-effects-transfer { border: 2px dotted gray;}
+.ui-progressbar-value{
+	transition: all 300ms ease-in-out;
+}
+.mms_Sinput{
+	width : 100% !important;
+	height: 99% !important;
+	position: absolute !important; 
+	opacity: 0 !important;
+	z-index : -10 !important;
+	left: 0px !important;
+	top: 0px !important;
+}
+.mms_Pinput{
+	width : 100% !important;
+	height: 99% !important;
+	position: absolute !important; 
+	opacity: 0 !important;
+	z-index : 10 !important;
+	left: 0px !important;
+	top: 0px !important;
+}
+.mms_Cinput{
+	width : inherit;
+	height: inherit;
+	position: static; 
+	opacity: 1;
+	z-index : 0;
+	left: 0px;
+	top: 0px;
+}
+.mms_hidden{
+	display: none;
+}
+.mms_Qicon{
+    display: inline-block;
+    margin: -2px 5px -3px -1px;
+}
+.mms_selected{
+	background-color: #C7F3D3 !important;
+	font-style: italic;
+}
+.mms_stick {
+	box-shadow: 0px 0px 4px 2px #FFF; 
+	width: 99% !important;
+    position: fixed;
+    top: 0;
+	left: 0;
+    z-index: 10000;
+    border-radius: 0 0 0.5em 0.5em;
+}
+#cp-main .rules{
+	margin: 0 !important;
+}
+#cp-main .rules span.corners-top {
+	background-image: url("./images/corners_left.gif");
+}
+
+#cp-main .rules span.corners-top span {
+	background-image: url("./images/corners_right.gif");
+}
+
+#cp-main .rules span.corners-bottom {
+	background-image: url("./images/corners_left.gif");
+}
+
+#cp-main .rules span.corners-bottom span {
+	background-image: url("./images/corners_right.gif");
+}
+#mms_form{
+	cursor: crosshair;
+}
+#mms_doc_loading{
+	position: fixed;
+	z-index: 10000;
+	height: 100%;
+	width: 100%;
+	left: 0px;
+	top: 0px;
+	background-color: #000;
+	opacity: 0.7;
+	text-align: center;
+}
+#mms_grabip_div h4 {
+	margin-top: 1em;
+}
+#mms_grabip_div textarea {
+	vertical-align:top;
+	border : 1px dashed white !important;
+	background-color: #DDD;
+	max-height: 600px;
+}
+#mms_doc_loading h2{
+	color: #FFF;
+	font-size: 2em;
+	margin-top: 5%;
+}
+#mms_doc_loading p{
+	color: #FFF;
+	font-size: 1.5em;
+}

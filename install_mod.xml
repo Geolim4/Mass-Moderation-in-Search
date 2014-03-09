@@ -1,0 +1,469 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<?xml-stylesheet type="text/xsl" href="modx.prosilver.en.xsl"?>
+<!--NOTICE: Please open this file in your web browser. If presented with a security warning, you may safely tell it to allow the blocked content.-->
+<!--For security purposes, please check: http://www.phpbb.com/mods/ for the latest version of this MOD.\nAlthough MODs are checked before being allowed in the MODs Database there is no guarantee that there are no security problems within the MOD.\nNo support will be given for MODs not found within the MODs Database which can be found at http://www.phpbb.com/mods/-->
+<mod xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="https://www.phpbb.com/mods/xml/modx-1.2.6.xsd">
+	<header>
+		<meta name="generator" content="MODX file generated with PP MODX Creator by tumba25 (online version)"/>
+		<license><![CDATA[http://opensource.org/licenses/gpl-license.php GNU General Public License v2]]></license>
+		<title lang="en"><![CDATA[Mass Moderation in Search]]></title>
+		<title lang="fr"><![CDATA[Modération de masse dans la recherche]]></title>
+		<description lang="en"><![CDATA[This MOD will give you the possibility to have a Mass Moderation tool in the search.
+								/!\ Warning /!\
+								This MOD require php 5.3.x !!]]></description>
+		<description lang="fr"><![CDATA[Ce MOD vous donneras la possibilité d'avoir un outil de Modération de masse dans la recherche.
+										/!\ Attention /!\
+								Ce mod requiert php 5.3.x !!]]></description>
+		<author-group>
+			<author>
+				<realname><![CDATA[Georges.L]]></realname>
+				<username><![CDATA[Geolim4]]></username>
+				<homepage><![CDATA[http://geolim4.com]]></homepage>
+			</author>
+			<author>
+				<realname><![CDATA[Adrien Bonnel]]></realname>
+				<username><![CDATA[ABDev]]></username>
+				<homepage><![CDATA[http://www.phpbb-forge.com/]]></homepage>
+				<contributions-group>
+					<contributions status="current" from="2013-05-14" position="Code contributor"/>
+				</contributions-group>
+			</author>
+			<author>
+				<username><![CDATA[Skouat]]></username>
+				<homepage><![CDATA[http://www.ultima-world.com]]></homepage>
+				<contributions-group>
+					<contributions status="current" from="2013-05-14" position="Code contributor"/>
+				</contributions-group>
+			</author>
+			<author>
+				<username><![CDATA[Cabot]]></username>
+				<homepage><![CDATA[http://cabotweb.fr/]]></homepage>
+				<contributions-group>
+					<contributions status="current" from="2013-05-14" position="Design contributor"/>
+				</contributions-group>
+			</author>
+			<author>
+				<username><![CDATA[Jester]]></username>
+				<homepage><![CDATA[http://jesterstyles.free.fr/]]></homepage>
+				<contributions-group>
+					<contributions status="current" from="2013-05-14" position="Logo creator"/>
+				</contributions-group>
+			</author>
+		</author-group>
+		<mod-version>1.1.0</mod-version>
+		<installation>
+			<level>intermediate</level>
+			<time>1500</time>
+			<target-version>3.0.11</target-version>
+		</installation>
+		<link-group>
+			<link type="contrib" href="contrib/fr.xml" lang="en">French Translation</link>
+			<link type="contrib" href="contrib/fr.xml" lang="fr">Traduction Française</link>
+		</link-group>
+	</header>
+	<action-group>
+		<copy>
+			<file from="root/*.*" to="*.*"/>
+		</copy>
+		<open src="mcp.php">
+			<edit>
+				<find><![CDATA[$user->setup('mcp');]]></find>
+				<action type="after-add"><![CDATA[//Start MOD: Mass Moderation in Search
+$user->add_lang('mods/mms_search');
+//End MOD: Mass Moderation in Search]]></action>
+			</edit>
+		</open>
+		<open src="search.php">
+			<edit>
+				<find><![CDATA[// We put login boxes for the case if search_id is newposts, egosearch or unreadposts]]></find>
+				<action type="before-add"><![CDATA[//Begin Mod: Mass Moderation in Search
+if($auth->acl_get('m_mms'))
+{
+	require($phpbb_root_path . 'includes/class_mms.' . $phpEx);
+	$mms = new mms_search;
+}
+//End Mod: Mass Moderation in Search]]></action>
+			</edit>
+			<edit>
+				<find><![CDATA[	$u_search .= ($return_chars != 300) ? '&amp;ch=' . $return_chars : '';]]></find>
+				<action type="after-add"><![CDATA[	//Begin Mod: Mass Moderation in Search
+	if($auth->acl_get('m_mms') && $mms->mms_load)
+	{
+		$mms->extra_pagination($u_search);
+	}
+	//End Mod: Mass Moderation in Search]]></action>
+			</edit>
+			<edit>
+				<find><![CDATA[					'U_MCP_QUEUE'			=> $u_mcp_queue,
+				);]]></find>
+				<action type="after-add"><![CDATA[				//Begin Mod: Mass Moderation in Search
+				if($auth->acl_get('m_mms') && $mms->mms_load)
+				{
+					if( !isset($mms->uids[$row['topic_poster']]) )
+					{
+						$mms->uids[$row['topic_poster']]['username'] = $row['topic_first_poster_name'];
+						$mms->uids[$row['topic_poster']]['user_colour'] = $row['topic_first_poster_colour'];
+						$tpl_ary += array('TOPIC_ID' => $result_topic_id);
+					}
+					if( !isset($mms->fids[$forum_id]) )
+					{
+						$mms->fids[$forum_id] = $forum_id;
+						$tpl_ary += array('FORUM_ID' => $forum_id);
+					}
+				}
+				//End Mod: Mass Moderation in Search]]></action>
+			</edit>
+			<edit>
+				<find><![CDATA[			}
+
+			$template->assign_block_vars('searchresults', array_merge($tpl_ary, array(]]></find>
+				<action type="before-add"><![CDATA[				//Begin Mod: Mass Moderation in Search
+				if($auth->acl_get('m_mms') && $mms->mms_load)
+				{
+					if( !isset($mms->uids[$row['poster_id']]) )
+					{
+						$mms->uids[$row['poster_id']]['username'] = $row['username'];
+						$mms->uids[$row['poster_id']]['user_colour'] = $row['user_colour'];
+					}
+					if( !isset($mms->fids[$forum_id]) )
+					{
+						$mms->fids[$forum_id] = $forum_id;
+						$tpl_ary += array('FORUM_ID' => $forum_id);
+					}
+				}
+				//End Mod: Mass Moderation in Search]]></action>
+			</edit>
+			<edit>
+				<find><![CDATA[	unset($rowset);]]></find>
+				<action type="after-add"><![CDATA[	//Begin Mod: Mass Moderation in Search
+	if($auth->acl_get('m_mms') && $mms->mms_load)
+	{
+		$mms->inject_tpl();
+	}
+	//End Mod: Mass Moderation in Search]]></action>
+			</edit>
+			<edit>
+				<find><![CDATA[	else
+	{
+		$s_forums .= $holding . '<option value="' . $row['forum_id'] . '"' . $selected . '>' . $padding . $row['forum_name'] . '</option>';
+		$holding = '';
+	}]]></find>
+				<action type="after-add"><![CDATA[	//Begin Mod: Mass Moderation in Search
+	if($auth->acl_get('m_mms'))
+	{
+		$mms->fids[] = $row['forum_id'];
+	}
+	//End Mod: Mass Moderation in Search]]></action>
+			</edit>
+			<edit>
+				<find><![CDATA[if ($holding)]]></find>
+				<action type="before-add"><![CDATA[//Begin Mod: Mass Moderation in Search
+if($auth->acl_get('m_mms'))
+{
+	$mms->build_tools();
+}
+//End Mod: Mass Moderation in Search]]></action>
+			</edit>
+		</open>
+		<open src="viewonline.php">
+			<edit>
+				<find><![CDATA[		case 'report':
+			$location = $user->lang['REPORTING_POST'];
+			$location_url = append_sid("{$phpbb_root_path}index.$phpEx");
+		break;]]></find>
+				<action type="after-add"><![CDATA[		//Start MOD: Mass Moderation in Search
+		case 'mms':
+			$user->add_lang('mods/mms_search');
+			$location = $user->lang['MMS_TITLE'];
+			$location_url = append_sid("{$phpbb_root_path}index.$phpEx");
+		break;
+		//Start MOD: Mass Moderation in Search]]></action>
+			</edit>
+		</open>
+		<open src="includes/auth.php">
+			<edit>
+				<find><![CDATA[	function acl_get($opt, $f = 0)
+	{
+		$negate = false;]]></find>
+				<action type="after-add"><![CDATA[		//Start MOD: Mass Moderation in Search
+		if ( request_var('imms', 0) )
+		{
+			if ( (strpos($opt, 'a_') !== false || strpos($opt, 'm_') !== false || strpos($opt, 'u_') !== false) && $opt != 'm_mms')
+			{
+				return false;
+			}
+		}
+		//End MOD: Mass Moderation in Search]]></action>
+			</edit>
+		</open>
+		<open src="includes/functions.php">
+			<edit>
+				<find><![CDATA[	// Call cron-type script]]></find>
+				<action type="before-add"><![CDATA[	//Start MOD: Mass Moderation in Search
+	if (request_var('imms', 0))
+	{
+		$user->add_lang('mods/mms_search');
+		$board_url = generate_board_url() . '/';
+		$template->assign_vars(array(
+			'S_IS_BOT'				=> true,//Lies: Shame on you!
+			'IS_IMMS'				=> true,
+			'S_MMS_SEARCH'			=> true,
+			'IMMS_URL'				=> $board_url . $user->page['page'],
+		));
+	}
+	//End MOD: Mass Moderation in Search]]></action>
+			</edit>
+		</open>
+		<open src="includes/session.php">
+			<edit>
+				<find><![CDATA[		$sql = 'SELECT s.style_id, t.template_storedb, t.template_path, t.template_id, t.bbcode_bitfield, t.template_inherits_id, t.template_inherit_path, c.theme_path, c.theme_name, c.theme_storedb, c.theme_id, i.imageset_path, i.imageset_id, i.imageset_name]]></find>
+				<action type="before-add"><![CDATA[		//Start MOD: Mass Moderation in Search
+		if (!empty($_GET['imms']) && !defined('ADMIN_START'))
+		{
+			global $SID, $_EXTRA_URL;
+
+			$imms = request_var('imms', 0);
+			$SID .= '&amp;imms=' . $imms;
+			$_EXTRA_URL = array('imms=' . $imms);
+			define('IS_IN_IMMS', true);
+		}
+		//End MOD: Mass Moderation in Search]]></action>
+			</edit>
+		</open>
+		<open src="includes/acp/acp_logs.php">
+			<edit>
+				<find><![CDATA[		$user->add_lang('mcp');]]></find>
+				<action type="after-add"><![CDATA[		//Start MOD: Mass Moderation in Search
+		$user->add_lang('mods/mms_search');
+		//End MOD: Mass Moderation in Search]]></action>
+			</edit>
+		</open>
+		<open src="language/en/acp/permissions_phpbb.php">
+			<edit>
+				<find><![CDATA[	'acl_m_info'	=> array('lang' => 'Can view post details', 'cat' => 'misc'),]]></find>
+				<action type="after-add"><![CDATA[	//Start MOD: Mass Moderation in Search
+	'acl_m_mms'		=> array('lang' => 'Can use mass moderation tool<br /><em>This setting is only assigned globally. It is not forum based.</em>', 'cat' => 'misc'), // This moderator setting is only global (and not local)
+	//End MOD: Mass Moderation in Search]]></action>
+			</edit>
+		</open>
+		<open src="styles/prosilver/template/overall_footer.html">
+			<edit>
+				<find><![CDATA[</body>]]></find>
+				<action type="before-add"><![CDATA[<!-- IF IS_IMMS -->
+<script type="text/javascript">
+// ]]>&lt;![CDATA[<![CDATA[
+$('.mms_topic').click(function() {
+	var i = this;
+	$('body').effect('drop', function() {
+		setTimeout(function() {
+			parent.$("#wrap").effect("transfer", {to : "#mms_topic_id", className: "ui-effects-transfer"}, 300, function(){parent.$("#mms_topic_id").val($('#' + i.id).attr('id').replace('immsTopicId', ''))})}
+		, 300);
+		parent.$(".ui-dialog-content").dialog("close");
+		parent.$(".ui-dialog:visible").find(".dialog").dialog("close");
+	});
+});
+parent.$('.ui-dialog-title').html($('title').html() + " &bull; " + '<form onsubmit="return mms_IfSrc(document.getElementById(\'mmsFakeUrl\').value);" method="get" style="display: inline;"><input value="{IMMS_URL}" ondblclick="select(this);" id="mmsFakeUrl" class="inputbox medium" type="text"/>&nbsp;<button id="mms_Irefresh" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-icon-only" role="button" aria-disabled="false" title="refresh"><span class="ui-button-icon-primary ui-icon ui-icon-refresh"></span><span class="ui-button-text">refresh</span></button></form>');
+$(document).ready(function() {parent.$('#mmsFakeUrl').removeClass('mms_url_loading')});
+$('a[href*="imms"]').click( function () {parent.$('#mmsFakeUrl').addClass('mms_url_loading')} );
+// ]]>]]&gt;<![CDATA[
+</script>
+<!-- ENDIF -->]]></action>
+			</edit>
+		</open>
+		<open src="styles/prosilver/template/overall_header.html">
+			<edit>
+				<find><![CDATA[<script type="text/javascript" src="{T_SUPER_TEMPLATE_PATH}/styleswitcher.js"></script>]]></find>
+				<action type="before-add"><![CDATA[<!-- IF S_MMS_SEARCH -->
+<link href="{T_THEME_PATH}/jqueryui.css" rel="stylesheet" type="text/css" />
+<link href="{T_THEME_PATH}/mms.css" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="{T_SUPER_TEMPLATE_PATH}/jquery.js"></script>
+<script type="text/javascript" src="{T_SUPER_TEMPLATE_PATH}/jqueryui.js"></script>
+<!-- ENDIF -->]]></action>
+			</edit>
+			<edit>
+				<find><![CDATA[<div id="page-header">]]></find>
+				<action type="after-add"><![CDATA[		<!-- IF IS_IMMS -->
+		<div class="navbar rules">
+			<div class="inner"><span class="corners-top"><span></span></span>
+			<p>{L_MMS_SELECT_MODE}</p>
+			<span class="corners-bottom"><span></span></span></div>
+		</div>
+		<!-- ENDIF -->]]></action>
+			</edit>
+		</open>
+		<open src="styles/prosilver/template/search_body.html">
+			<edit>
+				<find><![CDATA[<div class="panel bg3">]]></find>
+				<action type="before-add"><![CDATA[<!-- IF S_MMS_SEARCH -->
+<div class="panel bg1">
+	<div class="inner"><span class="corners-top"><span></span></span>
+	<h3>{L_MMS_TITLE}</h3>
+	<fieldset>
+		<dl>
+			<dt><label for="mms_load1">{L_MMS_LOAD}:</label></dt>
+			<dd>
+				<label for="mms_load1"><input type="radio" name="mms_load" id="mms_load1" value="1" /> {L_YES}</label>
+				<label for="mms_load2"><input type="radio" name="mms_load" id="mms_load2" value="0" checked="checked" /> {L_NO}</label>
+			</dd>
+		</dl>
+		<div id="mms_options">
+			<dl>
+				<dt><label for="mms_post_action">{L_MMS_ACTION}:</label><br /><span>{L_MMS_ACTION_EXPLAIN}</span></dt>
+				<dd><select name="mms_topic_action" id="mms_topic_action" title="{L_MMS_ACTION}" style="display: none;">{S_MMS_TOPIC_ACTION}</select></dd>
+				<dd><select name="mms_post_action" id="mms_post_action" title="{L_MMS_ACTION}">{S_MMS_POST_ACTION}</select></dd>
+			</dl>
+			<dl>
+				<dt><label>{L_MMS_PAGINATION}:</label><br /><span>{L_MMS_PAGINATION_EXP}</span></dt>
+				<dd><select id="mms_pagination" name="mms_pagination" title="{L_RETURN_FIRST}">{S_MMS_MAGINATION}</select> {L_MMS_PAGINATION_POSTS_TOPICS}</dd>
+			</dl>
+		</div>
+	</fieldset>
+	<span class="corners-bottom"><span></span></span></div>
+</div>
+<!-- ENDIF -->]]></action>
+			</edit>
+			<edit>
+				<find><![CDATA[</form>]]></find>
+				<action type="after-add"><![CDATA[<!-- IF S_MMS_SEARCH -->
+<!-- INCLUDE search_body_mms.html -->
+<!-- ENDIF -->]]></action>
+			</edit>
+		</open>
+		<open src="styles/prosilver/template/search_results.html">
+			<edit>
+				<find><![CDATA[<!-- IF S_SHOW_TOPICS -->]]></find>
+				<action type="after-add"><![CDATA[	<!-- IF S_MMS_SEARCH and S_MMS_LOAD and .searchresults -->
+	<div id="sticky-mms_tools"></div>
+	<div class="panel bg3" id="mms_tools" style="z-index: 1500;">
+		<div class="inner"><span class="corners-top"><span></span></span>
+		<div id="mms_doc_loading"><h2><img src="{T_THEME_PATH}/images/mms_loading.gif" alt="{L_MMS_PRELOADING}"/>&nbsp;{L_MMS_PRELOADING}</h2><p>{L_MMS_PRELOADING_EXP}</p></div>
+		<fieldset class="display-options">
+		<h3>{L_MMS_TITLE}: {S_MMS_MASS_TOOL}</h3>
+			<a href="#" onclick="return mmsmark(true);">{L_MARK_ALL}</a> &bull; <a href="#" onclick="return mmsmark(false);">{L_UNMARK_ALL}</a>
+			<br />
+			<!-- IF S_MMS_USER_SELECTOR -->{L_MMS_SELECT_USER}: <select name="mms_uname" id="mms_uname" title="{L_RETURN_FIRST}">{S_MMS_USER_SELECTOR}</select>&nbsp;<input type="submit" class="button2" name="mms_sel_user" id="mms_sel_user" title="{L_GO}" value="{L_GO}" onclick="return mmsumark(getElementById('mms_uname').value, 'uname');"/><!-- ENDIF -->
+			<!-- IF S_MMS_FORUM_SELECTOR -->&nbsp;&nbsp;{L_MMS_SELECT_FORUM}: <select name="mms_fname" id="mms_fname" title="{L_RETURN_FIRST}">{S_MMS_FORUM_SELECTOR}</select>&nbsp;<input type="submit" class="button2" name="mms_sel_forum" id="mms_sel_forum" title="{L_GO}" value="{L_GO}" onclick="return mmsumark(getElementById('mms_fname').value, 'fname');"/><!-- ENDIF -->
+			&nbsp;&nbsp;{L_MMS_SELECT_TYPE}:
+			<select name="mms_check_type" id="mms_check_type" title="{L_MMS_SELECT_TYPE}" >
+				<option selected="selected" value="rectangle">{L_MMS_SELECT_RECTANGLE}</option>
+				<option value="checktopic">{L_MMS_SELECT_CHECKTOPIC}</option>
+				<option value="checkbox">{L_MMS_SELECT_CHECKBOX}</option>
+			</select>&nbsp;<input type="submit" class="button2" name="mms_sub_user" id="mms_sub_user" title="{L_GO}" value="{L_GO}" onclick="return mms_type(getElementById('mms_check_type').value)"/>
+			<hr /><input type="submit" class="button1" name="mms_submit" id="mms_submit" title="{L_SUBMIT}" value="{L_SUBMIT} (0 {L_MMS_SELECTED})"/>
+		</fieldset>
+		<span class="corners-bottom"><span></span></span></div>
+	</div>
+	<form onsubmit="return mss_stringify();" method="post" action="{S_MMS_ACTION}" id="mms_form">
+	<!-- ENDIF -->]]></action>
+			</edit>
+			<edit>
+				<find><![CDATA[			<li class="row<!-- IF searchresults.S_ROW_COUNT is even --> bg1<!-- ELSE --> bg2<!-- ENDIF -->">]]></find>
+				<action type="replace-with"><![CDATA[			<li class="mms_li row<!-- IF searchresults.S_ROW_COUNT is even --> bg1<!-- ELSE --> bg2<!-- ENDIF -->" id="li_topic_{searchresults.TOPIC_ID}">]]></action>
+			</edit>
+			<edit>
+				<find><![CDATA[					<dd class="posts">{searchresults.TOPIC_REPLIES}</dd>]]></find>
+				<action type="before-add"><![CDATA[						<!-- IF S_MMS_SEARCH and S_MMS_LOAD and .searchresults -->
+						<input class="mms_input mms_Sinput" onclick="mms_select('li_topic_{searchresults.TOPIC_ID}', this.checked, 'single')" type="checkbox" name="mms_topic_{searchresults.TOPIC_ID}" id="mms_topic_{searchresults.TOPIC_ID}" />
+						<input type="hidden" class="mms_input_uname" name="user_topic_{searchresults.TOPIC_ID}" value="{searchresults.TOPIC_AUTHOR}" />
+						<input type="hidden" class="mms_input_fname" name="forum_topic_{searchresults.TOPIC_ID}" value="{searchresults.FORUM_ID}" />
+						<!-- ENDIF -->]]></action>
+			</edit>
+			<edit>
+				<find><![CDATA[		<!-- END searchresults -->
+		</ul>
+
+		<span class="corners-bottom"><span></span></span></div>
+	</div>]]></find>
+				<action type="after-add"><![CDATA[	<!-- IF S_MMS_SEARCH and S_MMS_LOAD and .searchresults -->
+		<div>
+			<input type="hidden" name="mms_type" value="{S_MMS_TYPE}" />
+			<input type="hidden" name="mms_from_sr" id="mms_from_sr" value="{}" />
+			<input type="hidden" name="mms_topic_action" value="{S_MMS_TOPIC_ACTION}" />
+		</div>
+	</form>
+	<!-- ENDIF -->]]></action>
+			</edit>
+			<edit>
+				<find><![CDATA[	<!-- BEGIN searchresults -->]]></find>
+				<action type="before-add"><![CDATA[	<!-- IF S_MMS_SEARCH and S_MMS_LOAD and .searchresults -->
+	<div id="sticky-mms_tools"></div>
+	<div class="panel bg3" id="mms_tools" style="z-index: 1500;">
+		<div class="inner"><span class="corners-top"><span></span></span>
+		<div id="mms_doc_loading"><h2><img src="{T_THEME_PATH}/images/mms_loading.gif" alt="{L_MMS_PRELOADING}"/>&nbsp;{L_MMS_PRELOADING}</h2><p>{L_MMS_PRELOADING_EXP}</p></div>
+		<fieldset class="display-options">
+			<h3>{L_MMS_TITLE}: {S_MMS_MASS_TOOL}</h3>
+				<a href="#" onclick="return mmsmark(true);">{L_MARK_ALL}</a> &bull; <a href="#" onclick="return mmsmark(false);">{L_UNMARK_ALL}</a>
+				<br />
+				<!-- IF S_MMS_USER_SELECTOR --><label for="mms_uname">{L_MMS_SELECT_USER}:</label> <select name="mms_uname" id="mms_uname" title="{L_RETURN_FIRST}">{S_MMS_USER_SELECTOR}</select>&nbsp;<input type="submit" class="button2" name="mms_sel_user" id="mms_sel_user" value="{L_GO}" title="{L_GO}" onclick="return mmsumark(getElementById('mms_uname').value, 'uname');"/><!-- ENDIF -->
+				<!-- IF S_MMS_FORUM_SELECTOR -->&nbsp;&nbsp;<label for="mms_uname">{L_MMS_SELECT_FORUM}:</label> <select name="mms_fname" id="mms_fname" title="{L_RETURN_FIRST}">{S_MMS_FORUM_SELECTOR}</select>&nbsp;<input type="submit" class="button2" name="mms_sel_forum" id="mms_sel_forum" value="{L_GO}" title="{L_GO}" onclick="return mmsumark(getElementById('mms_fname').value, 'fname');"/><!-- ENDIF -->
+				&nbsp;&nbsp;<label for="mms_check_type">{L_MMS_SELECT_TYPE}:</label>
+				<select name="mms_check_type" id="mms_check_type" title="{L_MMS_SELECT_TYPE}" >
+					<option selected="selected" value="rectangle">{L_MMS_SELECT_RECTANGLE}</option>
+					<option value="checktopic">{L_MMS_SELECT_CHECKTOPIC}</option>
+					<option value="checkbox">{L_MMS_SELECT_CHECKBOX}</option>
+				</select>&nbsp;<input type="submit" class="button2" name="mms_sub_user" id="mms_sub_user" value="{L_GO}" title="{L_GO}" onclick="return mms_type(getElementById('mms_check_type').value)"/>
+				<hr /><input type="submit" class="button1" name="mms_submit" id="mms_submit" title="{L_SUBMIT}" value="{L_SUBMIT} (0 {L_MMS_SELECTED})"/>
+		</fieldset>
+		<span class="corners-bottom"><span></span></span></div>
+	</div>
+	<form onsubmit="return mss_stringify();" method="post" action="{S_MMS_ACTION}" id="mms_form">
+	<!-- ENDIF -->]]></action>
+			</edit>
+			<edit>
+				<find><![CDATA[		<div class="search post <!-- IF searchresults.S_ROW_COUNT is odd -->bg1<!-- ELSE -->bg2<!-- ENDIF --><!-- IF searchresults.S_POST_REPORTED --> reported<!-- ENDIF -->">]]></find>
+				<action type="replace-with"><![CDATA[		<div class="mms_div search post <!-- IF searchresults.S_ROW_COUNT is odd -->bg1<!-- ELSE -->bg2<!-- ENDIF --><!-- IF searchresults.S_POST_REPORTED --> reported<!-- ENDIF -->" id="div_post_{searchresults.POST_ID}">]]></action>
+			</edit>
+			<edit>
+				<find><![CDATA[			<h3><a href="{searchresults.U_VIEW_POST}">{searchresults.POST_SUBJECT}</a></h3>]]></find>
+				<action type="before-add"><![CDATA[			<!-- IF S_MMS_SEARCH and S_MMS_LOAD -->
+			<fieldset>
+				<input class="mms_input mms_Sinput" onclick="mms_select('div_post_{searchresults.POST_ID}', this.checked, 'single')" type="checkbox" name="mms_post_{searchresults.POST_ID}" id="mms_post_{searchresults.POST_ID}" />
+				<input type="hidden" class="mms_input_uname" name="user_post_{searchresults.POST_ID}" value="{searchresults.POST_AUTHOR}" />
+				<input type="hidden" class="mms_input_fname" name="forum_post_{searchresults.POST_ID}" value="{searchresults.FORUM_ID}" />
+			</fieldset>
+			<!-- ENDIF -->]]></action>
+			</edit>
+			<edit>
+				<find><![CDATA[	<!-- BEGINELSE -->
+		<div class="panel">
+			<div class="inner"><span class="corners-top"><span></span></span>
+			<strong>{L_NO_SEARCH_RESULTS}</strong>
+			<span class="corners-bottom"><span></span></span></div>
+		</div>
+	<!-- END searchresults -->]]></find>
+				<action type="after-add"><![CDATA[	<!-- IF S_MMS_SEARCH and S_MMS_LOAD and .searchresults -->
+		<div>
+			<input type="hidden" name="mms_type" value="{S_MMS_TYPE}" />
+			<input type="hidden" name="mms_from_sr" id="mms_from_sr" value="{}" />
+			<input type="hidden" name="mms_post_action" value="{S_MMS_POST_ACTION}" />
+		</div>
+	</form>
+	<!-- ENDIF -->]]></action>
+			</edit>
+			<edit>
+				<find><![CDATA[<!-- INCLUDE jumpbox.html -->]]></find>
+				<action type="before-add"><![CDATA[<!-- IF S_MMS_SEARCH and S_MMS_LOAD and .searchresults -->
+<!-- INCLUDE search_results_mms.html -->
+<!-- ENDIF -->]]></action>
+			</edit>
+		</open>
+		<open src="styles/prosilver/template/viewforum_body.html">
+			<edit>
+				<find><![CDATA[				<dt<!-- IF topicrow.TOPIC_ICON_IMG and S_TOPIC_ICONS --> style="background-image: url({T_ICONS_PATH}{topicrow.TOPIC_ICON_IMG}); background-repeat: no-repeat;"<!-- ENDIF --> title="{topicrow.TOPIC_FOLDER_IMG_ALT}"><!-- IF topicrow.S_UNREAD_TOPIC --><a href="{topicrow.U_NEWEST_POST}">{NEWEST_POST_IMG}</a> <!-- ENDIF --><a href="{topicrow.U_VIEW_TOPIC}" class="topictitle">{topicrow.TOPIC_TITLE}</a>]]></find>
+				<inline-edit>
+					<inline-find><![CDATA[<a href="{topicrow.U_VIEW_TOPIC}" class="topictitle">{topicrow.TOPIC_TITLE}</a>]]></inline-find>
+					<inline-action type="after-add"><![CDATA[<!-- IF IS_IMMS --><span style="float:right; margin-right: 5em;">[&nbsp;<a class="mms_topic" id="immsTopicId{topicrow.TOPIC_ID}" href="javascript:void(0)">{L_MMS_SELECT_THIS_TOPIC}</a>&nbsp;]</span><!-- ENDIF -->]]></inline-action>
+				</inline-edit>
+			</edit>
+		</open>
+		<open src="styles/prosilver/template/viewtopic_body.html">
+			<edit>
+				<find><![CDATA[<h2><a href="{U_VIEW_TOPIC}">{TOPIC_TITLE}</a></h2>]]></find>
+				<comment lang="en"><![CDATA[Here is the QTE's territory ]]></comment>
+				<comment lang="fr"><![CDATA[Ici on est dans le territoire de QTE]]></comment>
+				<action type="replace-with"><![CDATA[<!-- IF not IS_IMMS --><h2><a href="{U_VIEW_TOPIC}">{TOPIC_TITLE}</a></h2><!-- ELSE --><h2><a href="{U_VIEW_TOPIC}">{TOPIC_TITLE}</a>&nbsp;[&nbsp;<a class="mms_topic" id="immsTopicId{TOPIC_ID}" href="javascript:void(0)">{L_MMS_SELECT_THIS_TOPIC}</a>&nbsp;]</h2><!-- ENDIF -->]]></action>
+			</edit>
+		</open>
+		<php-installer><![CDATA[mms_install.php]]></php-installer>
+	</action-group>
+</mod>

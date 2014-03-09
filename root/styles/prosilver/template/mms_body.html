@@ -1,0 +1,970 @@
+<!-- IF not S_MMS_AJAX_UPDATE -->
+<!-- INCLUDE overall_header.html -->
+<h2>{L_MMS_TITLE}</h2>
+<div id="tabs">
+	<ul>
+		<li class="activetab"><a href="javascript:void(0);"><span>{S_MMS_MASS_TOOL}</span></a></li>
+	</ul>
+</div>
+
+<div class="panel bg3">
+	<div class="inner"><span class="corners-top"><span></span></span>
+	<div id="mms_doc_loading">
+		<h2><img src="{T_THEME_PATH}/images/mms_loading.gif" alt="{L_MMS_PRELOADING}"/>&nbsp;{L_MMS_PRELOADING}</h2><p>{L_MMS_PRELOADING_EXP}</p>
+	</div>
+	<div style="width: 100%;">
+
+	<div id="cp-menu">
+		<div id="navigation">
+			<ul>
+				<li id="active-subsection"><a href="javascript:void(0);" id="li_mms_left" class="mms_li"><span>{L_MMS_LEFT}</span>&nbsp;<span id="spanli_left_count"><!-- IF MMS_ROWS_COUNT -->({MMS_ROWS_COUNT})<!-- ELSE -->(0)<!-- ENDIF --></span></a></li>
+				<li><a href="javascript:void(0);" id="li_mms_treated" class="mms_li"><span>{L_MMS_TREAT}</span>&nbsp;<span id="spanli_treat_count">(0)</span></a></li>
+				<li><a href="javascript:void(0);" id="li_mms_failed" class="mms_li"><span>{L_MMS_FAIL}</span>&nbsp;<span id="spanli_fail_count"><!-- IF MMS_ROWS_FAIL_COUNT -->({MMS_ROWS_FAIL_COUNT})<!-- ELSE -->(0)<!-- ENDIF --></span></a></li>
+			</ul>
+		</div>
+		<div id="sticky-mms_tools" class="cp-mini"></div>
+		<div class="cp-mini" id="mms_tools">
+			<div class="inner"><span class="corners-top"><span></span></span>
+				<dl class="mini">
+					<dt style="text-decoration: underline;">{L_MMS_PREVIEW}:</dt>
+					<dd id="mms_preview">-</dd>
+				</dl>
+			<span class="corners-bottom"><span></span></span></div>
+		</div>
+	</div>
+		<div id="cp-main" class="mcp-main">
+					<!-- IF MMS_ROWS_COUNT -->
+				<div class="panel">
+					<div class="inner"><span class="corners-top"><span></span></span>
+						<fieldset class="display-options" style="min-height:120px;">
+							<div class="rules">
+								<span class="corners-top"><span></span></span>
+								<span class="ui-icon ui-icon-alert mms_Qicon"></span>
+								{L_MMS_WARNING_ACTION}
+								<span class="corners-bottom"><span></span></span>
+							</div>
+							<div id="progressbar" style="width: 100%; position: relative;"><span id="progressbar_text" style="position: absolute; text-align: center; width: inherit;"></span></div>
+							<span id="mms_statut"></span><br />
+							<!-- IF (MMS_ACTION == 'move' or MMS_ACTION == 'fork') and S_MMS_TYPE == 'topic' -->
+							<div id="mms_forum_div"><label for="mms_forum_id"><strong>{L_MMS_FORUM_ID}:</strong>&nbsp;<select name="mms_forum_id" id="mms_forum_id">{S_MMS_FORUM_OPTIONS}</select></label></div>
+							<!-- ELSEIF MMS_ACTION == 'options' and S_MMS_TYPE == 'post' -->
+							<div id="mms_post_options_div"><label for="mms_post_options"><strong>{L_MMS_POSTS_OPTIONS_EXP}:</strong>&nbsp;<select name="mms_post_options" id="mms_post_options">{S_MMS_POST_OPTIONS_ACTION}</select></label></div>
+							<!-- ELSEIF (MMS_ACTION == 'move' and S_MMS_TYPE == 'post') or (MMS_ACTION == 'merge' and S_MMS_TYPE == 'topic') -->
+							<div id="mms_topic_div">
+								<form action="javascript:void(0)" method="post" onsubmit="init_confirm();return false;" id="mms_form_topic_id">
+									<fieldset><label for="mms_topic_id"><strong>{L_MMS_TOPIC_ID}:</strong>&nbsp;<input type="text" class="inputbox autowidth" name="mms_topic_id" id="mms_topic_id" size="8" title="{L_MMS_TOPIC_ID_EXP}" /></label></fieldset>
+									<p>[ <a href="javascript:void(0)" id="mms_find_topic">{L_MMS_FIND_TOPIC}</a> ]</p>
+								</form>
+							</div>
+							<!-- ELSEIF MMS_ACTION == 'chgposter' and S_MMS_TYPE == 'post' -->
+							<div id="mms_username_div">
+								<form action="javascript:void(0)" method="post" onsubmit="init_confirm();return false;" id="mms_form_username">
+									<fieldset><label for="mms_username"><strong>{L_MMS_USERNAME}:</strong>&nbsp;<input type="text" class="inputbox autowidth" name="mms_username" id="mms_username" size="20" title="{L_MMS_USERNAME_CASE}" /></label></fieldset>
+									<p>[&nbsp;<a href="{U_FIND_USERNAME}" onclick="find_username(this.href); return false;">{L_FIND_USERNAME}</a>&nbsp;]</p>
+								</form>
+							</div>
+							<!-- ELSEIF MMS_ACTION == 'chgicon' and S_MMS_TYPE == 'topic' -->
+							<div id="mms_icon_div">
+								<form action="javascript:void(0)" method="post" onsubmit="init_confirm();return false;" id="mms_form_icon_id">
+									<fieldset><label for="mms_icon_id_0">{L_MMS_TOPIC_ICON}:</label><hr />
+										<label for="mms_icon_id_0">
+											<input type="radio" class="mms_icon_id" name="mms_icon_id" id="mms_icon_id_0" value="0" checked="checked" style="cursor: pointer;" />&nbsp;{L_MMS_TOPIC_ICON_NO}
+										</label>
+										<!-- BEGIN topic_icon2 -->
+										<label for="mms_icon_id_{topic_icon2.ICON_ID}">
+											<input type="radio" class="mms_icon_id" name="mms_icon_id" id="mms_icon_id_{topic_icon2.ICON_ID}" value="{topic_icon2.ICON_ID}" style="cursor: pointer;" {topic_icon2.S_ICON_CHECKED} /><img src="{topic_icon2.ICON_IMG}" width="{topic_icon2.ICON_WIDTH}" height="{topic_icon2.ICON_HEIGHT}" alt="" title="" />
+										</label>
+										<!-- END topic_icon2 -->
+									</fieldset>
+								</form>
+							</div>
+							<!-- ELSEIF MMS_ACTION == 'attr' and S_MMS_TYPE == 'topic' -->
+							<div id="mms_attr_div">
+								<form action="javascript:void(0)" method="post" onsubmit="init_confirm();return false;" id="mms_form_attr">
+									<fieldset><label for="mms_addon_qte_id">{L_QTE_ATTRIBUTE}:</label>
+											<select name="mms_addon_qte_id" id="mms_addon_qte_id" style="max-width:200px;">
+												<option value="-1" style="padding-left:0px; font-weight:bold;">{L_QTE_ATTRIBUTE_REMOVE}</option>
+												<!-- BEGIN row -->
+												<option value="{row.QTE_ID}"{row.QTE_COLOUR}<!-- IF row.IS_SELECTED --> selected="selected"<!-- ENDIF -->>{row.QTE_NAME}<!-- IF row.S_QTE_DESC --> [{row.QTE_DESC}]<!-- ENDIF --></option>
+												<!-- END row -->
+											</select>
+									</fieldset>
+								</form>
+							</div>
+							<!-- ELSEIF MMS_ACTION == 'grabip' and S_MMS_TYPE == 'post' -->
+							<div id="mms_grabip_div" class="mms_hidden">
+								<h4>{L_MMS_IPS_GRABBED}:</h4>
+								<textarea title="{L_MMS_GRAB_EXP}" readonly="readonly" ondblclick="select(this)" rows="1" name="grabbedip" id="grabbedip" class="mms_title inputbox mms_tiny"></textarea>
+							</div>
+							<!-- ENDIF -->
+							<strong class="mms_hidden error">
+								<br /><a href="javascript:confirmAbort('{LA_MMS_EXIT_ALERT}')">[ {L_MMS_ABORT} ]</a>
+							</strong>
+							<br /><div style="float: right;display: none;margin-top: -40px;">{L_MMS_LOADAVG} <span style="cursor: help;" class="mms_title" title="{L_MMS_LOADAVG_EXP}">[?]</span> <div id="loadavgbar" style="width: 200px; position: relative;"><span id="loadavgbar_text" style="position: absolute; text-align: center; width: inherit;"></span></div></div>
+							<div>
+								<hr />
+								<a class="button2" href="{S_MMS_ACTION_REDIRECT}">{L_CANCEL}</a>&nbsp;&nbsp;<a class="button1" id="mms_submit" href="javascript:void(0);"><strong>{L_SUBMIT}</strong></a>
+							</div>
+						</fieldset>
+					<span class="corners-bottom"><span></span></span></div>
+				</div>
+				<!-- ELSE -->
+				<div class="panel">
+					<div class="inner"><span class="corners-top"><span></span></span>
+						<p>{L_MMS_LEFTNO}</p>
+					<span class="corners-bottom"><span></span></span></div>
+				</div>
+				<!-- ENDIF -->
+			<div id="div_mms_left">
+				<h2>{L_MMS_LEFT}&nbsp;<span id="spandiv_left_count"><!-- IF MMS_ROWS_COUNT -->({MMS_ROWS_COUNT})<!-- ELSE -->(0)<!-- ENDIF --></span></h2>
+				<!-- BEGIN mms_row -->
+					<div class="panel" id="div_row_id<!-- IF S_MMS_TYPE == 'post' -->{mms_row.POST_ID}<!-- ELSE -->{mms_row.TOPIC_ID}<!-- ENDIF -->"<!-- IF mms_row.S_ROW_COUNT > 49 --> style="display: none;"<!-- ENDIF -->>
+						<div class="inner"><span class="corners-top"><span></span></span>
+						<h3>#{mms_row.S_MMS_ROW_COUNT} {S_ROW_TYPE}: <a href="javascript:mmsIpreview('{mms_row.FULL_URL}', '{L_MMS_PREV}: {mms_row.ROW_TITLE}')" class="mms_wo" title="{mms_row.ROW_TITLE}">{mms_row.ROW_TITLE}</a>&nbsp;<span style="cursor: help;" class="mms_tooltip" id="span_row_id<!-- IF S_MMS_TYPE == 'post' -->{mms_row.POST_ID}<!-- ELSE -->{mms_row.TOPIC_ID}<!-- ENDIF -->">[?]<span title="{mms_row.TEXT_CONTENT}"></span></span><a style="float: right;" class="mms_top" href="javascript:void(0);">{L_MMS_CHAR_TOP}</a>&nbsp;<a style="float: right;" class="mms_bottom" href="javascript:void(0);">{L_MMS_CHAR_BOTTOM}</a></h3>
+						<span>{L_POST_BY_AUTHOR}: {mms_row.FULL_USER}</span>
+						<br /><span>{mms_row.ROW_TIME}</span>
+						<strong class="error"></strong>
+						<span class="corners-bottom"><span></span></span></div>
+					</div>
+				<!-- END mms_row -->
+				<!-- IF .mms_row > 49 -->
+				<div class="panel" id="mms_showToleft">
+					<div class="inner"><span class="corners-top"><span></span></span>
+					<fieldset class="display-options">
+						<a href="javascript:mms_showLess('left')" class="left">{L_MMS_VIEW_LESS}</a>&nbsp;&bull;&nbsp;<a href="javascript:mms_showMore('left')" class="right">{L_MMS_VIEW_MORE}</a>
+						<br /><a class="button2" href="javascript:mms_showReset('left')">{L_RESET}</a>&nbsp;<a class="button2" href="javascript:mms_showAll('left')">{L_MMS_VIEW_ALL}</a>
+					</fieldset>
+					<span class="corners-bottom"><span></span></span></div>
+				</div>
+				<!-- ENDIF -->
+			</div>
+			<div id="div_mms_treated" style="display: none;">
+				<h2>{L_MMS_TREAT}&nbsp;<span id="spandiv_treated_count">(0)</span></h2>
+				<div class="panel">
+					<div class="inner"><span class="corners-top"><span></span></span>
+						<p>{L_MMS_TREATED}</p>
+					<span class="corners-bottom"><span></span></span></div>
+				</div>
+				<div class="panel" id="mms_showTotreated" style="display: none;">
+					<div class="inner"><span class="corners-top"><span></span></span>
+					<fieldset class="display-options">
+						<a href="javascript:mms_showLess('treated')" class="left">{L_MMS_VIEW_LESS}</a>&nbsp;&bull;&nbsp;<a href="javascript:mms_showMore('treated')" class="right">{L_MMS_VIEW_MORE}</a>
+						<br /><a class="button2" href="javascript:mms_showReset('treated')">{L_RESET}</a>&nbsp;<a class="button2" href="javascript:mms_showAll('treated')">{L_MMS_VIEW_ALL}</a>
+					</fieldset>
+					<span class="corners-bottom"><span></span></span></div>
+				</div>
+			</div>
+			<div id="div_mms_failed" style="display: none;">
+				<h2>{L_MMS_FAIL}&nbsp;<span id="spandiv_failed_count"><!-- IF MMS_ROWS_FAIL_COUNT -->({MMS_ROWS_FAIL_COUNT})<!-- ELSE -->(0)<!-- ENDIF --></span></h2>
+				<!-- IF .mms_fail_row -->
+					<!-- BEGIN mms_fail_row -->
+						<div class="panel" id="div_row_id<!-- IF S_MMS_TYPE == 'post' -->{mms_fail_row.POST_ID}<!-- ELSE -->{mms_fail_row.TOPIC_ID}<!-- ENDIF -->"<!-- IF mms_fail_row.S_ROW_COUNT > 49 --> style="display: none;"<!-- ENDIF -->>
+							<div class="inner"><span class="corners-top"><span></span></span>
+							<h3>#{mms_fail_row.S_MMS_ROW_COUNT} {S_ROW_TYPE}: <a href="<!-- IF mms_fail_row.IS_VIEWABLE -->javascript:mmsIpreview('{mms_fail_row.FULL_URL}', '{L_MMS_PREV}: {mms_fail_row.ROW_TITLE}')<!-- ELSE -->javascript:void(0);<!-- ENDIF -->" class="mms_wo" title="<!-- IF mms_fail_row.IS_VIEWABLE -->{mms_fail_row.ROW_TITLE}<!-- ELSE -->{L_MMS_PRIV}<!-- ENDIF -->"><!-- IF mms_fail_row.IS_VIEWABLE -->{mms_fail_row.ROW_TITLE}<!-- ELSE --><em>{L_MMS_PRIV}</em><!-- ENDIF --></a>&nbsp;<span style="cursor: help;" class="mms_tooltip" id="span_row_id<!-- IF S_MMS_TYPE == 'post' -->{mms_fail_row.POST_ID}<!-- ELSE -->{mms_fail_row.TOPIC_ID}<!-- ENDIF -->">[?]<span title="<!-- IF mms_fail_row.IS_VIEWABLE -->{mms_fail_row.TEXT_CONTENT}<!-- ELSE -->{L_MMS_PRIVATE}<!-- ENDIF -->"></span></span></h3>
+							<span>{L_POST_BY_AUTHOR}: {mms_fail_row.FULL_USER}</span>
+							<br /><span>{mms_fail_row.ROW_TIME}</span>
+							<br /><strong class="error"><em>{L_MMS_REASON}: {mms_fail_row.FAIL_REASON}</em></strong>
+							<span class="corners-bottom"><span></span></span></div>
+						</div>
+					<!-- END mms_fail_row -->
+				<!-- ELSE -->
+					<div class="panel">
+						<div class="inner"><span class="corners-top"><span></span></span>
+							<p>{L_MMS_FAILED}</p>
+						<span class="corners-bottom"><span></span></span></div>
+					</div>
+				<!-- ENDIF -->
+				<div class="panel" id="mms_showTofailed"<!-- IF not .mms_fail_row --> style="display: none;"<!-- ENDIF -->>
+					<div class="inner"><span class="corners-top"><span></span></span>
+					<fieldset class="display-options">
+						<a href="javascript:mms_showLess('failed')" class="left">{L_MMS_VIEW_LESS}</a>&nbsp;&bull;&nbsp;<a href="javascript:mms_showMore('failed')" class="right">{L_MMS_VIEW_MORE}</a>
+						<br /><a class="button2" href="javascript:mms_showReset('failed')">{L_RESET}</a>&nbsp;<a class="button2" href="javascript:mms_showAll('failed')">{L_MMS_VIEW_ALL}</a>
+					</fieldset>
+					<span class="corners-bottom"><span></span></span></div>
+				</div>
+			</div>
+			<div id="mms_iframe" style="overflow: hidden;"></div>
+		</div>
+	<div class="clear"></div>
+
+	</div>
+	<span class="corners-bottom"><span></span></span></div>
+</div>
+
+<script type="text/javascript">
+// <![CDATA[
+var mmsLang = {
+	"CANCEL" : "{LA_CANCEL}",
+	"CONFIRM" : "{LA_CONFIRM}",
+	"CONFIRM_OPERATION" : "{LA_CONFIRM_OPERATION}",
+	"INFORMATION" : "{LA_INFORMATION}",
+	"LEAVE_SHADOW" : "{LA_LEAVE_SHADOW}",
+	"MMS_ABORTED" : "{LA_MMS_ABORTED}",
+	"MMS_BAD_DATA_FORMAT" : "{LA_MMS_BAD_DATA_FORMAT}",
+	"MMS_CHRONO" : <!-- IF S_MMS_TYPE == 'post' -->"{LA_MMS_CHRONO_POSTS}"<!-- ELSE -->"{LA_MMS_CHRONO_TOPICS}"<!-- ENDIF -->,
+	"MMS_CONNECTION_FAIL" : "{LA_MMS_CONNECTION_FAIL}",
+	"MMS_DATA_INTERRUPTED" : "{LA_MMS_DATA_INTERRUPTED}",
+	"MMS_DATA_TERMINATED" : "{LA_MMS_DATA_TERMINATED}",
+	"MMS_DATA_SENDING" : "{LA_MMS_DATA_SENDING}",
+	"MMS_EXIT_ALERT" : "{LA_MMS_EXIT_ALERT}",
+	"MMS_HTML_DUMP" : "{LA_MMS_HTML_DUMP}",
+	"MMS_IGNORE" : "{LA_MMS_IGNORE}",
+	"MMS_IGNORED" : "{LA_MMS_IGNORED}",
+	"MMS_IPS_GRABBED" : "{LA_MMS_IPS_GRABBED}",
+	"MMS_MORE_INFORMATIONS" : "{LA_MMS_MORE_INFORMATIONS}",
+	"MMS_NOT_AVAILABLE" : "{LA_MMS_NOT_AVAILABLE}",
+	"MMS_OK" : "{LA_MMS_OK}",
+	"MMS_REASON" : "{LA_MMS_REASON}",
+	"MMS_SELECT_TOPIC" : "{LA_MMS_SELECT_TOPIC}",
+	"MMS_SHOW_POST_REASON" : "{LA_MMS_SHOW_POST_REASON}",
+	"MMS_SQL_QUERIES" : "{LA_MMS_SQL_QUERIES}",
+	"MMS_SQL_WARN" : "{LA_MMS_SQL_WARN}",
+	"MMS_STATUT" : "{LA_MMS_STATUT}",
+	"MMS_SUCCESS" : "{LA_MMS_SUCCESS}",
+	"MMS_TIMEOUT" : "{LA_MMS_TIMEOUT}",
+	"MMS_TIMEOUT_EXP" : "{LA_MMS_TIMEOUT_EXP}",
+	"MMS_TOPIC_ID_INVALID" : "{LA_MMS_TOPIC_ID_INVALID}",
+	"MMS_USERNAME_INVALID" : "{LA_MMS_USERNAME_INVALID}",
+	"NO" : "{LA_NO}",
+	"NO_FORUM" : "{LA_NO_FORUM}",
+	"SUBMIT" : "{LA_SUBMIT}",
+	"YES" : "{LA_YES}",
+	//Addons part
+	<!-- IF MMS_ACTION == 'attr' and S_MMS_TYPE == 'topic' -->
+	"QTE_ATTRIBUTE_UNSELECTED" : "{LA_QTE_ATTRIBUTE_UNSELECTED}",
+	<!-- ENDIF -->
+
+};
+var e_ary = {"a" : "mms_left" ,"b" : "mms_treated" ,"c" : "mms_failed"}, f_resync = {"f" : false, "t" : false, "s" : false, "u" : false}, f_data = {"f" : {}, "t" : {}, "s" : {}, "u" : {}}, rowAry = {MMS_JSON_ROW}, rowPackets = {S_MMS_AJAX_PACKETS}, rowTimeout = {S_MMS_MOD_TIMEOUT}, rowTime = 5, mms_treated = 0, mms_num_queries = 0, mms_failed = 0, mms_left = {MMS_ROWS_COUNT}, mmsIgnoreDirtyFlag = false;
+var snow = 0, mnow = 0, scounter = '', mcounter = '', user_pwd = '', pwd_confirmed = false, ajaxmms = '', fallback = '', mms_aborted = false, timer_started = false, mms_loading_src = '{T_THEME_PATH}/images/mms_loading.gif', squeries = mmsLang['MMS_SQL_QUERIES'];
+<!-- IF MMS_ACTION == 'move' or MMS_ACTION == 'fork' -->var mms_forum_id = 0<!-- IF S_MMS_TYPE == 'topic' -->, mms_shadow = 0<!-- ENDIF -->;<!-- ENDIF -->
+<!-- IF MMS_ACTION == 'chgposter' -->var username = 0;<!-- ENDIF -->
+<!-- IF MMS_ACTION == 'options' and S_MMS_TYPE == 'post' -->var option = '', reason = false;<!-- ENDIF -->
+<!-- IF MMS_ACTION == 'attr' and S_MMS_TYPE == 'topic' -->var attr_id = -1;<!-- ENDIF -->
+<!-- IF MMS_ACTION == 'attr' and S_MMS_TYPE == 'topic' --><!-- ENDIF -->
+<!-- IF (MMS_ACTION == 'move' and S_MMS_TYPE == 'post') or (MMS_ACTION == 'merge' and S_MMS_TYPE == 'topic') -->var mms_topic_id = 0;<!-- ENDIF -->
+<!-- IF MMS_ACTION == 'grabip' -->var grabebdIps = {}, grabbedip = '';<!-- ENDIF -->
+var result = mmsLang['MMS_CHRONO'];
+onload_functions.push('init()');
+window.history.forward(1);
+function init(){
+	$(document).ready(function (){
+		jQuery.browser = {};
+		//JQ 1.9...
+		jQuery.browser.msie = /msie/.test(navigator.userAgent.toLowerCase());
+		if ($.browser.msie) {
+			$('[href^="javascript:"]').bind('click.ignoreDirtyFlag', function () {
+				mmsIgnoreDirtyFlag = true;
+			});
+		}
+		$("#mms_doc_loading").fadeOut(800);
+		$(".mms_top").click(function (){
+			$('html, body').animate({
+				scrollTop: $("#top").offset().top
+			}, 800);
+		});
+		$(".mms_bottom").click(function (){
+			$('html, body').animate({
+				scrollTop: $("#bottom").offset().top
+			}, 800);
+		});
+	});
+	$('.rules').effect('bounce', { times: 10 , distance : '40'}, 1600);
+	mms_tooltip();
+	$(function () {
+		$(window).scroll(mms_stickMe);
+		mms_stickMe();
+	});
+	$(window).resize(function() {
+		mms_stickMe(true);
+	});
+	$(".mms_li").click(function() {
+		document.getElementById('active-subsection').id = '';
+		document.getElementById(this.id).parentNode.id = 'active-subsection';
+		for(key in e_ary){
+			if (e_ary[key] == this.id.replace('li_', '')){
+				$('#div_' + e_ary[key]).show('puf');
+			}else{
+				$('#div_' + e_ary[key]).hide('puf');
+			}
+		}
+	});
+	<!-- IF MMS_ACTION == 'grabip' -->
+	$('textarea').val('');
+	$('textarea').autosize();
+	$('#grabbedip').css({
+		"transition":" height 0.2s ease 0s",
+		"border-radius" : "5px",
+		"resize" : "none"
+	});
+	$('#mms_grabip_div').children('div').children('a:first').click(function (){
+		$('#grabbedip').css({"max-height": "", "height" : ""});
+	});
+	$('#mms_grabip_div').children('div').children('a:last').click(function (){
+		$('#grabbedip').css({"max-height": "300px", "height" : "300px"});
+	});
+	<!-- ENDIF -->
+	<!-- IF (MMS_ACTION == 'move' and S_MMS_TYPE == 'post') or (MMS_ACTION == 'merge' and S_MMS_TYPE == 'topic') -->
+	$('#mms_find_topic').click(function() {
+		$("#mms_iframe")
+		.html($('<iframe></iframe>')
+			.attr({ src : '{S_MMS_EXTRA_URL}', width : "100%", height : "100%", id : "mmsTopicIframe", name : "mmsTopicIframe"})
+			.css({border : '0px'})
+		)
+		.dialog({
+			modal: true, title: mmsLang['MMS_SELECT_TOPIC'], autoOpen: true, draggable: false,
+			height: ($(window).height() * 0.85),
+			width: ($(window).width() * 0.85),
+			show: {effect : 'drop'}
+		});
+	});
+	<!-- ENDIF -->
+	$('.mms_tooltip').click(function() {
+		$('#' + this.id).effect('transfer', {to: "#mms_preview", className: "ui-effects-transfer"}, 200, function() {
+			$('#mms_preview').html($('#' + this.id).children("span").attr('title'));
+			$('#mms_tools').effect('highlight', '', 600);
+		});
+	});
+	<!-- IF MMS_ACTION == 'fork' -->
+	mms_confirm(mmsLang['INFORMATION'], mmsLang['MMS_SQL_WARN'], true, 'rowTimeout = (rowTimeout * 100); rowPackets = Math.ceil(rowPackets / 2); rowTimeout = (rowTimeout * 2) ', '');
+	<!-- ENDIF -->
+	<!-- IF MMS_ACTION == 'chgposter' or ( (MMS_ACTION == 'move' and S_MMS_TYPE == 'post') or (MMS_ACTION == 'merge' and S_MMS_TYPE == 'topic') ) -->
+	$(function(){
+		$('#'+<!-- IF MMS_ACTION == 'chgposter' -->'mms_username'<!-- ELSEIF (MMS_ACTION == 'move' and S_MMS_TYPE == 'post') or (MMS_ACTION == 'merge' and S_MMS_TYPE == 'topic') -->'mms_topic_id'<!-- ENDIF -->).tooltip({
+			show: null,position: {my: "left top", at: "left bottom"},open: function( event, ui ) {
+				ui.tooltip.animate({ top: ui.tooltip.position().top + 15 }, 150 )
+			}
+		})
+	});
+	<!-- ENDIF -->
+	$('#mms_submit').click(function(){init_confirm()});
+}
+
+function mms_showAll(cat){
+	$("#mms_doc_loading").fadeIn(300, function(){
+		var loop = 0, toFirst = '';
+		$("#div_mms_" + cat).children('div:hidden').each(function(i) {
+			if(this.id.match('^div_row_id')){
+				if(loop === 0){
+					toFirst = this.id;
+				}
+				$('#' + this.id).show();
+				loop++;
+			}
+		});
+		if (typeof toFirst !== 'undefined' && toFirst){
+				$('html, body').animate({
+					scrollTop: $('#' + toFirst).offset().top
+				}, 800);
+				window.location = '#' + toFirst;
+		}
+		$("#mms_doc_loading").fadeOut(300);
+	});
+}
+function mms_showReset(cat){
+	$("#mms_doc_loading").fadeIn(300, function(){
+		var loop = 0, toFirst = '';
+		$($("#div_mms_" + cat).children('div:visible').get().reverse()).each(function(i) {
+			if(this.id.match('^div_row_id')){
+				if(loop === 49){
+					toFirst = $("#" + this.id)
+					.prevAll('div:visible').eq(49)
+					.attr('id');
+				}
+				$('#' + this.id).hide();
+				loop++;
+			}
+		});
+		mms_showMore(cat);
+		$("#mms_doc_loading").fadeOut(300);
+	});
+}
+function mms_showLess(cat){
+	var loop = 0, toFirst = '';
+	$($("#div_mms_" + cat).children('div:visible').get().reverse()).each(function(i) {
+		if(loop < 50 && this.id.match('^div_row_id')){
+			if(loop === 49){
+				toFirst = $("#" + this.id)
+				.prevAll('div:visible').eq(49)
+				.attr('id');
+			}
+			$('#' + this.id).hide();
+			loop++;
+		}else{
+			return;
+		}
+	});
+	if (typeof toFirst !== 'undefined' && toFirst){
+		$('html, body').animate({
+			scrollTop: $('#' + toFirst).offset().top
+		}, 800);
+		window.location = '#' + toFirst;
+	}
+}
+function mms_showMore(cat){
+	var loop = 0, toFirst = '';
+	$("#div_mms_" + cat).children('div:hidden').each(function(i) {
+		if(loop < 50 && this.id.match('^div_row_id')){
+			if(loop === 0){
+				toFirst = this.id;
+			}
+			$('#' + this.id).show();
+			loop++;
+		}else{
+			return;
+		}
+	});
+	if (typeof toFirst !== 'undefined' && toFirst){
+		$('html, body').animate({
+			scrollTop: $('#' + toFirst).offset().top
+		}, 800);
+		window.location = '#' + toFirst;
+	}
+}
+function mms_stickMe(resize) {
+	var window_top = $(window).scrollTop(), div_top = $('#sticky-mms_tools').offset().top, $el = $('#mms_tools'), $pl = $('#sticky-mms_tools');
+	if(resize === true && window_top > div_top){
+		$('#mms_tools').css({'position': 'fixed', 'top': '0px', 'width' : $pl.css('width')});
+		return;
+	}
+	if (window_top > div_top) {
+		$('#mms_tools').css({'position': 'fixed', 'top': '0px', 'width' : $el.css('width')});
+	} else {
+		$('#mms_tools').css({'position': '', 'top': '0px', 'width' : "auto"});
+	}
+}
+function mms_tooltip(){
+	$( ".mms_title" ).tooltip({
+		show: null,
+		track: true,
+		position: {my: "left top", at: "left bottom"},
+		open: function( event, ui ) {ui.tooltip.animate({ top: ui.tooltip.position().top + 10 }, "fast" )}
+	});
+}
+function init_confirm(){
+	mms_confirm(mmsLang['INFORMATION'], mmsLang['CONFIRM_OPERATION'], true, 'ajax_init()', '')
+}
+function mms_IfSrc(url){
+var patt=/imms=1/g;
+if (!patt.test(url)){
+	url = url.replace('?', '?imms=1&');
+	if (!patt.test(url)){
+		url += '?imms=1';
+	}
+}
+$('#mmsFakeUrl').addClass('mms_url_loading')
+$("#mmsTopicIframe").attr("src",url);
+return false;
+}
+function mmsIpreview(u,t)
+{
+	$("#mms_iframe")
+	.html($('<iframe></iframe>')
+		.attr({ src : u, width : "100%", height : "100%", id : "mmsTopicIframe", name : "mmsTopicIframe"})
+		.css({border : '0px'})
+	)
+	.dialog({
+		modal: true, title: t, autoOpen: true, draggable: false,
+		height: ($(window).height() * 0.85),
+		width: ($(window).width() * 0.85),
+		show: {effect : 'drop'}
+	});
+}
+function ajax_init(){
+	<!-- IF MMS_ACTION == 'move' and S_MMS_TYPE == 'topic' -->
+	mms_confirm(mmsLang['CONFIRM'], mmsLang['LEAVE_SHADOW'] + '<span class="ui-icon ui-icon-help mms_Qicon"></span>', false, 'mms_shadow=1;mms_forum_id = $("#mms_forum_id").val();mms_ajax();', 'mms_shadow=0;mms_forum_id = $("#mms_forum_id").val();mms_ajax();')
+	<!-- ELSEIF MMS_ACTION == 'fork' and S_MMS_TYPE == 'topic' -->
+	mms_forum_id = $("#mms_forum_id").val();
+	if(mms_forum_id){
+		mms_ajax();
+	}else{
+		mms_info(mmsLang['INFORMATION'], mmsLang['NO_FORUM'], true, '');
+	}
+	<!-- ELSEIF MMS_ACTION == 'chgposter' and S_MMS_TYPE == 'post' -->
+	username = $("#mms_username").val();
+	if(username){
+		mms_ajax();
+	}else{
+		mms_info(mmsLang['INFORMATION'], mmsLang['MMS_USERNAME_INVALID'], true, '');
+	}
+	<!-- ELSEIF (MMS_ACTION == 'move' and S_MMS_TYPE == 'post') or (MMS_ACTION == 'merge' and S_MMS_TYPE == 'topic') -->
+	mms_topic_id = $("#mms_topic_id").val();
+	if(mms_topic_id && is_int(mms_topic_id)){
+		mms_ajax();
+	}else{
+		mms_info(mmsLang['INFORMATION'], mmsLang['MMS_TOPIC_ID_INVALID'], true, '');
+	}
+	<!-- ELSEIF MMS_ACTION == 'options' and S_MMS_TYPE == 'post' -->
+	mms_confirm(mmsLang['CONFIRM'], mmsLang['MMS_SHOW_POST_REASON'], false, 'reason=true;option = $("#mms_post_options").val();mms_ajax();', 'reason=false;option = $("#mms_post_options").val();mms_ajax();')
+	<!-- ELSEIF MMS_ACTION == 'chgicon' and S_MMS_TYPE == 'topic' -->
+	mms_confirm(mmsLang['CONFIRM'], mmsLang['MMS_SHOW_POST_REASON'], false, 'reason=true;icon_id = $(".mms_icon_id:checked").val();mms_ajax();', 'reason=false;icon_id = $(".mms_icon_id:checked").val();mms_ajax();')
+	<!-- ELSEIF MMS_ACTION == 'attr' and S_MMS_TYPE == 'topic' -->
+	attr_id = $("#mms_addon_qte_id").val();
+	if(is_int(attr_id)){
+		mms_ajax();
+	}else{
+		mms_info(mmsLang['INFORMATION'], mmsLang['QTE_ATTRIBUTE_UNSELECTED'], true, '');
+	}
+	<!-- ELSE -->
+	mms_ajax();
+	<!-- ENDIF -->
+}
+function stimer(){
+	if(snow == 60){
+		mtimer();
+	}
+	snow++;
+}
+function mtimer(){
+	snow = 0;
+	mnow++;
+}
+function is_int(n){
+	if( Math.floor(n) == n && $.isNumeric(n)){
+		return true;
+	}else{
+		return false;
+	}
+}
+function mms_abort(){
+	$('.display-options').children('strong.error').remove();
+	$('#loadavgbar, #mms_submit').parent('div').remove();
+	window.onbeforeunload = mms_aborted = true;
+	ajaxmms.abort();
+	$('<h2><span class="error">' + mmsLang['MMS_ABORTED'] + '</span></h2>').appendTo($('#progressbar').parent('.display-options'));
+	$('#cp-main').children('div:first').effect('highlight', {color: 'darkorange'}, 2000);
+	$('#progressbar, #mms_statut, #progressbar, .rules').remove();
+	setTimeout(function(){window.location.href = '{S_MMS_INSTANT_REDIRECT}'}, 5000);
+}
+function mms_ajax(errorback){
+	if(!errorback){
+		var post_data = {}, i = 0, a = '', b = '';
+		for(key in rowAry){
+			if(i<rowPackets){
+				post_data[i] = key;
+				i++;
+			}else{
+				break;
+			}
+		}
+		fallback = post_data;
+	}else{
+		//Here we do a nice fallback if the connection was lost during the process 8)
+		post_data = fallback;
+		i = 1;
+	}
+	if(i){
+		ajaxmms = $.ajax({
+			type: 'POST',
+			url: '{S_MMS_ACTION}',
+			beforeSend : function() {$("#mms_statut").html('<span>' + mmsLang['MMS_STATUT'] + ': <strong style="color: green;">' + mmsLang['MMS_DATA_SENDING'] + '</strong><img style="margin-bottom: -6px;" height="24" src="{T_THEME_PATH}/images/mms_loading.gif" alt=""/></span>')},
+			data: {'ajax' : 1,
+				<!-- IF S_MMS_TYPE == 'post' -->'mms_post_action'<!-- ELSE -->'mms_topic_action'<!-- ENDIF --> : '{MMS_ACTION}',
+				'mms_type' : '{S_MMS_TYPE}',
+				'password' : (pwd_confirmed ? '' : user_pwd),
+				'rids' : JSON.stringify(post_data),
+				'mms_data' : <!-- IF MMS_ACTION == 'move' and S_MMS_TYPE == 'topic' -->JSON.stringify({"forum_id" : mms_forum_id, "shadow" : mms_shadow})<!-- ELSEIF MMS_ACTION == 'fork' and S_MMS_TYPE == 'topic' -->JSON.stringify({"forum_id" : mms_forum_id})<!-- ELSEIF MMS_ACTION == 'chgposter' -->JSON.stringify({"username" : username})<!-- ELSEIF (MMS_ACTION == 'move' and S_MMS_TYPE == 'post') or (MMS_ACTION == 'merge' and S_MMS_TYPE == 'topic') -->JSON.stringify({"topic_id" : mms_topic_id})<!-- ELSEIF MMS_ACTION == 'options' and S_MMS_TYPE == 'post' -->JSON.stringify({"option" : option, "reason" : reason})<!-- ELSEIF MMS_ACTION == 'chgicon' and S_MMS_TYPE == 'topic' -->JSON.stringify({"icon_id" : icon_id, "reason" : reason})<!-- ELSEIF MMS_ACTION == 'attr' and S_MMS_TYPE == 'topic' -->JSON.stringify({"attr_id" : attr_id})<!-- ELSE -->''<!-- ENDIF -->
+			},
+			timeout: rowTimeout,
+			success: function(data, textStts, errThrown) {
+				if(!mms_aborted){
+					if(typeof(data) == 'object'){
+						mms_ajax_callback(data);
+					}else{
+						$('#cp-main').children('div:first').effect('highlight', {color: 'orange'}, 1000);
+						$("#mms_statut").html('<span>' + mmsLang['MMS_STATUT'] + ': <strong style="color: darkorange;">' + mmsLang['MMS_DATA_INTERRUPTED'] + '</strong></span>');
+						var errorData = mmsLang['MMS_BAD_DATA_FORMAT'] + '<br />' + mmsLang['MMS_HTML_DUMP'] + ':<br /><textarea class="inputbox" tabindex="3" cols="70" rows="10" name="message" >' + ajaxmms.getAllResponseHeaders() + data + '</textarea>';
+						mms_confirm(mmsLang['INFORMATION'], mmsLang['MMS_CONNECTION_FAIL'], true, 'mms_ajax(fallback)', 'mms_abort()', false, false, errorData, true, true);
+					}
+				}
+			},
+			error: function(data, textStts, errThrown) {
+				//Here we do the Extra Debug as in Jquery Offline mode.
+				if (data['responseText']){
+					try{
+						data['responseText'] = JSON.parse(data['responseText']);
+					}catch(e){
+						console.log(e);
+					}
+				}
+				if(!mms_aborted){
+					if(typeof(data['responseText']) != 'object' && data['status'] == 200){
+						$('#cp-main').children('div:first').effect('highlight', {color: 'orange'}, 1000);
+						$("#mms_statut").html('<span>' + mmsLang['MMS_STATUT'] + ': <strong style="color: darkorange;">' + mmsLang['MMS_DATA_INTERRUPTED'] + '</strong></span>');
+						var errorData = mmsLang['MMS_BAD_DATA_FORMAT'] + '<br />' + mmsLang['MMS_HTML_DUMP'] + ':<br /><textarea class="inputbox" tabindex="3" cols="70" rows="10" name="message" >' + ajaxmms.getAllResponseHeaders() + data['responseText'] + '</textarea>';
+						mms_confirm(mmsLang['INFORMATION'], mmsLang['MMS_CONNECTION_FAIL'], true, 'mms_ajax(fallback)', 'mms_abort()', false, false, errorData, true, true);
+					}else if(typeof(data['responseText']) == 'object' && data['status'] != 200){
+						$('#cp-main').children('div:first').effect('highlight', {color: 'orange'}, 1000);
+						$("#mms_statut").html('<span>' + mmsLang['MMS_STATUT'] + ': <strong style="color: darkorange;">' + mmsLang['MMS_DATA_INTERRUPTED'] + '</strong></span>');
+						mms_info(data['responseText']['title'], data['responseText']['message'], true, 'mms_abort()');
+					}else{
+						$('#cp-main').children('div:first').effect('highlight', {color: 'orange'}, 1000);
+						$("#mms_statut").html('<span>' + mmsLang['MMS_STATUT'] + ': <strong style="color: darkorange;">' + mmsLang['MMS_DATA_INTERRUPTED'] + '</strong></span>');
+						if(textStts == 'error'){
+							var errorData = textStts + ': ' + data.status + ' ' + errThrown + '<br />' + mmsLang['MMS_HTML_DUMP'] + ':<br /><textarea class="inputbox" tabindex="3" cols="70" rows="10" name="message" >' + ajaxmms.getAllResponseHeaders() + data.responseText + '</textarea>';
+						} else {
+							var errorData = '118 ' + mmsLang['MMS_TIMEOUT'] + '<br />' + mmsLang['MMS_TIMEOUT_EXP'] + '<br />' + mmsLang['MMS_HTML_DUMP'] + ':<br />' + mmsLang['MMS_NOT_AVAILABLE'];
+						}
+						mms_confirm(mmsLang['INFORMATION'], mmsLang['MMS_CONNECTION_FAIL'], true, 'mms_ajax(fallback);', 'mms_abort()', false, false, errorData, true, true);
+					}
+				}
+			},
+		});
+	}else{
+		final_resync();
+	}
+}
+function mms_ajax_callback(data){
+	var keyIndex = '', ttaa = '';
+	if(data['error']){
+		if(data['continue']){
+			if(!data['pwd_confirm']){
+				if (data['final_eval']){
+					eval(data['final_eval']);
+				}
+				mms_confirm(data['title'], data['message'], false, 'mms_ajax()', '', true, true)
+			}else{
+				mms_info(data['title'], data['message'], true, '');
+			}
+			$("#mms_statut").html('<span>' + mmsLang['MMS_STATUT'] + ': <strong style="color: darkorange;">' + mmsLang['MMS_DATA_INTERRUPTED'] + '</strong></span>')
+		}else{
+			$('#mms_submit').parent('div').remove();
+			mms_abort();
+			<!-- IF (MMS_ACTION == 'move' or MMS_ACTION == 'fork') and S_MMS_TYPE == 'topic' -->$('#mms_forum_div').remove();<!-- ELSEIF MMS_ACTION == 'chgposter' -->$('#mms_username_div').remove();<!-- ELSEIF (MMS_ACTION == 'move' and S_MMS_TYPE == 'post') or (MMS_ACTION == 'merge' and S_MMS_TYPE == 'topic') -->$('#mms_topic_div').remove();<!-- ELSEIF MMS_ACTION == 'options' and S_MMS_TYPE == 'post' -->$('#mms_post_options_div').remove();<!-- ENDIF -->
+			mms_info(data['title'], data['message'], true, '');
+			if(data['redirect']){
+				setTimeout(function(){window.location.href = data['redirect']}, 5000);
+			 }
+		}
+	clearInterval(scounter);
+	clearInterval(mcounter);
+	}else{
+		if(data['pwd_confirm'])
+		{
+			pwd_confirmed = true;
+		}
+		mms_runTimer();
+		if(data['continue']){
+		var post_data = new Array('rids_treated'), i = 0, a = 'rids_treated', b = '';
+			for(key in data['rids_treated']){
+				//post_data[key];
+				if(data['rids_treated'][key]){
+					if(!mms_treated){
+						$("#mms_showTotreated").show();
+						$("#div_mms_treated").children("div:first").remove();
+					}
+					$('#div_row_id' + key).insertBefore("#mms_showTotreated");
+					mms_treated++;
+					mms_left--;
+					$('<br /><em>' + mmsLang['MMS_STATUT'] + ': ' + data['message'][key] + '</em>').appendTo($('#div_row_id' + key).children("div").children(".error"));
+					$('#spanli_left_count, #spandiv_left_count').html(' (' + mms_left + ')');
+					$('#spanli_treat_count, #spandiv_treated_count').html(' (' + mms_treated + ')');
+					if(data['fdata'] !== false){
+						for(key_ in data['fdata']['f']){
+							f_data['f'][data['fdata']['f'][key_]] = true;
+						}
+						for(key_ in data['fdata']['t']){
+							f_data['t'][data['fdata']['t'][key_]] = true;
+						}
+						for(key_ in data['fdata']['u']){
+							f_data['u'][data['fdata']['u'][key_]] = true;
+						}
+					}
+				<!-- IF MMS_ACTION == 'grabip' -->
+					keyIndex = data['rids_treated'][key];
+					if(typeof(grabebdIps[keyIndex]) == 'undefined'){
+						ttaa = $('#grabbedip').val();
+						$('#grabbedip').val(ttaa + (ttaa ?"\n":'') + keyIndex).trigger('autosize.resize');
+						grabebdIps[keyIndex] = key;
+						$('#mms_grabip_div').children('h4').html(mmsLang['MMS_IPS_GRABBED'] + '&nbsp;(' + Object.keys(grabebdIps).length + '):');
+						grabbedip = $('#grabbedip');
+						grabbedip.scrollTop(
+							grabbedip[0].scrollHeight - grabbedip.height()
+						);
+					}
+				<!-- ENDIF -->
+				}else{
+					if(!mms_failed){
+						$("#mms_showTofailed").show();
+						$("#div_mms_failed").children("div:first").remove();
+					}
+					$('#div_row_id' + key).insertBefore("#mms_showTofailed");
+					$('<br /><em>' + mmsLang['MMS_REASON'] + ': ' + data['message'][key] + '</em>').appendTo($('#div_row_id' + key).children("div").children(".error"));
+					mms_failed++;
+					mms_left--;
+					$('#spanli_left_count, #spandiv_left_count').html(' (' + mms_left + ')');
+					$('#spanli_fail_count, #spandiv_failed_count').html(' (' + mms_failed + ')');
+				}
+				//Action confirmed by the server, delete row altered.
+				delete rowAry[key];
+				<!-- IF (MMS_ACTION == 'move' or MMS_ACTION == 'fork') and S_MMS_TYPE == 'topic' -->$('#mms_forum_div').remove();<!-- ELSEIF MMS_ACTION == 'chgposter' -->$('#mms_username_div').remove();<!-- ELSEIF (MMS_ACTION == 'move' and S_MMS_TYPE == 'post') or (MMS_ACTION == 'merge' and S_MMS_TYPE == 'topic') -->$('#mms_topic_div').remove();<!-- ELSEIF MMS_ACTION == 'options' and S_MMS_TYPE == 'post' -->$('#mms_post_options_div').remove();<!-- ELSEIF MMS_ACTION == 'chgicon' and S_MMS_TYPE == 'topic' -->$('#mms_icon_div').remove();<!-- ELSEIF MMS_ACTION == 'attr' and S_MMS_TYPE == 'topic' -->$('#mms_attr_div').remove();<!-- ENDIF -->
+			}
+			if (data['final_eval']){
+				eval(data['final_eval']);
+			}
+			if (data['num_queries']){
+				mms_num_queries += data['num_queries'];
+			}
+			if (typeof data['loadavg'] !== 'undefined'){
+				var loadAvgCnt = data['loadavg'] + '%';
+				if(data['loadavg'] > 3){
+					loadAvgCnt += '<span class="ui-icon mmsLoadavgAlert ui-icon-alert" style="float: right"></span>';
+				}
+				$("#loadavgbar" ).parent('div').css('display', 'block');
+				$("#loadavgbar" ).progressbar({value: (data['loadavg'] * 10)});
+				$("#loadavgbar_text" ).html(loadAvgCnt);
+				$(".mmsLoadavgAlert" ).effect('pulsate', 2);
+				mms_tooltip();//recreate tooltip...
+			}else{
+				$("#loadavgbar" ).parent('div').css('display', 'none')
+			}
+			var percent = Math.round((((mms_failed + mms_treated) * 100) / {MMS_ROWS_COUNT}) * 10) / 10;
+			$(function() {
+				$("#progressbar" ).progressbar({value: percent});
+				$("#progressbar_text" ).html(percent + '% ' + ((percent < 100) ? squeries.replace('*s*', mms_num_queries) : ''));
+			});
+			fallback = '';
+			//Sleep a bit if needed...
+			setTimeout(function (){mms_ajax()}, rowTime);
+		}
+	}
+}
+function mms_runTimer(){
+	if(!timer_started)
+	{
+		var percent = Math.round((((mms_failed + mms_treated) * 100) / {MMS_ROWS_COUNT}) * 10) / 10;
+
+		$('.mms_hidden').removeClass('mms_hidden');
+		$('#mms_submit').parent('div').remove();
+		$('.rules').remove();
+		window.onbeforeunload = confirmExit;
+		setInterval(function(){stimer()},1000);
+		timer_started = true;
+		$(function() {
+			$("#progressbar" ).progressbar({value: percent});
+			$("#progressbar_text" ).html(percent + '% ' + ((percent < 100) ? squeries.replace('*s*', mms_num_queries) : ''));
+		});
+	}
+}
+function final_resync(){
+	var action = '';
+	<!-- IF MMS_SYNC_NEEDED -->
+	if(!f_resync["f"]){
+		action = "f";
+		$("#mms_statut").html('<span>' + mmsLang['MMS_STATUT'] + ': <strong style="color: green;">{S_RESYNC_NEXT_FORUMS}<img style="margin-bottom: -6px;" height="24" src="{T_THEME_PATH}/images/mms_loading.gif" alt=""/></strong></span>')
+	}else if(!f_resync["t"]){
+		action = "t";
+	}else if(!f_resync["s"]){
+		action = "s";
+	}else if(!f_resync["u"]){
+		action = "u";
+	}else{
+	<!-- ENDIF -->
+		clearInterval(scounter);
+		clearInterval(mcounter);
+		window.onbeforeunload = true;
+		$('.display-options').children('strong.error').remove();
+		$('#loadavgbar').parent('div').remove();
+		$('#mms_showToleft').remove();
+		$('<div class="panel"><div class="inner"><span class="corners-top"><span></span></span><p>{L_MMS_LEFTNO}</p><span class="corners-bottom"><span></span></span></div></div>').appendTo('#div_mms_left');
+		$("#mms_statut").html('<span>' + mmsLang['MMS_STATUT'] + ': <strong style="color: green;">' + mmsLang['MMS_DATA_TERMINATED'] + '</strong></span>');
+		mms_info(mmsLang['INFORMATION'], '<span class="ui-icon ui-icon-check" style="float: left;"></span> ' + mmsLang['MMS_SUCCESS']);
+		$('<hr /><strong style="color: green;">' + result
+			.replace('*d*', mms_treated)
+			.replace('*f*', (mms_failed ? '<em class="error">' + mms_failed + '</em>' : mms_failed))
+			.replace('*m*', mnow)
+			.replace('*s*', snow)
+			.replace('*q*', mms_num_queries)
+			.replace(<!-- IF S_MMS_TYPE == 'post' -->'*p*'<!-- ELSE -->'*t*'<!-- ENDIF -->, (mms_failed + mms_treated)) + "</strong>")
+			.appendTo($('#progressbar').parent('.display-options'));
+			$('#progressbar').effect('bounce', { times: 8 , distance : '40'}, 600);
+			$('#cp-main').children('div:first').effect('highlight', {color: 'palegreen'}, 1500);
+	<!-- IF MMS_SYNC_NEEDED -->
+	}
+	if(action)
+	{
+		$.ajax({
+			type: 'POST',
+			url: '{S_MMS_ACTION}',
+			data: {'ajax' : 1,
+				'resync' : action,
+				'data' : JSON.stringify(f_data[action]),
+				'password' : (pwd_confirmed ? '' : user_pwd),
+			},
+			timeout: (rowTimeout * 100),//Huge timeout for statistics...
+			success: function(data, textStts, errThrown) {
+				if(!mms_aborted){
+					if(typeof(data) == 'object'){
+						if(!data['error']){
+							if(!data['pwd_confirm']){
+								if (data['final_eval']){
+									eval(data['final_eval']);
+								}
+								mms_confirm(data['title'], data['message'], false, 'mms_ajax()', '', true, true)
+							}else{
+								if (data['num_queries']){
+									mms_num_queries += data['num_queries'];
+								}
+								if (data['action_next']){
+									$("#mms_statut").html('<span>' + mmsLang['MMS_STATUT'] + ': <strong style="color: green;">' + data['action_next'] + '<img style="margin-bottom: -6px;" height="24" src="{T_THEME_PATH}/images/mms_loading.gif" alt=""/></strong></span>')
+								}
+								f_resync[data['action_done']] = true;
+								if (typeof data['loadavg'] !== 'undefined'){
+									var loadAvgCnt = data['loadavg'] + '%';
+									if(data['loadavg'] > 3){
+										loadAvgCnt += '<span class="ui-icon mmsLoadavgAlert ui-icon-alert" style="float: right"></span>';
+									}
+									$("#loadavgbar" ).parent('div').css('display', 'block');
+									$("#loadavgbar" ).progressbar({value: (data['loadavg'] * 10)});
+									$("#loadavgbar_text" ).html(loadAvgCnt);
+									$(".mmsLoadavgAlert" ).effect('pulsate', 2);
+									mms_tooltip();//recreate tooltip...
+								}else{
+									$("#loadavgbar" ).parent('div').css('display', 'none')
+								}
+								setTimeout(function(){final_resync()}, 1000);
+							}
+						}
+					}else{
+						$('#cp-main').children('div:first').effect('highlight', {color: 'orange'}, 1000);
+						$("#mms_statut").html('<span>' + mmsLang['MMS_STATUT'] + ': <strong style="color: darkorange;">' + mmsLang['MMS_DATA_INTERRUPTED'] + '</strong></span>');
+						var errorData = mmsLang['MMS_BAD_DATA_FORMAT'] + '<br />' + mmsLang['MMS_HTML_DUMP'] + ':<br /><textarea class="inputbox" tabindex="3" cols="70" rows="10" name="message" >' + ajaxmms.getAllResponseHeaders() + data + '</textarea>';
+						mms_confirm(mmsLang['INFORMATION'], mmsLang['MMS_CONNECTION_FAIL'], true, 'final_resync()', 'mms_abort()', false, false, errorData, true);
+					}
+				}
+			},
+			error: function(data, textStts, errThrown) {
+				if(!mms_aborted){
+					$('#cp-main').children('div:first').effect('highlight', {color: 'orange'}, 1000);
+					$("#mms_statut").html('<span>' + mmsLang['MMS_STATUT'] + ': <strong style="color: darkorange;">' + mmsLang['MMS_DATA_INTERRUPTED'] + '</strong></span>');
+					if(textStts == 'error'){
+						var errorData = textStts + ': ' + data.status + ' ' + errThrown + '<br />' + mmsLang['MMS_HTML_DUMP'] + ':<br /><textarea class="inputbox" tabindex="3" cols="70" rows="10" name="message" >' + ajaxmms.getAllResponseHeaders() + data.responseText + '</textarea>';
+					} else {
+						var errorData = '118 ' + mmsLang['MMS_TIMEOUT'] + '<br />' + mmsLang['MMS_TIMEOUT_EXP'] + '<br />' + mmsLang['MMS_HTML_DUMP'] + ':<br />' + mmsLang['MMS_NOT_AVAILABLE'];
+					}
+					mms_confirm(mmsLang['INFORMATION'], mmsLang['MMS_CONNECTION_FAIL'], true, 'final_resync()', 'mms_abort()', false, false, errorData, true);
+				}
+			},
+		});
+	}
+	<!-- ENDIF -->
+}
+function confirmExit(){
+	//IE, coincidentally....
+	//http://goo.gl/Rt9ki
+	if (!mmsIgnoreDirtyFlag) {
+		return mmsLang['MMS_EXIT_ALERT'];
+	}
+	mmsIgnoreDirtyFlag = false;
+    return;
+}
+function confirmAbort(msg){
+	mms_confirm(mmsLang['INFORMATION'], msg, true, 'mms_abort()', '');
+}
+function mms_info(title, message, alert, callback){
+	okBtn = mmsLang['MMS_OK'];
+	btns = {};
+	btns[okBtn] = function () {
+		$(this).remove();
+		if(callback){
+			eval(callback);
+		}
+	};
+	$('<div></div>').appendTo('body')
+	.html('<div>' + (alert ? '<span class="ui-icon ui-icon-alert" style="float: left; margin: 0 7px 20px 0;"></span>' : '') + '<p>' + message + '</p></div>')
+	.dialog({
+		modal: true, title: title, 
+		zIndex: 10000, autoOpen: true,
+		width: '350px', resizable: true,
+		buttons: btns, 
+	});
+}
+function mms_confirm(title, message, alert, btn_yes_callback, btn_no_callback, pwd_cfm, choice, mInfos, autoSize, btn_ignore){
+	if(pwd_cfm && !pwd_confirmed){
+		field = '<br /><br /><span class="ui-icon ui-icon-key" style="float: left;"></span><input type="password" name="pwd_field" id="pwd_field" class="inputbox ui-widget-content ui-corner-all">';
+	}else{
+		field = '';
+	}
+	message = message.replace('?', '<span class="ui-icon ui-icon-help mms_Qicon"></span>');
+	yesBtn = (choice ? mmsLang['SUBMIT'] : mmsLang['YES']);
+	noBtn = (choice ? mmsLang['CANCEL'] : mmsLang['NO']);
+	ignoreBtn = mmsLang['MMS_IGNORE'];
+	Ibtn = mmsLang['MMS_MORE_INFORMATIONS'];
+	btns = {};
+	btns[yesBtn] = function () {
+		if(btn_yes_callback){
+			user_pwd = $("#pwd_field").val();
+			eval(btn_yes_callback);
+		}
+		$(this).remove();
+	};
+	btns[noBtn] = function () {
+		$(this).remove();
+		if(btn_no_callback){
+			eval(btn_no_callback);
+		}
+	};
+	if(btn_ignore)
+	{
+		//Ignore this loop, delete them so!
+		btns[ignoreBtn] = function () {
+			var i = 0, toDel = {};
+			for(key in rowAry){
+				if(i<rowPackets){
+					toDel[key] = true;
+					i++;
+				}else{
+					break;
+				}
+			}
+			if(!mms_failed){
+				$("#mms_showTofailed").show();
+				$("#div_mms_failed").children("div:first").remove();
+			}
+			mms_runTimer();
+			$('.rules').remove();
+			for(key in toDel){
+				$('#div_row_id' + key).insertBefore("#mms_showTofailed");
+				$('<br /><em>' + mmsLang['MMS_REASON'] + ': ' + mmsLang['MMS_IGNORED'] + '</em>').appendTo($('#div_row_id' + key).children("div").children(".error"));
+				mms_failed++;
+				mms_left--;
+				$('#spanli_left_count, #spandiv_left_count').html(' (' + mms_left + ')');
+				$('#spanli_fail_count, #spandiv_failed_count').html(' (' + mms_failed + ')');
+				delete rowAry[key];
+			}
+			<!-- IF (MMS_ACTION == 'move' or MMS_ACTION == 'fork') and S_MMS_TYPE == 'topic' -->$('#mms_forum_div').remove();<!-- ELSEIF MMS_ACTION == 'chgposter' -->$('#mms_username_div').remove();<!-- ELSEIF (MMS_ACTION == 'move' and S_MMS_TYPE == 'post') or (MMS_ACTION == 'merge' and S_MMS_TYPE == 'topic') -->$('#mms_topic_div').remove();<!-- ELSEIF MMS_ACTION == 'options' and S_MMS_TYPE == 'post' -->$('#mms_post_options_div').remove();<!-- ELSEIF MMS_ACTION == 'chgicon' and S_MMS_TYPE == 'topic' -->$('#mms_icon_div').remove();<!-- ELSEIF MMS_ACTION == 'attr' and S_MMS_TYPE == 'topic' -->$('#mms_attr_div').remove();<!-- ENDIF -->
+			fallback = '';
+			user_pwd = $("#pwd_field").val();
+			eval(btn_yes_callback);
+			$(this).remove();
+		};
+	}
+	if(mInfos){
+		btns[Ibtn] = function () {
+			mms_info(mmsLang['MMS_MORE_INFORMATIONS'], '<span class="ui-icon ui-icon-info" style="float: left;"></span>' + mInfos);
+		};
+	}
+	var cfmBox = $('<div></div>').appendTo('body')
+		.html('<div>' + (alert ? '<span class="ui-icon ui-icon-alert" style="float: left; margin: 0 7px 10px 0;"></span>' : '') + '<div>' + message + field +'</div></div>')
+		.dialog({
+			modal: true, title: (title ? title : mmsLang['CONFIRM']), 
+			zIndex: 10000, autoOpen: true,
+			width: (autoSize ? 'auto' : '350px'), resizable: true,
+			buttons : btns, "{L_QUIT}": function (event, ui) {
+		}
+	});
+	//hack the submit key if we request a password...
+	$('#pwd_field').keyup(function(event) {
+		 if (event.which == 13) {
+			if(btn_yes_callback){
+				user_pwd = $("#pwd_field").val();
+				eval(btn_yes_callback);
+			}
+			$(cfmBox).remove();
+		}
+	});
+}
+// ]]>
+</script>
+<!-- INCLUDE overall_footer.html -->
+<!-- ENDIF -->

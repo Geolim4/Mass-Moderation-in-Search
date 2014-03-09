@@ -1,0 +1,214 @@
+<script type="text/javascript">
+// <![CDATA[
+	onload_functions.push('init()');
+	var mms_cc_count = 0, mms_is_fixed = false, mss_stringified = false;
+	function init(){
+		reset_field();
+		mms_stickMe();
+		var selected = new Array();
+		var selecting = new Array();
+		$("#mms_form").selectable({
+			filter : 'input.mms_Sinput',
+			autoRefresh: false,
+			selected: function(event, ui){
+				selected.push(ui.selected.id);
+				$('#' + ui.selected.id).prop('checked', !$('#' + ui.selected.id).prop('checked'));
+				mms_select(<!-- IF S_MMS_TYPE == 'post' -->'div_post_'<!-- ELSEIF S_MMS_TYPE == 'topic' -->'li_topic_'<!-- ENDIF --> + ui.selected.id.replace('mms_<!-- IF S_MMS_TYPE == 'post' -->post<!-- ELSEIF S_MMS_TYPE == 'topic' -->topic<!-- ENDIF -->_', ''), $('#' + ui.selected.id).prop('checked'), 'single')
+			},
+			selecting: function(event, ui){
+				clear_highlight();
+				selecting.push(ui.selecting.id);
+			},
+		});
+		$(document).ready(function() {
+			$("#mms_doc_loading").fadeOut();
+			$("#mms_submit").click(function() {
+				$('.mms_input:checkbox:checked').each(function (){mms_cc_count++});
+				if(mms_cc_count){
+					$("#mms_form").submit();
+				}else{
+					mms_alert('{LA_INFORMATION}', <!-- IF S_MMS_TYPE == 'post' -->'{LA_MMS_NO_POST}'<!-- ELSEIF S_MMS_TYPE == 'topic' -->'{LA_MMS_NO_TOPIC}'<!-- ENDIF -->);
+				}
+			});
+		});
+		$(function () {
+			$(window).scroll(mms_stickMe);
+		});
+	}
+	function mms_stickMe() {
+		var window_top = $(window).scrollTop();
+		var div_top = $('#sticky-mms_tools').offset().top;
+		if (window_top > div_top) {
+			if(!mms_is_fixed){
+				setTimeout(function(){$("#mms_form").selectable("refresh")}, 20);
+				mms_is_fixed = true;//Do the refresh only once.
+			}
+			$('#mms_tools').addClass('mms_stick');
+		} else {
+			if(mms_is_fixed){
+				setTimeout(function(){$("#mms_form").selectable("refresh")}, 20);
+				mms_is_fixed = false;//And again...
+			}
+			$('#mms_tools').removeClass('mms_stick');
+		}
+	}
+	function mss_stringify(){
+		//Do the hack onsubmit
+		if(!mss_stringified){
+			$("#mms_doc_loading").fadeIn(800, function(){
+				// http://goo.gl/JnIV0
+				var stringified = {};
+				$('input:checkbox:checked').each(function( index ) {
+					stringified[this.id] = true;
+				});
+				$('#mms_from_sr').val(JSON.stringify(stringified));
+				$('.mms_input_uname, .mms_input_fname, .mms_input').remove();
+				mss_stringified = true;
+				$("#mms_form").submit();
+			});
+		}
+		return mss_stringified;
+	}
+	function mms_select(topic_id, check_statut, type){
+		if (type = 'single')
+		{
+			clear_highlight();
+			if(check_statut){
+				$('#' + topic_id).addClass('mms_selected', 150);
+			}
+			if(!check_statut){
+				$('#' + topic_id).removeClass('mms_selected', 150);
+			}
+		}
+		mmsBtnCount();
+	}
+	function mmsmark(state){
+		clear_highlight();
+		var mms_class = <!-- IF S_MMS_TYPE == 'post' -->'.mms_div'<!-- ELSEIF S_MMS_TYPE == 'topic' -->'.mms_li'<!-- ENDIF -->
+		$("#mms_doc_loading").fadeIn(300, function (){
+			$('.mms_input').prop('checked', state);
+			if(state){
+				$(mms_class).addClass('mms_selected');
+			}else{
+				$(mms_class).removeClass('mms_selected');
+			}
+			mmsBtnCount();
+			$("#mms_doc_loading").fadeOut();
+		});
+		return false;
+	}
+	function mmsBtnCount(){
+		var mmsCount = 0, value = '';
+		$('.mms_input:checkbox:checked').each(function (){mmsCount++});
+		value = '{LA_SUBMIT} ' + ((mmsCount <= 1) ? '(' + mmsCount + ' {LA_MMS_SELECTED})':  '(' + mmsCount + ' {LA_MMS_SELECTEDS})');
+		$("#mms_submit").val(value);
+	}
+	function mmsumark(value, type){
+
+		$("#mms_doc_loading").fadeIn(300, function (){
+			inputs = document.getElementsByClassName('mms_input_' + type);
+			clear_highlight();
+			for (var i = 0; i < inputs.length; i++) {
+				if(inputs[i].value == value){
+					var InputName = inputs[i].name;
+					var InputId = inputs[i].name.replace((type == 'fname' ? 'forum_' : 'user_'), '');
+					//alert('#' + <!-- IF S_MMS_TYPE == 'post' -->'div_'<!-- ELSEIF S_MMS_TYPE == 'topic' -->'li_'<!-- ENDIF -->+ InputId);
+					$('#' + <!-- IF S_MMS_TYPE == 'post' -->'div_'<!-- ELSEIF S_MMS_TYPE == 'topic' -->'li_'<!-- ENDIF -->+ InputId).addClass('mms_selected');
+					$('#mms_{S_MMS_TYPE}_' + InputId.replace('{S_MMS_TYPE}_', '')).prop('checked', true);
+				}
+			}
+			mmsBtnCount();
+			$("#mms_doc_loading").fadeOut();
+		});
+		return false;
+	}
+	function mms_type(type){
+		$("#mms_doc_loading").fadeIn(300, function ()
+			{
+				if(type == 'checktopic'){
+					if($( "#mms_form" ).selectable())
+					{
+						$( "#mms_form" ).selectable( "destroy" );
+					}
+					set_cursor("#mms_form", "");
+					$('.mms_input').removeClass('mms_Cinput mms_Sinput').addClass('mms_Pinput');
+					$("#mms_doc_loading").fadeOut();
+				}else if(type == 'rectangle'){
+					var selected = new Array();
+					var selecting = new Array();
+					set_cursor("#mms_form", "crosshair");
+					$('.mms_input').removeClass('mms_Cinput mms_Pinput').addClass('mms_Sinput');
+					$("#mms_doc_loading").fadeOut();
+					$("#mms_form").selectable({filter : 'input',
+						autoRefresh: false,
+						selected: function(event, ui){
+							selected.push(ui.selected.id);
+							$('#' + ui.selected.id).prop('checked', !$('#' + ui.selected.id).prop('checked'));
+							mms_select(<!-- IF S_MMS_TYPE == 'post' -->'div_post_'<!-- ELSEIF S_MMS_TYPE == 'topic' -->'li_topic_'<!-- ENDIF --> + ui.selected.id.replace('mms_<!-- IF S_MMS_TYPE == 'post' -->post<!-- ELSEIF S_MMS_TYPE == 'topic' -->topic<!-- ENDIF -->_', ''), $('#' + ui.selected.id).prop('checked'), 'single')
+						},
+						selecting: function(event, ui){
+							clear_highlight();
+							selecting.push(ui.selecting.id);
+						},
+					});
+				}else{
+					if($( "#mms_form" ).selectable())
+					{
+						$( "#mms_form" ).selectable( "destroy" );
+					}
+					set_cursor("#mms_form", "inherit");
+					$('.mms_input').removeClass('mms_Sinput mms_Pinput').addClass('mms_Cinput');
+					$("#mms_doc_loading").fadeOut();
+				}
+			}
+		);
+		return false;
+	}
+	function mms_alert(title, message){
+	$('<div></div>').appendTo('body')
+	.html('<div><p>' + message + '</p></div>')
+		.dialog({
+			modal: true, title: title, zIndex: 10000, autoOpen: true,
+			width: '200px', resizable: true,
+			buttons: {
+				"{LA_MMS_OK}": function () {
+					$(this).dialog("close");
+				},
+			},
+			"{L_QUIT}": function (event, ui) {
+				$(this).remove();
+			}
+		});
+	}
+	function set_cursor(id, form){
+		$(id).css({cursor : form});
+	}
+	function reset_field(){
+		$('#phpbb').find(':input').each(function() {
+			switch(this.type) {
+				case 'password':
+				case 'select-multiple':
+				case 'select-one':
+				case 'text':
+				case 'textarea':
+					$(this).val('');
+					break;
+				case 'checkbox':
+				case 'radio':
+					this.checked = false;
+			}
+		});
+	}
+	function clear_highlight(){
+		if (window.getSelection) {
+			if (window.getSelection().empty) {  // Chrome
+				window.getSelection().empty();
+			} else if (window.getSelection().removeAllRanges) {  // Firefox
+				window.getSelection().removeAllRanges();
+			}
+		}else if (document.selection){  // IE?
+			document.selection.empty();
+		}
+	}
+// ]]>
+</script>

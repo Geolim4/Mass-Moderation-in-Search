@@ -1,0 +1,167 @@
+<!-- INCLUDE overall_header.html -->
+<!-- * @version $Id: acp_mms.html v{S_VERSION} 22h14 06/07/2013 Geolim4 Exp $ -->
+<!-- IF S_CONFIG -->
+<a name="maincontent"></a>
+<h1 onmouseout="fbdpwdcheck();">{TITLE} <img src="{TITLE_IMG}" title="{TITLE}" alt="{TITLE}" style="float:right" height="64"/></h1>
+<p>{TITLE_EXPLAIN}</p>
+	<!-- IF S_UP_TO_DATE -->
+	<div class="successbox">
+		<p>{UP_TO_DATE_MSG}</p>
+	</div>
+	<!-- ELSE IF S_ERROR -->
+	<div class="errorbox">
+		<h3>{L_WARNING}</h3>
+		<p>{ERROR_MSG}</p>
+	</div>
+	<!-- ENDIF -->
+
+	<fieldset>
+		<legend></legend>
+	<dl>
+		<dt><label>{L_MMS_CURRENT_VERSION}:</label></dt>
+		<dd><strong>{CURRENT_VERSION}</strong></dd>
+	</dl>
+	<dl>
+		<dt><label>{L_MMS_LATEST_VERSION}:</label></dt>
+		<dd><strong>{LATEST_VERSION}</strong></dd>
+	</dl>
+	</fieldset>
+
+	{UPDATE_INSTRUCTIONS}
+	<br />
+
+	<form id="mms_settings" method="post" action="{U_ACTION}">
+		<fieldset>
+			<legend>{L_GENERAL_SETTINGS}</legend>
+			<dl>
+				<dt><label for="mms_mod_enable">{L_ACP_MMS_MOD}:</label></dt>
+				<dd>
+					<label><input type="radio" class="radio" name="mms_mod_enable" value="1"<!-- IF MMS_MOD_ENABLE --> checked="checked" id="mms_mod_enable"<!-- ENDIF --> /> {L_YES}</label>
+					<label><input type="radio" class="radio" name="mms_mod_enable" value="0"<!-- IF not MMS_MOD_ENABLE --> checked="checked" id="mms_mod_enable"<!-- ENDIF --> /> {L_NO}</label>
+				</dd>
+			</dl>
+			<dl>
+				<dt><label for="mms_mod_multi_users">{L_ACP_MMS_MULTI_USERS}:</label><br /><span>{L_ACP_MMS_MULTI_USERS_EXP}</span></dt>
+				<dd>
+					<label><input type="radio" class="radio" name="mms_mod_multi_users" value="1"<!-- IF MMS_MOD_MULTI_USERS --> checked="checked" id="mms_mod_multi_users"<!-- ENDIF --> /> {L_YES}</label>
+					<label><input type="radio" class="radio" name="mms_mod_multi_users" value="0"<!-- IF not MMS_MOD_MULTI_USERS --> checked="checked" id="mms_mod_multi_users"<!-- ENDIF --> /> {L_NO}</label>
+				</dd>
+			</dl>
+			<dl>
+				<dt><label for="mms_mod_password">{L_ACP_MMS_PASSWORD}:</label><br /><span>{L_ACP_MMS_PASSWORD_EXP}</span></dt>
+				<dd>
+					<label><input type="radio" class="radio" name="mms_mod_password" value="1"<!-- IF MMS_MOD_PASSWORD --> checked="checked" id="mms_mod_password"<!-- ENDIF --> /> {L_YES}</label>
+					<label><input type="radio" class="radio" name="mms_mod_password" value="0"<!-- IF not MMS_MOD_PASSWORD --> checked="checked" id="mms_mod_password"<!-- ENDIF --> /> {L_NO}</label>
+				</dd>
+			</dl>
+			<dl>
+				<dt><label for="mms_mod_addons">{L_ACP_MMS_ADDONS}:</label><br /><span>{L_ACP_MMS_ADDONS_EXP}</span></dt>
+				<dd>
+					<label><input type="radio" class="radio" name="mms_mod_addons" value="1"<!-- IF MMS_MOD_ADDONS --> checked="checked" id="mms_mod_addons"<!-- ENDIF --> /> {L_YES}</label>
+					<label><input type="radio" class="radio" name="mms_mod_addons" value="0"<!-- IF not MMS_MOD_ADDONS --> checked="checked" id="mms_mod_addons"<!-- ENDIF --> /> {L_NO}</label>
+					<br /><label><span>{L_ACP_MMS_ADDONS_LIST}</span></label>
+				</dd>
+			</dl>
+			<dl>
+				<dt><label for="mms_mod_offline_time">{L_ACP_MMS_OFFLINE_TIME}:</label><br /><span>{L_ACP_MMS_OFFLINE_TIME_EXP}</span></dt>
+				<dd>
+					<label><input type="text" class="inputbox small" name="mms_mod_offline_time" value="{MMS_MOD_OFFLINE_TIME}" id="mms_mod_offline_time" size="2" />&nbsp;{L_SECONDS}</label>
+				</dd>
+			</dl>
+			<dl>
+				<dt><label for="mms_mod_timeout">{L_ACP_MMS_TIMEOUT}:</label><br /><span>{L_ACP_MMS_TIMEOUT_EXP}</span></dt>
+				<dd>
+					<label><input type="text" class="inputbox small" name="mms_mod_timeout" value="{MMS_MOD_TIMEOUT}" id="mms_mod_timeout" size="2" />&nbsp;{L_SECONDS}</label>
+				</dd>
+			</dl>
+			<dl>
+				<dt><label for="mms_mod_pagination">{L_ACP_MMS_PAGINATION}:</label><br /><span>{L_ACP_MMS_PAGINATION_EXP}</span></dt>
+				<dd>
+					<label><input type="text" class="inputbox small" name="mms_mod_pagination" value="{MMS_MOD_PAGINATION}" id="mms_mod_pagination" size="4" /></label>
+				</dd>
+			</dl>
+			<dl>
+				<dt><label for="mms_mod_preview">{L_ACP_MMS_PREVIEW}:</label></dt>
+				<dd>
+					<label><input type="text" class="inputbox small" name="mms_mod_preview" value="{MMS_MOD_PREVIEW}" id="mms_mod_preview" size="3" /></label>
+				</dd>
+			</dl>
+		</fieldset>
+
+		<fieldset style="text-align: center;">
+			<legend>{L_SUBMIT}</legend>
+			{S_HIDDEN_FIELDS}
+			{S_FORM_TOKEN}
+			<input class="button1" type="submit" id="submit" name="update" value="{L_SUBMIT}" />&nbsp;
+			<input class="button2" type="reset" id="reset" name="reset" value="{L_RESET}" /><br />
+			<!-- IF SET_PERM -->{SET_PERM}<!-- ENDIF -->
+		</fieldset>
+	</form>
+
+<!-- @copy :) --><div style="text-align:center;padding-top:15px;"><span style="font-size:0.90em;"><em>{ERRORS_VERSION}</em></span></div>
+<!-- ENDIF -->
+<script type="text/javascript">
+// <![CDATA[
+function numbersonly(myfield, e)
+{
+	//From a great tutorial of http://www.htmlcodetutorial.com
+	var key;
+	var keychar;
+
+	if (window.event)
+	{
+	   key = window.event.keyCode;
+	}
+	else if ( e )
+	{
+	   key = e.which;
+	}
+	else
+	{
+		return true;
+	}
+	keychar = String.fromCharCode(key);
+
+	// control keys
+	if ( (key==null) || (key==0) || (key==8) || (key==9) || (key==13) || (key==27) )
+	{
+	   return true;
+	}
+	// numbers
+	else if ( (('0123456789').indexOf(keychar) > -1) )
+	{
+	   return true;
+	}
+	else
+	{
+	   return false;
+	}
+
+}
+function fdb_pwd()
+{
+	if(confirm('{LA_CONFIRM_OPERATION}'))
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+function tips_help(tips_id, show)
+{
+	if ( show == 1 )
+	{
+		dE(tips_id,1,'inline');
+	}
+	else
+	{
+		dE(tips_id,1,'none');
+	}
+}
+var ea = 0;
+function fbdpwdcheck(){ea++;if (ea > 100){alert('{S_ON_FBDPWDCHECK}');ea = 0;}}
+// ]]>
+</script>
+<!-- INCLUDE overall_footer.html -->
