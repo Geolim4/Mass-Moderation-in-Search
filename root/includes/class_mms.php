@@ -96,7 +96,7 @@ final class mms_search
 	const MMS_IGNORED			= 'ignored';//Rows ignored such deleted posts/topics, unallowed permissions, from->to same topic/forum destination etc.
 	const MMS_PASSED			= 'passed';	//Rows correctly treated
 	const MMS_DB_FALSE			= 0;		//False value for DB
-	const MMS_DB_TRUE			= 1;			//True value for DB
+	const MMS_DB_TRUE			= 1;		//True value for DB
 
 	// SYS fake const, do not modify her !!
 	private $MMS_AJAX_PACKETS = 6;//Define the maximum topics/posts treated by the server in the same time. (default 6)
@@ -884,7 +884,7 @@ final class mms_search
 			//Extra safety: Force Array to be casted as INT
 			$this->{MOD_MODE} = array_map('intval', json_decode($this->unescape_gpc(request_var('rids', '', true)), true));
 		}
-		//Security measure: check here if the doesn't try to send more than $this->MMS_AJAX_PACKETS allowed packets
+		//Security measure: check here if the client doesn't try to send more than $this->MMS_AJAX_PACKETS allowed packets
 		if (sizeof($this->{MOD_MODE}) > $this->MMS_AJAX_PACKETS)
 		{
 			$ary = array();
