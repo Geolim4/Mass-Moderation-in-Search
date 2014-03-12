@@ -1,7 +1,9 @@
 <script type="text/javascript">
 // <![CDATA[
-	onload_functions.push('init()');
 	var mms_cc_count = 0, mms_is_fixed = false, mss_stringified = false;
+
+	onload_functions.push('init()');
+
 	function init(){
 		reset_field();
 		mms_stickMe();
@@ -175,7 +177,7 @@
 					$(this).dialog("close");
 				},
 			},
-			"{L_QUIT}": function (event, ui) {
+			"{LA_QUIT}": function (event, ui) {
 				$(this).remove();
 			}
 		});

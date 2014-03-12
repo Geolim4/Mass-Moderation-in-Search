@@ -14,15 +14,15 @@ $(document).ready(function() {
 					modal: true, title: '{LA_CONFIRM}', zIndex: 10000, autoOpen: true,
 					width: '250px', resizable: true,
 					buttons: {
-						"{L_YES}": function () {
+						"{LA_YES}": function () {
 							$(this).dialog("close");
 						},
-						"{L_NO}": function () {
+						"{LA_NO}": function () {
 						$('#mms_pagination').val('50')
 						$(this).dialog("close");
 						}
 					},
-					"{L_QUIT}": function (event, ui) {
+					"{LA_QUIT}": function (event, ui) {
 						$(this).remove();
 				}
 			});

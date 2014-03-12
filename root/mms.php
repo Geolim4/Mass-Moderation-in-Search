@@ -41,13 +41,13 @@ if ($redirect)
 	}
 
 }
-if ( !sizeof($_POST) )
+if (!sizeof($_POST))
 {
 	if ($auth->acl_get('m_mms'))
 	{
 		$user->add_lang('mods/mms_search');
 		meta_refresh(5, $phpbb_root_path . 'search.' . $phpEx);
-		trigger_error($user->lang('MMS_NO_DIRECT_ACCESS', '<a href="' . $phpbb_root_path . 'search.' . $phpEx . '">', '</a>'));
+		trigger_error($user->lang('MMS_NO_DIRECT_ACCESS', '<a href="' . append_sid($phpbb_root_path . 'search.' . $phpEx) . '">', '</a>'));
 	}
 	else
 	{
@@ -61,19 +61,21 @@ if (!$auth->acl_get('m_mms') && !$is_ajax)
 	trigger_error($user->lang['NOT_AUTHORISED']);
 }
 $mms = new mms_search;
-if ( empty($config['mms_mod_enable']) )
+
+if (empty($config['mms_mod_enable']))
 {
 	$mms->trigger_error($user->lang['MMS_MOD_DISABLED'] . '<br />' . $user->lang['MMS_REDIRECT'], E_USER_WARNING, append_sid("{$phpbb_root_path}mms.{$phpEx}", "r=2"), false);
 }
-if ( $mms->is_ajax )
+if ($mms->is_ajax)
 {
 	// Report only fatal errors as in Ajax mode
 	error_reporting(E_ERROR | E_PARSE);
-	if(empty($resync))
+
+	if (empty($resync))
 	{
 		if ($mms->row_mode == 'post')
 		{
-			if ( !sizeof($mms->{DYN_VAR}) )
+			if (!sizeof($mms->{MOD_MODE}))
 			{
 				$mms->ajax_error($user->lang['INFORMATION'], $user->lang['NO_POST_SELECTED'] . '<br />' . $user->lang['MMS_REDIRECT'], append_sid("{$phpbb_root_path}mms.{$phpEx}", "r=2"));
 			}
@@ -81,7 +83,7 @@ if ( $mms->is_ajax )
 			{
 				$mms->ajax_error($user->lang['INFORMATION'], $user->lang['NOT_AUTHORISED'] . '<br />' . $user->lang['MMS_REDIRECT'], append_sid("{$phpbb_root_path}mms.{$phpEx}", "r=2"));
 			}
-			switch ( $mms->{'mms_' . $mms->row_mode . '_action'} )
+			switch ($mms->{'mms_' . $mms->row_mode . '_action'})
 			{
 				case 'delete':
 				case 'lock':
@@ -91,7 +93,7 @@ if ( $mms->is_ajax )
 				case 'options':
 				case 'grabip':
 					$mms->ajax_check_pwd();
-					$mms->{$mms->row_mode . '_' . $mms->mms_post_action}();//U Mad Bro? :troll:
+					$mms->{$mms->row_mode . '_' . $mms->mms_post_action}();
 				break;
 
 				default:
@@ -101,11 +103,11 @@ if ( $mms->is_ajax )
 		}
 		else if ($mms->row_mode == 'topic')
 		{
-			if ( !sizeof($mms->{DYN_VAR}) )
+			if (!sizeof($mms->{MOD_MODE}))
 			{
 				$mms->ajax_error($user->lang['INFORMATION'], $user->lang['NO_TOPIC_SELECTED'] . '<br />' . $user->lang['MMS_REDIRECT'], append_sid("{$phpbb_root_path}mms.{$phpEx}", "r=2"));
 			}
-			switch ( $mms->{'mms_' . $mms->row_mode . '_action'} )
+			switch ($mms->{'mms_' . $mms->row_mode . '_action'})
 			{
 				case 'delete':
 				case 'lock':
@@ -117,7 +119,7 @@ if ( $mms->is_ajax )
 				case 'chgicon':
 				case 'attr':
 					$mms->ajax_check_pwd();
-					$mms->{$mms->row_mode . '_' . $mms->mms_topic_action}();//U Mad Bro? :troll:
+					$mms->{$mms->row_mode . '_' . $mms->mms_topic_action}();
 				break;
 
 				default:
@@ -132,7 +134,7 @@ if ( $mms->is_ajax )
 	}
 	else
 	{
-		switch ( $resync )
+		switch ($resync)
 		{
 			case 'f':
 			case 't':

@@ -11,7 +11,7 @@
 /**
 * @ignore
 */
-if ( !defined('IN_PHPBB'))
+if (!defined('IN_PHPBB'))
 {
 	exit;
 }
@@ -92,13 +92,12 @@ final class mms_search
 
 
 	// SYS const, do not modify them!!!!
-	const
-		MMS_HARD_PAGINATION	= 5000,		//Hard pagination limit
-		MMS_IGNORED			= 'ignored',//Rows ignored such deleted posts/topics, unallowed permissions, from->to same topic/forum destination etc.
-		MMS_PASSED			= 'passed',	//Rows correctly treated
-		MMS_DB_FALSE		= 0,		//False value for DB
-		MMS_DB_TRUE			= 1			//True value for DB
-	;
+	const MMS_HARD_PAGINATION	= 5000;		//Hard pagination limit
+	const MMS_IGNORED			= 'ignored';//Rows ignored such deleted posts/topics, unallowed permissions, from->to same topic/forum destination etc.
+	const MMS_PASSED			= 'passed';	//Rows correctly treated
+	const MMS_DB_FALSE			= 0;		//False value for DB
+	const MMS_DB_TRUE			= 1;			//True value for DB
+
 	// SYS fake const, do not modify her !!
 	private $MMS_AJAX_PACKETS = 6;//Define the maximum topics/posts treated by the server in the same time. (default 6)
 
@@ -128,7 +127,7 @@ final class mms_search
 	private $post_options_selector = '';
 	private $user_selector = '';
 	private $forum_selector = '';
-	private $mms_action_acl = '';//Sanitized value for acl. Possible value: lock/delete/move/chgpostermerge/ (unlock depend of "lock" permission", fork depend of f_read/f_post source/destination forum, resync depend of m_edit permission)
+	private $mms_action_acl = '';//Sanitized value for acl. Possible value: lock/delete/move/chgposter/merge/ (unlock depend of "lock" permission", fork depend of f_read/f_post source/destination forum, resync depend of m_edit permission)
 	public $mms_load = 0;
 
 	public $fids = array();//Can be sticked from search.php
@@ -164,21 +163,19 @@ final class mms_search
 	);
 
 	//External vars
-	var
-		$row_mode = '',//post/topic
-		$resync = '',//forums/topics/stats/users
-		$mms_action = '',//Possible value: lock/unlock/delete/move/resync/fork/chgposter/options/attr/grabip
-		$mms_topic_action = '',
-		$mms_post_action = '',
-		$mms_topic_ary = array(),
-		$mms_post_ary = array(),
-		$mms_pagination = 25,
-		$is_ajax = false,
-		$post_reason = false,
-		$ajax_data = '',
-		$mms_from_sr = '',
-		$post_option = ''
-	;
+	public	$row_mode = '';//post/topic
+	public	$resync = '';//forums/topics/stats/users
+	public	$mms_action = '';//Possible value: lock/unlock/delete/move/resync/fork/chgposter/options/attr/grabip
+	public	$mms_topic_action = '';
+	public	$mms_post_action = '';
+	public	$mms_topic_ary = array();
+	public	$mms_post_ary = array();
+	public	$mms_pagination = 25;
+	public	$is_ajax = false;
+	public	$post_reason = false;
+	public	$ajax_data = '';
+	public	$mms_from_sr = '';
+	public	$post_option = '';
 
 	/****
 	* __construct()
@@ -206,7 +203,6 @@ final class mms_search
 		global $phpbb_root_path, $phpEx, $cache, $table_prefix;
 
 		include($phpbb_root_path . 'includes/db/db_tools.' . $phpEx);
-		$db_tools = new phpbb_db_tools($db);
 
 		//Do the globals vars fork
 		$this->template			= &$template;
@@ -218,14 +214,14 @@ final class mms_search
 		$this->phpEx			= &$phpEx;
 		$this->cache			= &$cache;
 		$this->table_prefix		= &$table_prefix;
-		$this->db_tools			= &$db_tools;
+		$this->db_tools			= new phpbb_db_tools($db);
 		$this->time				= time();
-		if ( $this->is_unix() && ((function_exists('sys_getloadavg') && $load = sys_getloadavg()) || ($load = explode(' ', @file_get_contents('/proc/loadavg')))) )
+		if ($this->is_unix() && ((function_exists('sys_getloadavg') && $load = sys_getloadavg()) || ($load = explode(' ', @file_get_contents('/proc/loadavg')))))
 		{
 			$this->load = array_slice($load, 0, 1);
 			$this->load = floatval($this->load[0]);
 		}
-		if ( !phpbb_version_compare(PHP_VERSION, '5.4.0', '>=') && !defined('ENT_XHTML') )
+		if (!phpbb_version_compare(PHP_VERSION, '5.4.0', '>=') && !defined('ENT_XHTML'))
 		 {
 			define('ENT_XHTML', 32);
 		 }
@@ -246,7 +242,7 @@ final class mms_search
 		$this->config['posts_per_page'] = &$this->mms_pagination;
 		$this->config['topics_per_page'] = &$this->mms_pagination;
 		$this->config['search_block_size'] = &$this->mms_pagination;
-		if ( $this->config['mms_mod_pagination'] > $this::MMS_HARD_PAGINATION || $this->config['mms_mod_pagination'] < 50)
+		if ($this->config['mms_mod_pagination'] > $this::MMS_HARD_PAGINATION || $this->config['mms_mod_pagination'] < 50)
 		{
 			$this->config['mms_mod_pagination'] = $this::MMS_HARD_PAGINATION;
 		}
@@ -254,14 +250,14 @@ final class mms_search
 		$this->is_ajax = request_var('ajax', 0);
 		$this->ajax_data = request_var('ajax_data', '');
 
-		if ( $this->mms_load || defined('IN_MMS'))
+		if ($this->mms_load || defined('IN_MMS'))
 		{
 			if (empty($this->resync))
 			{
 				$this->row_mode($mode);
 				$this->request_vars();
 				$this->load_sanitized_mms_action();
-				if ( sizeof($this->{DYN_VAR}) && empty($this->is_ajax) )
+				if (sizeof($this->{MOD_MODE}) && empty($this->is_ajax))
 				{
 					$this->get_tp_row();
 				}
@@ -276,7 +272,7 @@ final class mms_search
 	****/
 	private function load_values()
 	{
-		switch ( $this->mms_action )
+		switch ($this->mms_action)
 		{
 			case 'fork':
 				$this->MMS_AJAX_PACKETS = 4;//Topic forking is really an huge load for the server!
@@ -311,10 +307,10 @@ final class mms_search
 	****/
 	private function load_addons()
 	{
-		if ( !empty($this->config['mms_mod_addons']))
+		if (!empty($this->config['mms_mod_addons']))
 		{
 			global $qte;
-			if ( !empty($qte) && is_object($qte) && file_exists($this->phpbb_root_path . 'includes/functions_attributes.' . $this->phpEx))
+			if (!empty($qte) && is_object($qte) && file_exists($this->phpbb_root_path . 'includes/functions_attributes.' . $this->phpEx))
 			{
 				$this->qte = &$qte;
 				$this->addons['qte'] = true;
@@ -331,7 +327,7 @@ final class mms_search
 			}
 			if (file_exists($this->phpbb_root_path . 'includes/prime_post_revisions.' . $this->phpEx) && defined('POST_REVISIONS_TABLE'))
 			{
-				if ( $this->db_tools->sql_table_exists($this->table_prefix . 'post_revisions'))
+				if ($this->db_tools->sql_table_exists($this->table_prefix . 'post_revisions'))
 				{
 					$this->addons['ppr'] = true;
 				}
@@ -356,15 +352,15 @@ final class mms_search
 	****/
 	private function load_timecheck()
 	{
-		if ( !defined('IN_MMS') || $this->config['mms_mod_multi_users'])
+		if (!defined('IN_MMS') || $this->config['mms_mod_multi_users'])
 		{
 			return;
 		}
 		$timecheck = unserialize($this->config['mms_timecheck']);
 		$now = $this->time;
-		if ( $timecheck['last_sid'] != $this->user->session_id || $timecheck['last_uid'] != $this->user->data['user_id'] )
+		if ($timecheck['last_sid'] != $this->user->session_id || $timecheck['last_uid'] != $this->user->data['user_id'])
 		{
-			if ( $timecheck['last_time'] > ($now - $this->config['mms_mod_offline_time']) )
+			if ($timecheck['last_time'] > ($now - $this->config['mms_mod_offline_time']))
 			{
 				$sql = "SELECT user_id, username, user_colour
 					FROM " .  USERS_TABLE  . '
@@ -393,43 +389,25 @@ final class mms_search
 	private function load_sizecheck()
 	{
 		//Topic forking is really an huge load for the server!
-		if ( $this->mms_action == 'fork' && sizeof($this->{DYN_VAR}) > 4 )
+		if ($this->mms_action == 'fork' && sizeof($this->{MOD_MODE}) > 4)
 		{
 			send_status_line(412, 'Request Entity Too Large');
 			//There is maybe a potential exploit attempt...Broke the script now!
 			$this->trigger_error($this->user->lang['MMS_PACKET_SIZE'], E_USER_ERROR, append_sid("{$this->phpbb_root_path}index.{$this->phpEx}", ""), false);
 		}
-		if (
-				(
-					$this->mms_action == 'move' ||
-					$this->mms_action == 'resync' ||
-					$this->mms_action == 'merge' ||
-					$this->mms_action == 'delete' ||
-					$this->mms_action == 'chgposter'
-				)
-				&& sizeof($this->{DYN_VAR}) > 6
-			)
+		if (($this->mms_action == 'move' || $this->mms_action == 'resync' || $this->mms_action == 'merge' || $this->mms_action == 'delete' || $this->mms_action == 'chgposter')&& sizeof($this->{MOD_MODE}) > 6)
 		{
 			send_status_line(412, 'Request Entity Too Large');
 			//There is maybe a potential exploit attempt...Broke the script now!
 			$this->trigger_error($this->user->lang['MMS_PACKET_SIZE'], E_USER_ERROR, append_sid("{$this->phpbb_root_path}index.{$this->phpEx}", ""), false);
 		}
-		if ( $this->mms_action == 'options' && sizeof($this->{DYN_VAR}) > 8 )
+		if ($this->mms_action == 'options' && sizeof($this->{MOD_MODE}) > 8)
 		{
 			send_status_line(412, 'Request Entity Too Large');
 			//There is maybe a potential exploit attempt...Broke the script now!
 			$this->trigger_error($this->user->lang['MMS_PACKET_SIZE'], E_USER_ERROR, append_sid("{$this->phpbb_root_path}index.{$this->phpEx}", ""), false);
 		}
-		if (
-				(
-					$this->mms_action == 'lock' ||
-					$this->mms_action == 'unlock' ||
-					$this->mms_action == 'chgicon' ||
-					$this->mms_action == 'attr' ||
-					$this->mms_action == 'grabip'
-				)
-				&& sizeof($this->{DYN_VAR}) > 10
-			)
+		if (($this->mms_action == 'lock' || $this->mms_action == 'unlock' || $this->mms_action == 'chgicon' || $this->mms_action == 'attr' || $this->mms_action == 'grabip')&& sizeof($this->{MOD_MODE}) > 10)
 		{
 			send_status_line(412, 'Request Entity Too Large');
 			//There is maybe a potential exploit attempt...Broke the script now!
@@ -445,13 +423,13 @@ final class mms_search
 	****/
 	private function check_post_options_acl($fid, $is_me = false)
 	{
-		if ( !$is_me)
+		if (!$is_me)
 		{
-			switch ( $this->post_option )
+			switch ($this->post_option)
 			{
 				case 'disable_sig':
 				case 'enable_sig':
-					if ( !$this->auth->acl_get('f_sigs', $fid) || !$this->auth->acl_get('m_edit', $fid) )
+					if (!$this->auth->acl_get('f_sigs', $fid) || !$this->auth->acl_get('m_edit', $fid))
 					{
 						return false;
 					}
@@ -459,7 +437,7 @@ final class mms_search
 
 				case 'disable_smilies':
 				case 'enable_smilies':
-					if ( !$this->auth->acl_get('f_smilies', $fid) || !$this->auth->acl_get('m_edit', $fid) )
+					if (!$this->auth->acl_get('f_smilies', $fid) || !$this->auth->acl_get('m_edit', $fid))
 					{
 						return false;
 					}
@@ -472,14 +450,14 @@ final class mms_search
 
 				case 'disable_bbcodes':
 				case 'enable_bbcodes':
-					if ( !$this->auth->acl_get('f_bbcode', $fid) || !$this->auth->acl_get('m_edit', $fid) )
+					if (!$this->auth->acl_get('f_bbcode', $fid) || !$this->auth->acl_get('m_edit', $fid))
 					{
 						return false;
 					}
 				break;
 
 				case 'remove_attachment':
-					if ( !$this->auth->acl_get('f_attach', $fid) || !$this->auth->acl_get('m_edit', $fid) )
+					if (!$this->auth->acl_get('f_attach', $fid) || !$this->auth->acl_get('m_edit', $fid))
 					{
 						return false;
 					}
@@ -488,21 +466,21 @@ final class mms_search
 				//Addons
 				case 'disable_hpiv':
 				case 'enable_hpiv':
-					if ( !$this->addons['hpiv'] || !$this->auth->acl_get('f_post_profile', $fid) || !$this->auth->acl_get('m_edit', $fid) )
+					if (!$this->addons['hpiv'] || !$this->auth->acl_get('f_post_profile', $fid) || !$this->auth->acl_get('m_edit', $fid))
 					{
 						return false;
 					}
 				break;
 
 				case 'remove_ppr':
-					if ( !$this->addons['ppr'] || !$this->auth->acl_get('f_read', $fid) || !$this->auth->acl_get('m_delete', $fid) )
+					if (!$this->addons['ppr'] || !$this->auth->acl_get('f_read', $fid) || !$this->auth->acl_get('m_delete', $fid))
 					{
 						return false;
 					}
 				break;
 
 				case 'remove_mm':
-					if ( !$this->addons['mm'] || !$this->auth->acl_get('f_read', $fid) || !$this->auth->acl_get('m_mm_delete', $fid) )
+					if (!$this->addons['mm'] || !$this->auth->acl_get('f_read', $fid) || !$this->auth->acl_get('m_mm_delete', $fid))
 					{
 						return false;
 					}
@@ -511,11 +489,11 @@ final class mms_search
 		}
 		else
 		{
-			switch ( $this->post_option )
+			switch ($this->post_option)
 			{
 				case 'disable_sig':
 				case 'enable_sig':
-					if ( !$this->auth->acl_get('f_sigs', $fid) || (!$this->auth->acl_get('f_edit', $fid) || !$this->auth->acl_get('m_edit', $fid)) )
+					if (!$this->auth->acl_get('f_sigs', $fid) || (!$this->auth->acl_get('f_edit', $fid) || !$this->auth->acl_get('m_edit', $fid)))
 					{
 						return false;
 					}
@@ -523,7 +501,7 @@ final class mms_search
 
 				case 'disable_smilies':
 				case 'enable_smilies':
-					if ( !$this->auth->acl_get('f_smilies', $fid) || (!$this->auth->acl_get('f_edit', $fid) || !$this->auth->acl_get('m_edit', $fid)) )
+					if (!$this->auth->acl_get('f_smilies', $fid) || (!$this->auth->acl_get('f_edit', $fid) || !$this->auth->acl_get('m_edit', $fid)))
 					{
 						return false;
 					}
@@ -535,14 +513,14 @@ final class mms_search
 				break;
 				case 'disable_bbcodes':
 				case 'enable_bbcodes':
-					if ( !$this->auth->acl_get('f_bbcode', $fid) || (!$this->auth->acl_get('f_edit', $fid) || !$this->auth->acl_get('m_edit', $fid)) )
+					if (!$this->auth->acl_get('f_bbcode', $fid) || (!$this->auth->acl_get('f_edit', $fid) || !$this->auth->acl_get('m_edit', $fid)))
 					{
 						return false;
 					}
 				break;
 
 				case 'remove_attachment':
-					if ( !$this->auth->acl_get('f_attach', $fid) || (!$this->auth->acl_get('f_edit', $fid) || !$this->auth->acl_get('m_edit', $fid)) )
+					if (!$this->auth->acl_get('f_attach', $fid) || (!$this->auth->acl_get('f_edit', $fid) || !$this->auth->acl_get('m_edit', $fid)))
 					{
 						return false;
 					}
@@ -551,21 +529,21 @@ final class mms_search
 				//Addons
 				case 'disable_hpiv':
 				case 'enable_hpiv':
-					if ( !$this->addons['hpiv'] || !$this->auth->acl_get('f_post_profile', $fid) || (!$this->auth->acl_get('f_edit', $fid) || !$this->auth->acl_get('m_edit', $fid)) )
+					if (!$this->addons['hpiv'] || !$this->auth->acl_get('f_post_profile', $fid) || (!$this->auth->acl_get('f_edit', $fid) || !$this->auth->acl_get('m_edit', $fid)))
 					{
 						return false;
 					}
 				break;
 
 				case 'remove_ppr':
-					if ( !$this->addons['ppr'] || !$this->auth->acl_get('f_read', $fid) || (!$this->auth->acl_get('f_delete', $fid) || !$this->auth->acl_get('m_delete', $fid)) )
+					if (!$this->addons['ppr'] || !$this->auth->acl_get('f_read', $fid) || (!$this->auth->acl_get('f_delete', $fid) || !$this->auth->acl_get('m_delete', $fid)))
 					{
 						return false;
 					}
 				break;
 
 				case 'remove_mm':
-					if ( !$this->addons['mm'] || !$this->auth->acl_get('f_read', $fid) || (!$this->auth->acl_get('f_delete', $fid) || !$this->auth->acl_get('m_mm_delete', $fid)) )
+					if (!$this->addons['mm'] || !$this->auth->acl_get('f_read', $fid) || (!$this->auth->acl_get('f_delete', $fid) || !$this->auth->acl_get('m_mm_delete', $fid)))
 					{
 						return false;
 					}
@@ -581,9 +559,9 @@ final class mms_search
 	****/
 	private function row_mode(&$mode)
 	{
-		if ( ( $mode = request_var('mms_type', '')) )
+		if (($mode = request_var('mms_type', '')))
 		{
-			switch ( $mode)
+			switch ($mode)
 			{
 				//Extra security measure for variables variable.
 				case 'topic':
@@ -596,9 +574,9 @@ final class mms_search
 				break;
 			}
 		}
-		else if ( ( $mode = request_var('sr', '')) )
+		else if (($mode = request_var('sr', '')))
 		{
-			switch ( $mode)
+			switch ($mode)
 			{
 				//Extra security measure for variables variable.
 				case 'topics':
@@ -642,7 +620,7 @@ final class mms_search
 	****/
 	private function load_datas()
 	{
-		if ( !$this->config['mms_mod_enable'])
+		if (!$this->config['mms_mod_enable'])
 		{
 			return;
 		}
@@ -655,10 +633,10 @@ final class mms_search
 		{
 			$pagination .= '<option value="' . $i . '">' . $i . '</option>';
 		}
-		if ( $this->mms_load)
+		if ($this->mms_load)
 		{
 			$this->mms_pagination = request_var('mms_pagination', $this->mms_pagination);
-			if ( $this->mms_pagination > $this->config['mms_mod_pagination'])
+			if ($this->mms_pagination > $this->config['mms_mod_pagination'])
 			{
 
 				$this->mms_pagination = $this->config['mms_mod_pagination'];//Set the hardlimit
@@ -688,19 +666,19 @@ final class mms_search
 	****/
 	public function inject_tpl()
 	{
-		if ( $this->mms_topic_action == 'attr' && !$this->addons['qte'] )
+		if ($this->mms_topic_action == 'attr' && !$this->addons['qte'])
 		{
 			//Add-on missing, stop the script definitely!
 			$this->trigger_error($this->user->lang['MMS_ADDON_DISABLED'], E_USER_ERROR);
 		}
-		if ( !function_exists('make_forum_select') )
+		if (!function_exists('make_forum_select'))
 		{
 			include($this->phpbb_root_path . 'includes/functions_admin.' . $this->phpEx);
 		}
 		//If there is only one user in selector, then the user selector tool is useless..
-		if ( sizeof($this->uids) > 1)
+		if (sizeof($this->uids) > 1)
 		{
-			foreach ( $this->uids AS $uids_)
+			foreach ($this->uids AS $uids_)
 			{
 				$style = ($uids_['user_colour'] ? 'style="color: #' . $uids_['user_colour'] . ';font-weight: bold;" ' : '');
 				$this->user_selector .= '<option ' . $style . 'value="' . $uids_['username'] . '">' . $uids_['username'] . '</option>';
@@ -709,18 +687,18 @@ final class mms_search
 			$this->template->assign_var('S_MMS_USER_SELECTOR', $this->user_selector);
 		}
 		//If there is only one forum in selector, then the forum selector tool is useless..
-		if ( sizeof($this->fids) > 1)
+		if (sizeof($this->fids) > 1)
 		{
 			$forum_ary = make_forum_select(0, false, false, true, true, true, true);
 			$forum_ary_ = array();
-			foreach ( $this->fids AS $fid_ )
+			foreach ($this->fids AS $fid_)
 			{
 				$forum_ary_[$fid_] = $forum_ary[$fid_];
 			}
 			$forum_ary = $forum_ary_;
 			unset($forum_ary_, $fid_);
 
- 			foreach ( $forum_ary AS $fids_ => $row)
+ 			foreach ($forum_ary AS $fids_ => $row)
 			{
 				//Forum Title Colour Addon integration, uncomment below to see an example...
 				//$row['forum_name_colour'] = "AAAAAA";
@@ -740,9 +718,9 @@ final class mms_search
 	****/
 	public function build_tools()
 	{
-		foreach ( $this->fids AS $fids_ )
+		foreach ($this->fids AS $fids_)
 		{
-			if ( $this->auth->acl_getf('m_lock', $fids_) && !$this->mms_acl['lock'] )
+			if ($this->auth->acl_getf('m_lock', $fids_) && !$this->mms_acl['lock'])
 			{
 				$this->mms_acl['lock'] = true;
 				$this->mms_acl['unlock'] = true;
@@ -751,7 +729,7 @@ final class mms_search
 				$this->post_selector .= '<option value="lock">' . $this->user->lang['MMS_TOOLS_POSTS']['lock'] . '</option>';
 				$this->post_selector .= '<option value="unlock">' . $this->user->lang['MMS_TOOLS_POSTS']['unlock'] . '</option>';
 			}
-			if ( $this->auth->acl_getf('m_move', $fids_) && !$this->mms_acl['move'] )
+			if ($this->auth->acl_getf('m_move', $fids_) && !$this->mms_acl['move'])
 			{
 				$this->mms_acl['move'] = true;
 				$this->mms_acl['fork'] = true;
@@ -760,40 +738,40 @@ final class mms_search
 				$this->post_selector .= '<option value="move">' . $this->user->lang['MMS_TOOLS_POSTS']['move'] . '</option>';
 				//$this->post_selector .= '<option value="fork">' . $this->user->lang['MMS_TOOLS_POSTS']['fork'] . '</option>';
 			}
-			if ( $this->auth->acl_getf('m_delete', $fids_) && !$this->mms_acl['delete'] )
+			if ($this->auth->acl_getf('m_delete', $fids_) && !$this->mms_acl['delete'])
 			{
 				$this->mms_acl['delete'] = true;
 				$this->topic_selector .= '<option value="delete">' . $this->user->lang['MMS_TOOLS_TOPICS']['delete'] . '</option>';
 				$this->post_selector .= '<option value="delete">' . $this->user->lang['MMS_TOOLS_POSTS']['delete'] . '</option>';
 			}
-			if ( $this->auth->acl_getf('m_chgposter', $fids_) && !$this->mms_acl['chgposter'] )
+			if ($this->auth->acl_getf('m_chgposter', $fids_) && !$this->mms_acl['chgposter'])
 			{
 				$this->mms_acl['chgposter'] = true;
 				$this->post_selector .= '<option value="chgposter">' . $this->user->lang['MMS_TOOLS_POSTS']['chgposter'] . '</option>';
 			}
-			if ( $this->auth->acl_getf('m_edit', $fids_) && !$this->mms_acl['edit'] )
+			if ($this->auth->acl_getf('m_edit', $fids_) && !$this->mms_acl['edit'])
 			{
 				$this->mms_acl['edit'] = true;
 				$this->topic_selector .= '<option value="chgicon">' . $this->user->lang['MMS_TOOLS_TOPICS']['chgicon'] . '</option>';
 				$this->post_selector .= '<option value="options">' . $this->user->lang['MMS_TOOLS_POSTS']['options'] . '</option>';
-				if ( $this->addons['qte'])
+				if ($this->addons['qte'])
 				{
 					$this->topic_selector .= '<option value="attr">' . $this->user->lang['MMS_TOOLS_TOPICS']['attr'] . '</option>';
 				}
 			}
-			if ( $this->auth->acl_getf('m_info', $fids_) && !$this->mms_acl['info'] )
+			if ($this->auth->acl_getf('m_info', $fids_) && !$this->mms_acl['info'])
 			{
 				$this->mms_acl['info'] = true;
 				$this->post_selector .= '<option value="grabip">' . $this->user->lang['MMS_TOOLS_POSTS']['grabip'] . '</option>';
 			}
-			if ( $this->auth->acl_getf('m_merge', $fids_) && !$this->mms_acl['merge'] )
+			if ($this->auth->acl_getf('m_merge', $fids_) && !$this->mms_acl['merge'])
 			{
 				$this->mms_acl['merge'] = true;
 				$this->topic_selector .= '<option value="merge">' . $this->user->lang['MMS_TOOLS_TOPICS']['merge'] . '</option>';
 			}
 		}
 		unset($fids_);
-		if ( $this->topic_selector )
+		if ($this->topic_selector)
 		{
 			$this->topic_selector .= '<option value="resync">' . $this->user->lang['MMS_TOOLS_TOPICS']['resync'] . '</option>';
 		}
@@ -812,45 +790,45 @@ final class mms_search
 	{
 		$this->post_options_selector .= '<option value="disable_links">' . $this->user->lang['MMS_UP_ARROW'] . $this->user->lang['MMS_POSTS_OPTIONS']['DISABLE_LINKS'] . '</option>';
 		$this->post_options_selector .= '<option value="enable_links">' . $this->user->lang['MMS_SUB_ARROW'] . $this->user->lang['MMS_POSTS_OPTIONS']['ENABLE_LINKS'] . '</option>';
-		foreach ( $this->fids AS $fids_ )
+		foreach ($this->fids AS $fids_)
 		{
-			if ( $this->auth->acl_getf('f_sigs', $fids_) && !$this->mms_f_acl['sigs'] )
+			if ($this->auth->acl_getf('f_sigs', $fids_) && !$this->mms_f_acl['sigs'])
 			{
 				$this->mms_f_acl['sigs'] = true;
 				$this->post_options_selector .= '<option value="disable_sig">' . $this->user->lang['MMS_UP_ARROW'] . $this->user->lang['MMS_POSTS_OPTIONS']['DISABLE_SIG'] . '</option>';
 				$this->post_options_selector .= '<option value="enable_sig">' . $this->user->lang['MMS_SUB_ARROW'] . $this->user->lang['MMS_POSTS_OPTIONS']['ENABLE_SIG'] . '</option>';
 			}
-			if ( $this->auth->acl_getf('f_smilies', $fids_) && !$this->mms_f_acl['smilies'] )
+			if ($this->auth->acl_getf('f_smilies', $fids_) && !$this->mms_f_acl['smilies'])
 			{
 				$this->mms_f_acl['smilies'] = true;
 				$this->post_options_selector .= '<option value="disable_smilies">' . $this->user->lang['MMS_UP_ARROW'] . $this->user->lang['MMS_POSTS_OPTIONS']['DISABLE_SMILIES'] . '</option>';
 				$this->post_options_selector .= '<option value="enable_smilies">' . $this->user->lang['MMS_SUB_ARROW'] . $this->user->lang['MMS_POSTS_OPTIONS']['ENABLE_SMILIES'] . '</option>';
 			}
-			if ( $this->auth->acl_getf('f_bbcode', $fids_) && !$this->mms_f_acl['bbcode'] )
+			if ($this->auth->acl_getf('f_bbcode', $fids_) && !$this->mms_f_acl['bbcode'])
 			{
 				$this->mms_f_acl['bbcode'] = true;
 				$this->post_options_selector .= '<option value="disable_bbcodes">' . $this->user->lang['MMS_UP_ARROW'] . $this->user->lang['MMS_POSTS_OPTIONS']['DISABLE_BBCODES'] . '</option>';
 				$this->post_options_selector .= '<option value="enable_bbcodes">' . $this->user->lang['MMS_SUB_ARROW'] . $this->user->lang['MMS_POSTS_OPTIONS']['ENABLE_BBCODES'] . '</option>';
 			}
 			//Addons
-			if ($this->addons['hpiv'] && $this->auth->acl_getf('f_post_profile', $fids_) && !$this->mms_f_acl_addon['hpiv'] )
+			if ($this->addons['hpiv'] && $this->auth->acl_getf('f_post_profile', $fids_) && !$this->mms_f_acl_addon['hpiv'])
 			{
 				$this->mms_f_acl_addon['hpiv'] = true;
 				$this->post_options_selector .= '<option value="enable_hpiv">' . $this->user->lang['MMS_UP_ARROW'] . $this->user->lang['MMS_POSTS_OPTIONS']['ENABLE_HPIV'] . '</option>';
 				$this->post_options_selector .= '<option value="disable_hpiv">' . $this->user->lang['MMS_SUB_ARROW'] . $this->user->lang['MMS_POSTS_OPTIONS']['DISABLE_HPIV'] . '</option>';
 			}
-			if ($this->addons['ppr'] && $this->auth->acl_getf('f_delete', $fids_) && !$this->mms_f_acl_addon['ppr'] )
+			if ($this->addons['ppr'] && $this->auth->acl_getf('f_delete', $fids_) && !$this->mms_f_acl_addon['ppr'])
 			{
 				$this->mms_f_acl_addon['ppr'] = true;
 				$this->post_options_selector .= '<option value="remove_ppr">' . $this->user->lang['MMS_POSTS_OPTIONS']['REMOVE_PPR'] . '</option>';
 			}
-			if ($this->addons['mm'] && $this->auth->acl_getf('m_mm_delete', $fids_) && !$this->mms_f_acl_addon['mm'] )
+			if ($this->addons['mm'] && $this->auth->acl_getf('m_mm_delete', $fids_) && !$this->mms_f_acl_addon['mm'])
 			{
 				$this->mms_f_acl_addon['mm'] = true;
 				$this->post_options_selector .= '<option value="remove_mm">' . $this->user->lang['MMS_POSTS_OPTIONS']['REMOVE_MM'] . '</option>';
 			}
 			//Alone option only...
-			if ( $this->auth->acl_getf('f_attach', $fids_) && !$this->mms_f_acl['attach'] )
+			if ($this->auth->acl_getf('f_attach', $fids_) && !$this->mms_f_acl['attach'])
 			{
 				$this->mms_f_acl['attach'] = true;
 				$this->post_options_selector .= '<option value="remove_attachment">' . $this->user->lang['MMS_POSTS_OPTIONS']['REMOVE_ATTACHMENT'] . '</option>';
@@ -863,7 +841,7 @@ final class mms_search
 		));
 	}
 
-	private function build_mmsIpreview_Url($url, $title)
+	private function build_mms_ipreview_url($url, $title)
 	{
 		$str = "javascript:mmsIpreview('" . htmlentities($url) ."',%20'" . addslashes($title) . "')";
 		return $str;
@@ -875,47 +853,47 @@ final class mms_search
 	****/
 	private function request_vars()
 	{
-		define('DYN_VAR', "mms_{$this->row_mode}_ary");
-		$this->{DYN_VAR} = array();
+		define('MOD_MODE', "mms_{$this->row_mode}_ary");
+		$this->{MOD_MODE} = array();
 		//This IF statement will never be used, but will keep it if someone want do an addon for non-JSON server.
 		//As in Jquery all input like "mms_(topic|post)_(int)" are automatically transformed into a nice JSON object recovered in the next "ELSE alternative statement"
-		if ( sizeof($_POST) && !$this->is_ajax && empty($this->mms_from_sr))
+		if (sizeof($_POST) && !$this->is_ajax && empty($this->mms_from_sr))
 		{
-			foreach ( $_POST AS $_POST_KEY_ => $_POST_VALUE_ )
+			foreach ($_POST AS $_POST_KEY_ => $_POST_VALUE_)
 			{
-				if ( preg_match('/^mms_' . $this->row_mode . '_([0-9]{1,10})$/', $_POST_KEY_, $matches) )
+				if (preg_match('/^mms_' . $this->row_mode . '_([0-9]{1,10})$/', $_POST_KEY_, $matches))
 				{
 					//echo($_POST_KEY_);
-					$this->{DYN_VAR}[] = (int) $matches[1];
+					$this->{MOD_MODE}[] = (int) $matches[1];
 				}
 			}
 		}
-		else if ( !$this->is_ajax && !empty($this->mms_from_sr) && defined('IN_MMS'))
+		else if (!$this->is_ajax && !empty($this->mms_from_sr) && defined('IN_MMS'))
 		{
 			$post = json_decode($this->unescape_gpc($this->mms_from_sr), true);
-			foreach ( $post AS $post_key_ => $post_value_ )
+			foreach ($post AS $post_key_ => $post_value_)
 			{
-				if ( preg_match('/^mms_' . $this->row_mode . '_([0-9]{1,10})$/', $post_key_, $matches) )
+				if (preg_match('/^mms_' . $this->row_mode . '_([0-9]{1,10})$/', $post_key_, $matches))
 				{
-					$this->{DYN_VAR}[] = (int) $matches[1];
+					$this->{MOD_MODE}[] = (int) $matches[1];
 				}
 			}
 		}
-		else if ( $this->is_ajax && empty($this->mms_from_sr) )
+		else if ($this->is_ajax && empty($this->mms_from_sr))
 		{
 			//Extra safety: Force Array to be casted as INT
-			$this->{DYN_VAR} = array_map('intval', json_decode($this->unescape_gpc(request_var('rids', '', true)), true));
+			$this->{MOD_MODE} = array_map('intval', json_decode($this->unescape_gpc(request_var('rids', '', true)), true));
 		}
 		//Security measure: check here if the doesn't try to send more than $this->MMS_AJAX_PACKETS allowed packets
-		if (sizeof($this->{DYN_VAR}) > $this->MMS_AJAX_PACKETS)
+		if (sizeof($this->{MOD_MODE}) > $this->MMS_AJAX_PACKETS)
 		{
 			$ary = array();
 			$i = 0;
-			foreach ( $this->{DYN_VAR} AS $key_ => $val_)
+			foreach ($this->{MOD_MODE} AS $key_ => $val_)
 			{
 				$ary[$key_] = $val_;
 				$i++;
-				if ( $i = $this->MMS_AJAX_PACKETS)
+				if ($i = $this->MMS_AJAX_PACKETS)
 				{
 					//Chunck extra-rows
 					break;
@@ -944,10 +922,10 @@ final class mms_search
 	{
 		$mode = request_var('mms_' . $this->row_mode . '_action', '');//$this->row_mode is already sanitized above: function: row_mode()
 
-		switch ( $this->row_mode)
+		switch ($this->row_mode)
 		{
 			case 'post':
-					switch ( $mode )
+					switch ($mode)
 					{
 						case 'delete':
 						case 'lock':
@@ -967,7 +945,7 @@ final class mms_search
 			break;
 
 			case 'topic':
-					switch ( $mode )
+					switch ($mode)
 					{
 						case 'delete':
 						case 'lock':
@@ -1035,16 +1013,16 @@ final class mms_search
 	****/
 	private function get_tp_row()
 	{
-		if ( $this->row_mode)
+		if ($this->row_mode)
 		{
-			switch ( $this->row_mode)
+			switch ($this->row_mode)
 			{
 				case 'topic':
 						$sql = 'SELECT t.topic_id, t.forum_id, t.topic_title AS row_title, t.topic_poster AS user_id, t.topic_first_poster_name AS username, t.topic_first_poster_colour AS user_colour, t.topic_type AS row_type, t.topic_time AS row_time, p.post_text AS text_content
 							FROM ' . TOPICS_TABLE . ' t
 							LEFT JOIN ' . POSTS_TABLE . ' p
 									ON (p.post_id = t.topic_first_post_id)
-							WHERE ' . $this->db->sql_in_set('t.topic_id', $this->{DYN_VAR});
+							WHERE ' . $this->db->sql_in_set('t.topic_id', $this->{MOD_MODE});
 				break;
 				case 'post':
 						$sql = 'SELECT p.post_id, p.topic_id, p.forum_id, p.post_subject AS row_title, p.poster_id, p.post_time AS row_time, p.post_text AS text_content, t.topic_type AS row_type, u.user_id, u.username, u.user_colour
@@ -1053,15 +1031,15 @@ final class mms_search
 									ON (u.user_id = p.poster_id)
 							LEFT JOIN ' . TOPICS_TABLE . ' t
 									ON (t.topic_id = p.topic_id)
-							WHERE ' . $this->db->sql_in_set('p.post_id', $this->{DYN_VAR});
+							WHERE ' . $this->db->sql_in_set('p.post_id', $this->{MOD_MODE});
 				break;
 			}
 			$result = $this->db->sql_query($sql);
 			$i = $f = 0;
 			$json_row = array();
-			while ( $row = $this->db->sql_fetchrow($result))
+			while ($row = $this->db->sql_fetchrow($result))
 			{
-				if ( $this->auth->acl_get('m_' . $this->mms_action_acl, $row['forum_id']) && $this->auth->acl_gets('f_list', 'f_read', $row['forum_id']) && $row['row_type'] != POST_GLOBAL)
+				if ($this->auth->acl_get('m_' . $this->mms_action_acl, $row['forum_id']) && $this->auth->acl_gets('f_list', 'f_read', $row['forum_id']) && $row['row_type'] != POST_GLOBAL)
 				{
 					$this->template->assign_block_vars('mms_row',  array(
 						'POST_ID'		=> isset($row['post_id']) ? $row['post_id'] : '',
@@ -1082,7 +1060,7 @@ final class mms_search
 					$this->fids[] = $row['forum_id'];//Do only a pre-auth checking for build_tools_options()
 					$json_row[(isset($row['post_id']) ? $row['post_id'] : $row['topic_id'])] = $this->row_mode;
 				}
-				else if ( $row['row_type'] == POST_GLOBAL)//exclude global announcement
+				else if ($row['row_type'] == POST_GLOBAL)//exclude global announcement
 				{
 					$this->template->assign_block_vars('mms_fail_row',  array(
 						'POST_ID'		=> isset($row['post_id']) ? $row['post_id'] : '',
@@ -1102,7 +1080,7 @@ final class mms_search
 					));
 					$f++;
 				}
-				else if ( !$this->auth->acl_get('m_' . $this->mms_action_acl, $row['forum_id']) && $this->auth->acl_gets('f_list', 'f_read', $row['forum_id']))
+				else if (!$this->auth->acl_get('m_' . $this->mms_action_acl, $row['forum_id']) && $this->auth->acl_gets('f_list', 'f_read', $row['forum_id']))
 				{
 					$this->template->assign_block_vars('mms_fail_row',  array(
 						'POST_ID'		=> isset($row['post_id']) ? $row['post_id'] : '',
@@ -1144,21 +1122,21 @@ final class mms_search
 				}
 			}
 			$this->db->sql_freeresult($result);
-			if ( !$i && !$f)
+			if (!$i && !$f)
 			{
 				$this->trigger_error($this->user->lang['MMS_NO_' . strtoupper($this->row_mode)], E_USER_WARNING);
 			}
-			if ( $this->row_mode == 'post' && $this->mms_action == 'options')
+			if ($this->row_mode == 'post' && $this->mms_action == 'options')
 			{
 				$this->build_tools_options();
 			}
-			else if ( $this->row_mode == 'topic' && $this->mms_action == 'chgicon')
+			else if ($this->row_mode == 'topic' && $this->mms_action == 'chgicon')
 			{
 				$this->posting_gen_topic_icons();
 			}
-			else if ( $this->row_mode == 'topic' && $this->mms_action == 'attr' )
+			else if ($this->row_mode == 'topic' && $this->mms_action == 'attr')
 			{
-				if ( $this->addons['qte'] )
+				if ($this->addons['qte'])
 				{
 					$this->qte->attr_search();
 				}
@@ -1251,18 +1229,18 @@ final class mms_search
 	public function topic_delete()
 	{
 		$this->load_sizecheck();
-		$rows = $this->check_ids($this->{DYN_VAR}, TOPICS_TABLE, 'topic_id', 'topic_title', 'm_delete');
+		$rows = $this->check_ids($this->{MOD_MODE}, TOPICS_TABLE, 'topic_id', 'topic_title', 'm_delete');
 
 		$this->ajax_data = json_decode($this->unescape_gpc(request_var('mms_data', '', true)), true);
 
-		foreach ( $rows[$this::MMS_PASSED] AS $key_ => $val_)
+		foreach ($rows[$this::MMS_PASSED] AS $key_ => $val_)
 		{
 			$this->final_eval .= "$('#span_row_id{$val_}').remove();";
 			$this->row_msg_ary[$val_] = $this->user->lang['MMS_STATUT_DELETED'];
 			$this->row_statut_ary[$val_] = true;
 			add_log('mod', $this->fids[$val_], $this->tids[$val_], 'MMS_LOG_' . strtoupper($this->row_mode) . '_' . strtoupper($this->{'mms_' . $this->row_mode . '_action'}), $this->rids_title[$val_], $this->unms[$val_]);
 		}
-		foreach ( $rows[$this::MMS_IGNORED] AS $key_ => $reason_)
+		foreach ($rows[$this::MMS_IGNORED] AS $key_ => $reason_)
 		{
 			$this->row_msg_ary[$key_] = $reason_;
 			$this->row_statut_ary[$key_] = false;
@@ -1284,11 +1262,11 @@ final class mms_search
 			'pwd_confirm'	=> true,
 			'fdata'			=> $this->fdata,
 		);
-		if ( $this->auth->acl_get('a_') && $this->load !== false )
+		if ($this->auth->acl_get('a_') && $this->load !== false)
 		{
 			$this->ajax_ary += array('loadavg' => $this->load);
 		}
-		$this->ajax_echo(json_encode($this->ajax_ary),JSON_HEX_QUOT);
+		$this->ajax_echo(json_encode($this->ajax_ary), JSON_HEX_QUOT);
 
 	}
 
@@ -1304,7 +1282,7 @@ final class mms_search
 		$this->to_fid = $this->ajax_data['forum_id'];
 		$shadow = $this->ajax_data['shadow'];
 		$forum_data = $this->get_forum_data($this->to_fid);
-		if ( !sizeof($forum_data))
+		if (!sizeof($forum_data))
 		{
 			$this->trigger_error($this->user->lang['FORUM_NOT_EXIST'], E_USER_NOTICE, false);
 		}
@@ -1312,22 +1290,22 @@ final class mms_search
 		{
 			$forum_data = $forum_data[$this->to_fid];
 
-			if ( $forum_data['forum_type'] != FORUM_POST)
+			if ($forum_data['forum_type'] != FORUM_POST)
 			{
 				$this->trigger_error($this->user->lang['FORUM_NOT_POSTABLE'], E_USER_NOTICE, false);
 			}
-			else if ( !$this->auth->acl_get('f_post', $this->to_fid) || (!$this->auth->acl_get('m_approve', $this->to_fid) && !$this->auth->acl_get('f_noapprove', $this->to_fid)))
+			else if (!$this->auth->acl_get('f_post', $this->to_fid) || (!$this->auth->acl_get('m_approve', $this->to_fid) && !$this->auth->acl_get('f_noapprove', $this->to_fid)))
 			{
 				$this->trigger_error($this->user->lang['USER_CANNOT_POST'], E_USER_NOTICE, false);
 			}
 		}
-		$rows = $this->check_ids($this->{DYN_VAR}, TOPICS_TABLE, 'topic_id', 'topic_title', 'm_move');
+		$rows = $this->check_ids($this->{MOD_MODE}, TOPICS_TABLE, 'topic_id', 'topic_title', 'm_move');
 
-		foreach ( $rows[$this::MMS_PASSED] AS $key_ => $rows_)
+		foreach ($rows[$this::MMS_PASSED] AS $key_ => $rows_)
 		{
 			$this->mcp_move_topic(array($key_ => $rows_), $shadow, $forum_data);
 		}
-		foreach ( $rows[$this::MMS_IGNORED] AS $key_ => $reason_)
+		foreach ($rows[$this::MMS_IGNORED] AS $key_ => $reason_)
 		{
 			$this->row_msg_ary[$key_] = $reason_;
 			$this->row_statut_ary[$key_] = false;
@@ -1347,11 +1325,11 @@ final class mms_search
 			'pwd_confirm'	=> true,
 			'fdata'			=> $this->fdata,
 		);
-		if ( $this->auth->acl_get('a_') && $this->load !== false )
+		if ($this->auth->acl_get('a_') && $this->load !== false)
 		{
 			$this->ajax_ary += array('loadavg' => $this->load);
 		}
-		$this->ajax_echo(json_encode($this->ajax_ary),JSON_HEX_QUOT);
+		$this->ajax_echo(json_encode($this->ajax_ary), JSON_HEX_QUOT);
 
 	}
 
@@ -1363,7 +1341,7 @@ final class mms_search
 	public function topic_fork()
 	{
 		$this->load_sizecheck();
-		$rows = $this->check_ids($this->{DYN_VAR}, TOPICS_TABLE, 'topic_id', 'topic_title', 'm_');
+		$rows = $this->check_ids($this->{MOD_MODE}, TOPICS_TABLE, 'topic_id', 'topic_title', 'm_');
 		$this->ajax_data = json_decode($this->unescape_gpc(request_var('mms_data', '', true)), true);
 
 		$to_forum_id = $this->ajax_data['forum_id'];
@@ -1385,11 +1363,11 @@ final class mms_search
 			'pwd_confirm'	=> true,
 			'fdata'			=> $this->fdata,
 		);
-		if ( $this->auth->acl_get('a_') && $this->load !== false )
+		if ($this->auth->acl_get('a_') && $this->load !== false)
 		{
 			$this->ajax_ary += array('loadavg' => $this->load);
 		}
-		$this->ajax_echo(json_encode($this->ajax_ary),JSON_HEX_QUOT);
+		$this->ajax_echo(json_encode($this->ajax_ary), JSON_HEX_QUOT);
 	}
 
 	/****
@@ -1400,7 +1378,7 @@ final class mms_search
 	public function topic_lock()
 	{
 		$this->load_sizecheck();
-		$rows = $this->check_ids($this->{DYN_VAR}, TOPICS_TABLE, 'topic_id', 'topic_title', 'm_lock');
+		$rows = $this->check_ids($this->{MOD_MODE}, TOPICS_TABLE, 'topic_id', 'topic_title', 'm_lock');
 		if (sizeof($rows[$this::MMS_PASSED]))
 		{
 			$sql = "UPDATE " . TOPICS_TABLE . "
@@ -1408,13 +1386,13 @@ final class mms_search
 				WHERE ' . $this->db->sql_in_set('topic_id', $rows[$this::MMS_PASSED]);
 			$this->db->sql_query($sql);
 		}
-		foreach ( $rows[$this::MMS_PASSED] AS $key_ => $val_)
+		foreach ($rows[$this::MMS_PASSED] AS $key_ => $val_)
 		{
 			$this->row_msg_ary[$val_] = $this->user->lang['MMS_STATUT_LOCKED'];
 			$this->row_statut_ary[$val_] = true;
 			add_log('mod', $this->fids[$val_], $this->tids[$val_], 'MMS_LOG_' . strtoupper($this->row_mode) . '_' . strtoupper($this->{'mms_' . $this->row_mode . '_action'}), $this->rids_title[$val_]);
 		}
-		foreach ( $rows[$this::MMS_IGNORED] AS $key_ => $reason_)
+		foreach ($rows[$this::MMS_IGNORED] AS $key_ => $reason_)
 		{
 			$this->row_msg_ary[$key_] = $reason_;
 			$this->row_statut_ary[$key_] = false;
@@ -1431,11 +1409,11 @@ final class mms_search
 			'pwd_confirm'	=> true,
 			'fdata'			=> false,
 		);
-		if ( $this->auth->acl_get('a_') && $this->load !== false )
+		if ($this->auth->acl_get('a_') && $this->load !== false)
 		{
 			$this->ajax_ary += array('loadavg' => $this->load);
 		}
-		$this->ajax_echo(json_encode($this->ajax_ary),JSON_HEX_QUOT);
+		$this->ajax_echo(json_encode($this->ajax_ary), JSON_HEX_QUOT);
 	}
 
 	/****
@@ -1446,7 +1424,7 @@ final class mms_search
 	public function topic_unlock()
 	{
 		$this->load_sizecheck();
-		$rows = $this->check_ids($this->{DYN_VAR}, TOPICS_TABLE, 'topic_id', 'topic_title', 'm_lock');
+		$rows = $this->check_ids($this->{MOD_MODE}, TOPICS_TABLE, 'topic_id', 'topic_title', 'm_lock');
 		if (sizeof($rows[$this::MMS_PASSED]))
 		{
 			$sql = "UPDATE " . TOPICS_TABLE . "
@@ -1454,13 +1432,13 @@ final class mms_search
 				WHERE ' . $this->db->sql_in_set('topic_id', $rows[$this::MMS_PASSED]);
 			$this->db->sql_query($sql);
 		}
-		foreach ( $rows[$this::MMS_PASSED] AS $key_ => $val_)
+		foreach ($rows[$this::MMS_PASSED] AS $key_ => $val_)
 		{
 			$this->row_msg_ary[$val_] = $this->user->lang['MMS_STATUT_UNLOCKED'];
 			$this->row_statut_ary[$val_] = true;
 			add_log('mod', $this->fids[$val_], $this->tids[$val_], 'MMS_LOG_' . strtoupper($this->row_mode) . '_' . strtoupper($this->{'mms_' . $this->row_mode . '_action'}), $this->rids_title[$val_]);
 		}
-		foreach ( $rows[$this::MMS_IGNORED] AS $key_ => $reason_)
+		foreach ($rows[$this::MMS_IGNORED] AS $key_ => $reason_)
 		{
 			$this->row_msg_ary[$key_] = $reason_;
 			$this->row_statut_ary[$key_] = false;
@@ -1477,11 +1455,11 @@ final class mms_search
 			'pwd_confirm'	=> true,
 			'fdata'			=> false,
 		);
-		if ( $this->auth->acl_get('a_') && $this->load !== false )
+		if ($this->auth->acl_get('a_') && $this->load !== false)
 		{
 			$this->ajax_ary += array('loadavg' => $this->load);
 		}
-		$this->ajax_echo(json_encode($this->ajax_ary),JSON_HEX_QUOT);
+		$this->ajax_echo(json_encode($this->ajax_ary), JSON_HEX_QUOT);
 	}
 
 	/****
@@ -1492,15 +1470,15 @@ final class mms_search
 	public function topic_resync()
 	{
 		$this->load_sizecheck();
-		$rows = $this->check_ids($this->{DYN_VAR}, TOPICS_TABLE, 'topic_id', 'topic_title', 'm_');
+		$rows = $this->check_ids($this->{MOD_MODE}, TOPICS_TABLE, 'topic_id', 'topic_title', 'm_');
 
-		foreach ( $rows[$this::MMS_PASSED] AS $key_ => $val_)
+		foreach ($rows[$this::MMS_PASSED] AS $key_ => $val_)
 		{
 			$this->row_msg_ary[$val_] = $this->user->lang['MMS_STATUT_RECYNC'];
 			$this->row_statut_ary[$val_] = true;
 			add_log('mod', $this->fids[$val_], $this->tids[$val_], 'MMS_LOG_' . strtoupper($this->row_mode) . '_' . strtoupper($this->{'mms_' . $this->row_mode . '_action'}), $this->rids_title[$val_]);
 		}
-		foreach ( $rows[$this::MMS_IGNORED] AS $key_ => $reason_)
+		foreach ($rows[$this::MMS_IGNORED] AS $key_ => $reason_)
 		{
 			$this->row_msg_ary[$key_] = $reason_;
 			$this->row_statut_ary[$key_] = false;
@@ -1525,11 +1503,11 @@ final class mms_search
 			'pwd_confirm'	=> true,
 			'fdata'			=> false,
 		);
-		if ( $this->auth->acl_get('a_') && $this->load !== false )
+		if ($this->auth->acl_get('a_') && $this->load !== false)
 		{
 			$this->ajax_ary += array('loadavg' => $this->load);
 		}
-		$this->ajax_echo(json_encode($this->ajax_ary),JSON_HEX_QUOT);
+		$this->ajax_echo(json_encode($this->ajax_ary), JSON_HEX_QUOT);
 	}
 
 	/****
@@ -1550,15 +1528,15 @@ final class mms_search
 		$topicdata = $this->db->sql_fetchrow($result);
 		$this->db->sql_freeresult($result);
 
-		if ( empty($topicdata['topic_id']) )
+		if (empty($topicdata['topic_id']))
 		{
 			$this->trigger_error($this->user->lang['NO_TOPIC'], E_USER_NOTICE, false, true);
 		}
-		if ( !empty($topicdata['topic_moved_id']) && $topicdata['topic_status'] == ITEM_MOVED)
+		if (!empty($topicdata['topic_moved_id']) && $topicdata['topic_status'] == ITEM_MOVED)
 		{
 			$this->trigger_error($this->user->lang['MMS_ITEM_MOVED'], E_USER_NOTICE, false, true);
 		}
-		$rows = $this->check_ids($this->{DYN_VAR}, TOPICS_TABLE, 'topic_id', 'topic_title', 'm_merge');
+		$rows = $this->check_ids($this->{MOD_MODE}, TOPICS_TABLE, 'topic_id', 'topic_title', 'm_merge');
 
 		if (sizeof($rows[$this::MMS_PASSED]))
 		{
@@ -1566,13 +1544,13 @@ final class mms_search
 		}
 
 		$viewtopic_url = append_sid("{$this->phpbb_root_path}viewtopic.$this->phpEx", 't=' . $topicdata['topic_id']);
-		foreach ( $rows[$this::MMS_PASSED] AS $key_ => $val_)
+		foreach ($rows[$this::MMS_PASSED] AS $key_ => $val_)
 		{
-			$this->row_msg_ary[$val_] = $this->user->lang('MMS_STATUT_MERGED', '<a class="mms_wo" href="' . $this->build_mmsIpreview_Url($viewtopic_url, $topicdata['topic_title']) . '" title="' . $topicdata['topic_title'] . '">' . $topicdata['topic_title'] . '</a>');
+			$this->row_msg_ary[$val_] = $this->user->lang('MMS_STATUT_MERGED', '<a class="mms_wo" href="' . $this->build_mms_ipreview_url($viewtopic_url, $topicdata['topic_title']) . '" title="' . $topicdata['topic_title'] . '">' . $topicdata['topic_title'] . '</a>');
 			$this->row_statut_ary[$val_] = true;
 			add_log('mod', $this->fids[$val_], $topicdata['topic_id'], 'MMS_LOG_' . strtoupper($this->row_mode) . '_' . strtoupper($this->{'mms_' . $this->row_mode . '_action'}), $this->rids_title[$val_], $this->unms[$val_], $topicdata['topic_title']);
 		}
-		foreach ( $rows[$this::MMS_IGNORED] AS $key_ => $reason_)
+		foreach ($rows[$this::MMS_IGNORED] AS $key_ => $reason_)
 		{
 			$this->row_msg_ary[$key_] = $reason_;
 			$this->row_statut_ary[$key_] = false;
@@ -1593,11 +1571,11 @@ final class mms_search
 			'pwd_confirm'	=> true,
 			'fdata'			=> $this->fdata,
 		);
-		if ( $this->auth->acl_get('a_') && $this->load !== false )
+		if ($this->auth->acl_get('a_') && $this->load !== false)
 		{
 			$this->ajax_ary += array('loadavg' => $this->load);
 		}
-		$this->ajax_echo(json_encode($this->ajax_ary),JSON_HEX_QUOT);
+		$this->ajax_echo(json_encode($this->ajax_ary), JSON_HEX_QUOT);
 	}
 
 	/****
@@ -1608,7 +1586,7 @@ final class mms_search
 	public function topic_chgicon()
 	{
 		$this->load_sizecheck();
-		$rows = $this->check_ids($this->{DYN_VAR}, TOPICS_TABLE, 'topic_id', 'topic_title', 'm_edit', true);
+		$rows = $this->check_ids($this->{MOD_MODE}, TOPICS_TABLE, 'topic_id', 'topic_title', 'm_edit', true);
 		$this->ajax_data = json_decode($this->unescape_gpc(request_var('mms_data', '', true)), true);
 		$icon_id = $this->ajax_data['icon_id'];
 		$this->post_reason = $this->ajax_data['reason'];
@@ -1618,7 +1596,7 @@ final class mms_search
 		{
 			//echo($icon_id);
 			$icon = $this->cache->obtain_icons();
-			if ( !isset($icon[$icon_id]))
+			if (!isset($icon[$icon_id]))
 			{
 				$this->trigger_error($this->user->lang['MMS_POSTS_ICON_FAIL'], E_USER_NOTICE, false, true);
 			}
@@ -1626,7 +1604,7 @@ final class mms_search
 				SET icon_id = " . (int) $icon_id  . '
 				WHERE ' . $this->db->sql_in_set('topic_id', $rows[$this::MMS_PASSED]);
 			$this->db->sql_query($sql);
-			foreach ( $this->row_full AS $row_full_ )
+			foreach ($this->row_full AS $row_full_)
 			{
 				$row_full = $row_full_['topic_first_post_id'];
 			}
@@ -1637,7 +1615,7 @@ final class mms_search
 			$sql_ary = array(
 				'icon_id'	=> (int) $icon_id,
 			);
-			if ( $this->post_reason)
+			if ($this->post_reason)
 			{
 				$sql_ary += array(
 					'post_edit_time'	=> $this->time,
@@ -1649,20 +1627,20 @@ final class mms_search
 			$sql = 'UPDATE ' . POSTS_TABLE . '
 				SET ' . $this->db->sql_build_array('UPDATE', $sql_ary) . '
 				WHERE ' . $this->db->sql_in_set('post_id', $this->pids);
-			if ( $this->post_reason)
+			if ($this->post_reason)
 			{
 				//* Will return an SQL Error: Incorrect integer value[...]. Using preg_replace() instead of str_replace() for "limit" param...
 				$sql = preg_replace('#SET#', 'SET post_edit_count = post_edit_count + 1, ', $sql, 1);
 			}
 			$this->db->sql_query($sql);
 		}
-		foreach ( $rows[$this::MMS_PASSED] AS $key_ => $val_)
+		foreach ($rows[$this::MMS_PASSED] AS $key_ => $val_)
 		{
 			$this->row_msg_ary[$val_] = $this->user->lang['MMS_STATUT_ICONCHD'];
 			$this->row_statut_ary[$val_] = true;
 			add_log('mod', $this->fids[$val_], $this->tids[$val_], 'MMS_LOG_' . strtoupper($this->row_mode) . '_' . strtoupper($this->{'mms_' . $this->row_mode . '_action'}), $this->rids_title[$val_]);
 		}
-		foreach ( $rows[$this::MMS_IGNORED] AS $key_ => $reason_)
+		foreach ($rows[$this::MMS_IGNORED] AS $key_ => $reason_)
 		{
 			$this->row_msg_ary[$key_] = $reason_;
 			$this->row_statut_ary[$key_] = false;
@@ -1679,11 +1657,11 @@ final class mms_search
 			'pwd_confirm'	=> true,
 			'fdata'			=> false,
 		);
-		if ( $this->auth->acl_get('a_') && $this->load !== false )
+		if ($this->auth->acl_get('a_') && $this->load !== false)
 		{
 			$this->ajax_ary += array('loadavg' => $this->load);
 		}
-		$this->ajax_echo(json_encode($this->ajax_ary),JSON_HEX_QUOT);
+		$this->ajax_echo(json_encode($this->ajax_ary), JSON_HEX_QUOT);
 	}
 
 	/****
@@ -1695,15 +1673,15 @@ final class mms_search
 	public function topic_attr()
 	{
 		$this->load_sizecheck();
-		$rows = $this->check_ids($this->{DYN_VAR}, TOPICS_TABLE, 'topic_id', 'topic_title', 'm_edit');
+		$rows = $this->check_ids($this->{MOD_MODE}, TOPICS_TABLE, 'topic_id', 'topic_title', 'm_edit');
 		$this->ajax_data = json_decode($this->unescape_gpc(request_var('mms_data', '', true)), true);
-		if ( !$this->addons['qte'] )
+		if (!$this->addons['qte'])
 		{
 			//Add-on missing, stop the script definitely!
 			$this->trigger_error($this->user->lang['MMS_ADDON_DISABLED'], E_USER_ERROR, false, false);
 		}
 		$attr_id = (int) $this->ajax_data['attr_id'];
-		if ( $attr_id < 0)
+		if ($attr_id < 0)
 		{
 			$attr_id = 0;
 		}
@@ -1719,13 +1697,13 @@ final class mms_search
 				WHERE ' . $this->db->sql_in_set('topic_id', $rows[$this::MMS_PASSED]);
 			$this->db->sql_query($sql);
 		}
-		foreach ( $rows[$this::MMS_PASSED] AS $key_ => $val_)
+		foreach ($rows[$this::MMS_PASSED] AS $key_ => $val_)
 		{
 			$this->row_msg_ary[$val_] = $this->user->lang['QTE_TOPIC_ATTRIBUTE_' . ($attr_id < 1 ? 'REMOVED' : 'UPDATED')];
 			$this->row_statut_ary[$val_] = true;
 			add_log('mod', $this->fids[$val_], $this->tids[$val_], 'MCP_ATTRIBUTE_' . ($attr_id < 1 ? 'REMOVED' : 'UPDATED'), $this->rids_title[$val_] . $this->user->lang['MMS_VIA_MMS']);
 		}
-		foreach ( $rows[$this::MMS_IGNORED] AS $key_ => $reason_)
+		foreach ($rows[$this::MMS_IGNORED] AS $key_ => $reason_)
 		{
 			$this->row_msg_ary[$key_] = $reason_;
 			$this->row_statut_ary[$key_] = false;
@@ -1742,11 +1720,11 @@ final class mms_search
 			'pwd_confirm'	=> true,
 			'fdata'			=> false,
 		);
-		if ( $this->auth->acl_get('a_') && $this->load !== false )
+		if ($this->auth->acl_get('a_') && $this->load !== false)
 		{
 			$this->ajax_ary += array('loadavg' => $this->load);
 		}
-		$this->ajax_echo(json_encode($this->ajax_ary),JSON_HEX_QUOT);
+		$this->ajax_echo(json_encode($this->ajax_ary), JSON_HEX_QUOT);
 	}
 	/****************************
 	*****************************
@@ -1764,17 +1742,17 @@ final class mms_search
 	public function post_delete()
 	{
 		$this->load_sizecheck();
-		$rows = $this->check_ids($this->{DYN_VAR}, POSTS_TABLE, 'post_id', 'post_subject', 'm_delete');
+		$rows = $this->check_ids($this->{MOD_MODE}, POSTS_TABLE, 'post_id', 'post_subject', 'm_delete');
 
 		$this->ajax_data = json_decode($this->unescape_gpc(request_var('mms_data', '', true)), true);
 
-		foreach ( $rows[$this::MMS_PASSED] AS $key_ => $val_)
+		foreach ($rows[$this::MMS_PASSED] AS $key_ => $val_)
 		{
 			$this->row_msg_ary[$val_] = $this->user->lang['MMS_STATUT_DELETED'];
 			$this->row_statut_ary[$val_] = true;
 			add_log('mod', $this->fids[$val_], $this->tids[$val_], 'MMS_LOG_' . strtoupper($this->row_mode) . '_' . strtoupper($this->{'mms_' . $this->row_mode . '_action'}), $this->rids_title[$val_], $this->unms[$val_]);
 		}
-		foreach ( $rows[$this::MMS_IGNORED] AS $key_ => $reason_)
+		foreach ($rows[$this::MMS_IGNORED] AS $key_ => $reason_)
 		{
 			$this->row_msg_ary[$key_] = $reason_;
 			$this->row_statut_ary[$key_] = false;
@@ -1798,11 +1776,11 @@ final class mms_search
 			'pwd_confirm'	=> true,
 			'fdata'			=> $this->fdata,
 		);
-		if ( $this->auth->acl_get('a_') && $this->load !== false )
+		if ($this->auth->acl_get('a_') && $this->load !== false)
 		{
 			$this->ajax_ary += array('loadavg' => $this->load);
 		}
-		$this->ajax_echo(json_encode($this->ajax_ary),JSON_HEX_QUOT);
+		$this->ajax_echo(json_encode($this->ajax_ary), JSON_HEX_QUOT);
 	}
 
 	/****
@@ -1821,23 +1799,23 @@ final class mms_search
 		$result = $this->db->sql_query($sql);
 		$topicdata = $this->db->sql_fetchrow($result);
 		$this->db->sql_freeresult($result);
-		if ( empty($topicdata['topic_id']) )
+		if (empty($topicdata['topic_id']))
 		{
 			$this->trigger_error($this->user->lang['NO_TOPIC'], E_USER_NOTICE, false, true);
 		}
-		if ( !empty($topicdata['topic_moved_id']) && $topicdata['topic_status'] == ITEM_MOVED)
+		if (!empty($topicdata['topic_moved_id']) && $topicdata['topic_status'] == ITEM_MOVED)
 		{
 			$this->trigger_error($this->user->lang['MMS_ITEM_MOVED'], E_USER_NOTICE, false, true);
 		}
-		$rows = $this->check_ids($this->{DYN_VAR}, POSTS_TABLE, 'post_id', 'post_subject', 'm_move');
+		$rows = $this->check_ids($this->{MOD_MODE}, POSTS_TABLE, 'post_id', 'post_subject', 'm_move');
 		$viewtopic_url = append_sid("{$this->phpbb_root_path}viewtopic.$this->phpEx", 't=' . $topicdata['topic_id']);
-		foreach ( $rows[$this::MMS_PASSED] AS $key_ => $val_)
+		foreach ($rows[$this::MMS_PASSED] AS $key_ => $val_)
 		{
-			$this->row_msg_ary[$val_] = $this->user->lang('MMS_STATUT_MOVED', '<a class="mms_wo" href="' . $this->build_mmsIpreview_Url($viewtopic_url, $topicdata['topic_title']) . '" title="' . $topicdata['topic_title'] . '">' . $topicdata['topic_title'] . '</a>');
+			$this->row_msg_ary[$val_] = $this->user->lang('MMS_STATUT_MOVED', '<a class="mms_wo" href="' . $this->build_mms_ipreview_url($viewtopic_url, $topicdata['topic_title']) . '" title="' . $topicdata['topic_title'] . '">' . $topicdata['topic_title'] . '</a>');
 			$this->row_statut_ary[$val_] = true;
 			add_log('mod', $this->fids[$val_], $this->tids[$val_], 'MMS_LOG_' . strtoupper($this->row_mode) . '_' . strtoupper($this->{'mms_' . $this->row_mode . '_action'}), $this->unms[$val_], $this->rids_title[$val_], $topicdata['topic_title']);
 		}
-		foreach ( $rows[$this::MMS_IGNORED] AS $key_ => $reason_)
+		foreach ($rows[$this::MMS_IGNORED] AS $key_ => $reason_)
 		{
 			$this->row_msg_ary[$key_] = $reason_;
 			$this->row_statut_ary[$key_] = false;
@@ -1861,11 +1839,11 @@ final class mms_search
 			'pwd_confirm'	=> true,
 			'fdata'			=> $this->fdata,
 		);
-		if ( $this->auth->acl_get('a_') && $this->load !== false )
+		if ($this->auth->acl_get('a_') && $this->load !== false)
 		{
 			$this->ajax_ary += array('loadavg' => $this->load);
 		}
-		$this->ajax_echo(json_encode($this->ajax_ary),JSON_HEX_QUOT);
+		$this->ajax_echo(json_encode($this->ajax_ary), JSON_HEX_QUOT);
 	}
 
 	/****
@@ -1876,21 +1854,21 @@ final class mms_search
 	public function post_lock()
 	{
 		$this->load_sizecheck();
-		$rows = $this->check_ids($this->{DYN_VAR}, POSTS_TABLE, 'post_id', 'post_subject', 'm_lock');
+		$rows = $this->check_ids($this->{MOD_MODE}, POSTS_TABLE, 'post_id', 'post_subject', 'm_lock');
 		if (sizeof($rows[$this::MMS_PASSED]))
 		{
-			$sql = "UPDATE " . POSTS_TABLE . "
-				SET post_edit_locked = " .  ITEM_LOCKED  . '
+			$sql = 'UPDATE ' . POSTS_TABLE . '
+				SET post_edit_locked = ' .  ITEM_LOCKED  . '
 				WHERE ' . $this->db->sql_in_set('post_id', $rows[$this::MMS_PASSED]);
 			$this->db->sql_query($sql);
 		}
-		foreach ( $rows[$this::MMS_PASSED] AS $key_ => $val_)
+		foreach ($rows[$this::MMS_PASSED] AS $key_ => $val_)
 		{
 			$this->row_msg_ary[$val_] = $this->user->lang['MMS_STATUT_LOCKED'];
 			$this->row_statut_ary[$val_] = true;
 			add_log('mod', $this->fids[$val_], $this->tids[$val_], 'MMS_LOG_' . strtoupper($this->row_mode) . '_' . strtoupper($this->{'mms_' . $this->row_mode . '_action'}), $this->rids_title[$val_], $this->unms[$val_]);
 		}
-		foreach ( $rows[$this::MMS_IGNORED] AS $key_ => $reason_)
+		foreach ($rows[$this::MMS_IGNORED] AS $key_ => $reason_)
 		{
 			$this->row_msg_ary[$key_] = $reason_;
 			$this->row_statut_ary[$key_] = false;
@@ -1907,11 +1885,11 @@ final class mms_search
 			'pwd_confirm'	=> true,
 			'fdata'			=> false,
 		);
-		if ( $this->auth->acl_get('a_') && $this->load !== false )
+		if ($this->auth->acl_get('a_') && $this->load !== false)
 		{
 			$this->ajax_ary += array('loadavg' => $this->load);
 		}
-		$this->ajax_echo(json_encode($this->ajax_ary),JSON_HEX_QUOT);
+		$this->ajax_echo(json_encode($this->ajax_ary), JSON_HEX_QUOT);
 	}
 
 	/****
@@ -1922,22 +1900,22 @@ final class mms_search
 	public function post_unlock()
 	{
 		$this->load_sizecheck();
-		$rows = $this->check_ids($this->{DYN_VAR}, POSTS_TABLE, 'post_id', 'post_subject', 'm_lock');
+		$rows = $this->check_ids($this->{MOD_MODE}, POSTS_TABLE, 'post_id', 'post_subject', 'm_lock');
 
 		if (sizeof($rows[$this::MMS_PASSED]))
 		{
-			$sql = "UPDATE " . POSTS_TABLE . "
-				SET post_edit_locked = " .  ITEM_UNLOCKED  . '
+			$sql = 'UPDATE ' . POSTS_TABLE . '
+				SET post_edit_locked = ' .  ITEM_UNLOCKED  . '
 				WHERE ' . $this->db->sql_in_set('post_id', $rows[$this::MMS_PASSED]);
 			$this->db->sql_query($sql);
 		}
-		foreach ( $rows[$this::MMS_PASSED] AS $key_ => $val_)
+		foreach ($rows[$this::MMS_PASSED] AS $key_ => $val_)
 		{
 			$this->row_msg_ary[$val_] = $this->user->lang['MMS_STATUT_UNLOCKED'];
 			$this->row_statut_ary[$val_] = true;
 			add_log('mod', $this->fids[$val_], $this->tids[$val_], 'MMS_LOG_' . strtoupper($this->row_mode) . '_' . strtoupper($this->{'mms_' . $this->row_mode . '_action'}), $this->rids_title[$val_]);
 		}
-		foreach ( $rows[$this::MMS_IGNORED] AS $key_ => $reason_)
+		foreach ($rows[$this::MMS_IGNORED] AS $key_ => $reason_)
 		{
 			$this->row_msg_ary[$key_] = $reason_;
 			$this->row_statut_ary[$key_] = false;
@@ -1954,11 +1932,11 @@ final class mms_search
 			'pwd_confirm'	=> true,
 			'fdata'			=> false,
 		);
-		if ( $this->auth->acl_get('a_') && $this->load !== false )
+		if ($this->auth->acl_get('a_') && $this->load !== false)
 		{
 			$this->ajax_ary += array('loadavg' => $this->load);
 		}
-		$this->ajax_echo(json_encode($this->ajax_ary),JSON_HEX_QUOT);
+		$this->ajax_echo(json_encode($this->ajax_ary), JSON_HEX_QUOT);
 	}
 
 	/****
@@ -1971,25 +1949,25 @@ final class mms_search
 		$this->load_sizecheck();
 		$this->ajax_data = json_decode($this->unescape_gpc(request_var('mms_data', '', true)), true);
 		$username = trim($this->ajax_data['username']);
-		$sql = "SELECT *
-			FROM " .  USERS_TABLE  . '
+		$sql = 'SELECT *
+			FROM ' .  USERS_TABLE  . '
 			WHERE username = "' . $this->db->sql_escape(utf8_normalize_nfc($username)) . '"';
 		$result = $this->db->sql_query($sql);
 		$this->to_uid = $this->db->sql_fetchrow($result);
 		$this->db->sql_freeresult($result);
-		if ( empty($this->to_uid['username']) )
+		if (empty($this->to_uid['username']))
 		{
 			$this->trigger_error($this->user->lang['NO_USER'], E_USER_NOTICE, false, true);
 		}
-		$rows = $this->check_ids($this->{DYN_VAR}, POSTS_TABLE, 'post_id', 'post_subject', 'm_chgposter', true);
-		foreach ( $rows[$this::MMS_PASSED] AS $key_ => $val_)
+		$rows = $this->check_ids($this->{MOD_MODE}, POSTS_TABLE, 'post_id', 'post_subject', 'm_chgposter', true);
+		foreach ($rows[$this::MMS_PASSED] AS $key_ => $val_)
 		{
 			$this->row_msg_ary[$val_] = $this->user->lang('MMS_STATUT_POSTER_CHGED', get_username_string('full', $this->to_uid['user_id'], $this->to_uid['username'], $this->to_uid['user_colour']));
 			$this->row_statut_ary[$val_] = true;
 			$this->change_poster($this->row_full[$val_], $this->to_uid);
 			add_log('mod', $this->fids[$val_], $this->tids[$val_], 'MMS_LOG_' . strtoupper($this->row_mode) . '_' . strtoupper($this->{'mms_' . $this->row_mode . '_action'}), $this->rids_title[$val_], $this->row_full[$val_]['post_username'], $this->to_uid['username']);
 		}
-		foreach ( $rows[$this::MMS_IGNORED] AS $key_ => $reason_)
+		foreach ($rows[$this::MMS_IGNORED] AS $key_ => $reason_)
 		{
 			$this->row_msg_ary[$key_] = $reason_;
 			$this->row_statut_ary[$key_] = false;
@@ -2011,11 +1989,11 @@ final class mms_search
 			'pwd_confirm'	=> true,
 			'fdata'			=> $this->fdata,
 		);
-		if ( $this->auth->acl_get('a_') && $this->load !== false )
+		if ($this->auth->acl_get('a_') && $this->load !== false)
 		{
 			$this->ajax_ary += array('loadavg' => $this->load);
 		}
-		$this->ajax_echo(json_encode($this->ajax_ary),JSON_HEX_QUOT);
+		$this->ajax_echo(json_encode($this->ajax_ary), JSON_HEX_QUOT);
 	}
 
 	/****
@@ -2030,16 +2008,16 @@ final class mms_search
 		$this->post_option = $this->ajax_data['option'];
 		$this->post_reason = $this->ajax_data['reason'];
 
-		$rows = $this->check_ids($this->{DYN_VAR}, POSTS_TABLE, 'post_id', 'post_subject', 'm_', true);
+		$rows = $this->check_ids($this->{MOD_MODE}, POSTS_TABLE, 'post_id', 'post_subject', 'm_', true);
 		$this->mcp_post_options($rows);
 
-		foreach ( $rows[$this::MMS_PASSED] AS $key_ => $val_)
+		foreach ($rows[$this::MMS_PASSED] AS $key_ => $val_)
 		{
 			$this->row_msg_ary[$val_] = $this->user->lang['MMS_POSTS_OPTIONS_SUCCESS'][strtoupper($this->post_option)];
 			$this->row_statut_ary[$val_] = true;
 			add_log('mod', $this->fids[$val_], $this->tids[$val_], 'MMS_LOG_' . strtoupper($this->row_mode) . '_' . strtoupper($this->{'mms_' . $this->row_mode . '_action'}) . '_' . strtoupper($this->post_option), $this->row_full[$val_]['username'], $this->rids_title[$val_]);
 		}
-		foreach ( $rows[$this::MMS_IGNORED] AS $key_ => $reason_)
+		foreach ($rows[$this::MMS_IGNORED] AS $key_ => $reason_)
 		{
 			$this->row_msg_ary[$key_] = $reason_;
 			$this->row_statut_ary[$key_] = false;
@@ -2056,11 +2034,11 @@ final class mms_search
 			'pwd_confirm'	=> true,
 			'fdata'			=> false,
 		);
-		if ( $this->auth->acl_get('a_') && $this->load !== false )
+		if ($this->auth->acl_get('a_') && $this->load !== false)
 		{
 			$this->ajax_ary += array('loadavg' => $this->load);
 		}
-		$this->ajax_echo(json_encode($this->ajax_ary),JSON_HEX_QUOT);
+		$this->ajax_echo(json_encode($this->ajax_ary), JSON_HEX_QUOT);
 	}
 
 	/****
@@ -2073,14 +2051,14 @@ final class mms_search
 		$this->load_sizecheck();
 		$this->ajax_data = json_decode($this->unescape_gpc(request_var('mms_data', '', true)), true);
 
-		$rows = $this->check_ids($this->{DYN_VAR}, POSTS_TABLE, 'post_id', 'post_subject', 'm_info', true);
+		$rows = $this->check_ids($this->{MOD_MODE}, POSTS_TABLE, 'post_id', 'post_subject', 'm_info', true);
 
-		foreach ( $rows[$this::MMS_PASSED] AS $key_ => $val_)
+		foreach ($rows[$this::MMS_PASSED] AS $key_ => $val_)
 		{
 			$this->row_msg_ary[$val_] = $this->user->lang['MMS_STATUT_IPGRABBED'];
 			$this->row_statut_ary[$val_] = $this->row_full[$val_]['poster_ip'];
 		}
-		foreach ( $rows[$this::MMS_IGNORED] AS $key_ => $reason_)
+		foreach ($rows[$this::MMS_IGNORED] AS $key_ => $reason_)
 		{
 			$this->row_msg_ary[$key_] = $reason_;
 			$this->row_statut_ary[$key_] = false;
@@ -2097,11 +2075,11 @@ final class mms_search
 			'pwd_confirm'	=> true,
 			'fdata'			=> false,
 		);
-		if ( $this->auth->acl_get('a_') && $this->load !== false )
+		if ($this->auth->acl_get('a_') && $this->load !== false)
 		{
 			$this->ajax_ary += array('loadavg' => $this->load);
 		}
-		$this->ajax_echo(json_encode($this->ajax_ary),JSON_HEX_QUOT);
+		$this->ajax_echo(json_encode($this->ajax_ary), JSON_HEX_QUOT);
 	}
 
 	/****************************
@@ -2120,11 +2098,11 @@ final class mms_search
 	****/
 	public function final_resync($mode)
 	{
-		$this->data_to_resync = array_keys(json_decode($this->unescape_gpc(request_var('data', '', true)), true));
+		$this->data_to_resync = array_keys(json_decode($this->unescape_gpc(utf8_normalize_nfc(request_var('data', '', true))), true));
 		//Uncomment below to see transformed input values.
 		//print_r($this->data_to_resync);
 		//exit;
-		if(sizeof($this->data_to_resync) || $mode == 's' )
+		if (sizeof($this->data_to_resync) || $mode == 's')
 		{
 			switch($mode)
 			{
@@ -2170,12 +2148,12 @@ final class mms_search
 				case 'u':
 					switch ($this->db->sql_layer)
 					{
-						// $#'~~# Postgres DB
 						case 'postgres':
+						case 'firebird':
 							$i = 0;
 							foreach($this->data_to_resync AS $id)
 							{
-								if($i > 500)
+								if ($i > 500)
 								{
 									break;//Hard-limit...
 								}
@@ -2224,11 +2202,11 @@ final class mms_search
 			'final_eval'	=> '',
 			'pwd_confirm'	=> true
 		);
-		if ( $this->auth->acl_get('a_') && $this->load !== false )
+		if ($this->auth->acl_get('a_') && $this->load !== false)
 		{
 			$this->ajax_ary += array('loadavg' => $this->load);
 		}
-		$this->ajax_echo(json_encode($this->ajax_ary),JSON_HEX_QUOT);
+		$this->ajax_echo(json_encode($this->ajax_ary), JSON_HEX_QUOT);
 	}
 
 	/****
@@ -2238,7 +2216,7 @@ final class mms_search
 	****/
 	public function ajax_check_pwd()
 	{
-		if ( !$this->config['mms_mod_password'])
+		if (!$this->config['mms_mod_password'])
 		{
 			return;
 		}
@@ -2247,15 +2225,15 @@ final class mms_search
 		$timecheck = unserialize($this->config['mms_timecheck']);
 		$password = request_var('password', '');
 		$password_confirmed = false;
-		if ( $timecheck['last_sid'] == $this->user->session_id && $timecheck['last_uid'] == $this->user->data['user_id'] )
+		if ($timecheck['last_sid'] == $this->user->session_id && $timecheck['last_uid'] == $this->user->data['user_id'])
 		{
-			if ( empty($timecheck['last_pwd']) || $timecheck['last_pwd'] < ($now - 600) )
+			if (empty($timecheck['last_pwd']) || $timecheck['last_pwd'] < ($now - 600))
 			{
 				if (phpbb_check_hash($password, $this->user->data['user_password']))
 				{
 					$password_confirmed = true;
 				}
-				else if ( $password)
+				else if ($password)
 				{
 					$addtional_msg = '<span class="ui-icon ui-icon-alert" style="float: left; margin: 0 7px 20px 0;"></span><span class="error">' . $this->user->lang['MMS_PASSWORD_BAD'] . '</span><br />';
 				}
@@ -2265,7 +2243,7 @@ final class mms_search
 					'last_time'	=> $now,
 					'last_pwd'	=> $this::MMS_DB_FALSE
 				);
-				if ( $password_confirmed)
+				if ($password_confirmed)
 				{
 					$this->final_eval = '';
 					$timecheck['last_pwd'] = $now;
@@ -2286,11 +2264,11 @@ final class mms_search
 					'final_eval'	=> $this->final_eval,
 					'pwd_confirm'	=> $password_confirmed
 				);
-				if ( $this->auth->acl_get('a_') && $this->load !== false )
+				if ($this->auth->acl_get('a_') && $this->load !== false)
 				{
 					$this->ajax_ary += array('loadavg' => $this->load);
 				}
-				$this->ajax_echo(json_encode($this->ajax_ary),JSON_HEX_QUOT);
+				$this->ajax_echo(json_encode($this->ajax_ary), JSON_HEX_QUOT);
 			}
 			$timecheck = array(
 				'last_sid'	=> $this->user->session_id,
@@ -2361,9 +2339,9 @@ final class mms_search
 	****/
 	public function trigger_error($message, $e_level = E_USER_NOTICE, $redirect = false, $continue = true)
 	{
-		if ( $this->is_ajax)
+		if ($this->is_ajax)
 		{
-			switch ( $e_level)
+			switch ($e_level)
 			{
 				case E_USER_NOTICE:
 				case E_USER_WARNING:
@@ -2405,7 +2383,7 @@ final class mms_search
 	private function check_ids($ids, $table, $collumn, $title_collumn, $acl, $full = false)
 	{
 		$rows = array($this::MMS_IGNORED => array(), $this::MMS_PASSED => array(), $this::MMS_IGNORED => array(), $this::MMS_IGNORED => array());
-		if ( !$full)
+		if (!$full)
 		{
 			$sql = "SELECT " . $this->db->sql_escape($collumn) . ", " . $this->db->sql_escape($title_collumn) . ", forum_id" . ($table == POSTS_TABLE ? ', topic_id, post_username, poster_id, post_edit_locked' : ', topic_first_poster_name, topic_first_post_id, topic_poster, topic_status') . "
 				FROM $table
@@ -2438,34 +2416,34 @@ final class mms_search
 			$result = $this->db->sql_query($sql);
 		}
 
-		while ( $row = $this->db->sql_fetchrow($result))
+		while ($row = $this->db->sql_fetchrow($result))
 		{
 			//For each action the user need to have a valid access for the forum ID...
-			if ( $this->auth->acl_gets('f_list', 'f_read', $row['forum_id']) && $this->auth->acl_get($acl, $row['forum_id']))
+			if ($this->auth->acl_gets('f_list', 'f_read', $row['forum_id']) && $this->auth->acl_get($acl, $row['forum_id']))
 			{
-				if ( !empty($this->to_fid) && ($row['forum_id'] == $this->to_fid) && $acl == 'm_move')
+				if (!empty($this->to_fid) && ($row['forum_id'] == $this->to_fid) && $acl == 'm_move')
 				{
 					$rows[$this::MMS_IGNORED][$row[$collumn]] = $this->user->lang['MMS_SAME_FORUM'];
 				}
-				else if ( !empty($this->to_tid) && ($row['topic_id'] == $this->to_tid) && ($acl == 'm_move' || $acl == 'm_merge'))
+				else if (!empty($this->to_tid) && ($row['topic_id'] == $this->to_tid) && ($acl == 'm_move' || $acl == 'm_merge'))
 				{
 					$rows[$this::MMS_IGNORED][$row[$collumn]] = $this->user->lang['MMS_SAME_TOPIC'];
 				}
-				else if ( $this->row_mode == 'post' && (($this->{'mms_' . $this->row_mode . '_action'} == 'lock' && $row['post_edit_locked'] == ITEM_LOCKED) || ($this->{'mms_' . $this->row_mode . '_action'} == 'unlock' && $row['post_edit_locked'] == ITEM_UNLOCKED)))
+				else if ($this->row_mode == 'post' && (($this->{'mms_' . $this->row_mode . '_action'} == 'lock' && $row['post_edit_locked'] == ITEM_LOCKED) || ($this->{'mms_' . $this->row_mode . '_action'} == 'unlock' && $row['post_edit_locked'] == ITEM_UNLOCKED)))
 				{
 					$rows[$this::MMS_IGNORED][$row[$collumn]] = $this->user->lang['MMS_POST_ALREADY_' . strtoupper($this->{'mms_' . $this->row_mode . '_action'}) . 'ED'];
 				}
-				else if ( $this->row_mode == 'post' && ($this->{'mms_' . $this->row_mode . '_action'} == 'chgposter' && $row['poster_id'] == $this->to_uid['user_id']) )
+				else if ($this->row_mode == 'post' && ($this->{'mms_' . $this->row_mode . '_action'} == 'chgposter' && $row['poster_id'] == $this->to_uid['user_id']))
 				{
 					$rows[$this::MMS_IGNORED][$row[$collumn]] = $this->user->lang['MMS_SAME_USERNAME'];
 				}
-				else if ( $this->row_mode == 'topic' && (($this->{'mms_' . $this->row_mode . '_action'} == 'lock' && $row['topic_status'] == ITEM_LOCKED) || ($this->{'mms_' . $this->row_mode . '_action'} == 'unlock' && $row['topic_status'] == ITEM_UNLOCKED)))
+				else if ($this->row_mode == 'topic' && (($this->{'mms_' . $this->row_mode . '_action'} == 'lock' && $row['topic_status'] == ITEM_LOCKED) || ($this->{'mms_' . $this->row_mode . '_action'} == 'unlock' && $row['topic_status'] == ITEM_UNLOCKED)))
 				{
 					$rows[$this::MMS_IGNORED][$row[$collumn]] = $this->user->lang['MMS_TOPIC_ALREADY_' . strtoupper($this->{'mms_' . $this->row_mode . '_action'}) . 'ED'];
 				}
 				else
 				{
-					if ( $full)
+					if ($full)
 					{
 						$this->row_full[$row[$collumn]] = $row;
 					}
@@ -2500,12 +2478,12 @@ final class mms_search
 		$this->fdata['u'] = array_unique($this->fdata['u']);
 
 		$ignored_keys = array();
-		foreach ( $rows[$this::MMS_IGNORED] AS $key => $val)
+		foreach ($rows[$this::MMS_IGNORED] AS $key => $val)
 		{
 			$ignored_keys[$key] = $key;
 		}
 		$missing_rows = array_diff($ids, array_merge($ignored_keys, $rows[$this::MMS_PASSED]));
-		foreach ( $missing_rows AS $missing_rows_)
+		foreach ($missing_rows AS $missing_rows_)
 		{
 			$rows[$this::MMS_IGNORED][$missing_rows_] = $this->user->lang['MMS_' . strtoupper($this->row_mode) . '_DELETED'];
 		}
@@ -2523,7 +2501,7 @@ final class mms_search
 	****/
 	function adv_check_ids(&$ids, $table, $sql_id, $acl_list = false, $single_forum = false)
 	{
-		if ( !is_array($ids) || empty($ids))
+		if (!is_array($ids) || empty($ids))
 		{
 			return false;
 		}
@@ -2535,20 +2513,20 @@ final class mms_search
 		$ids = array();
 		$forum_id = false;
 
-		while ( $row = $this->db->sql_fetchrow($result))
+		while ($row = $this->db->sql_fetchrow($result))
 		{
-			if ( $acl_list && $row['forum_id'] && !$this->auth->acl_gets($acl_list, $row['forum_id']))
+			if ($acl_list && $row['forum_id'] && !$this->auth->acl_gets($acl_list, $row['forum_id']))
 			{
 				continue;
 			}
 
-			if ( $acl_list && !$row['forum_id'] && !$this->auth->acl_getf_global($acl_list))
+			if ($acl_list && !$row['forum_id'] && !$this->auth->acl_getf_global($acl_list))
 			{
 				continue;
 			}
 
 			// Limit forum? If not, just assign the id.
-			if ( $single_forum === false)
+			if ($single_forum === false)
 			{
 				$ids[] = $row[$sql_id];
 				continue;
@@ -2556,18 +2534,18 @@ final class mms_search
 
 			// Limit forum to a specific forum id?
 			// This can get really tricky, because we do not want to create a failure on global topics. :)
-			if ( $row['forum_id'])
+			if ($row['forum_id'])
 			{
-				if ( $single_forum !== true && $row['forum_id'] == (int) $single_forum)
+				if ($single_forum !== true && $row['forum_id'] == (int) $single_forum)
 				{
 					$forum_id = (int) $single_forum;
 				}
-				else if ( $forum_id === false)
+				else if ($forum_id === false)
 				{
 					$forum_id = $row['forum_id'];
 				}
 
-				if ( $row['forum_id'] == $forum_id)
+				if ($row['forum_id'] == $forum_id)
 				{
 					$ids[] = $row[$sql_id];
 				}
@@ -2580,7 +2558,7 @@ final class mms_search
 		}
 		$this->db->sql_freeresult($result);
 
-		if ( !sizeof($ids))
+		if (!sizeof($ids))
 		{
 			return false;
 		}
@@ -2628,9 +2606,9 @@ final class mms_search
 		// Approved topics removed from source forum (except global announcements)
 		$topics_authed_removed = $this::MMS_DB_FALSE;
 
-		foreach ( $topic_data AS $topic_id => $topic_info)
+		foreach ($topic_data AS $topic_id => $topic_info)
 		{
-			if ( $topic_info['topic_approved'])
+			if ($topic_info['topic_approved'])
 			{
 				$topics_authed_moved++;
 				$topic_posts_added++;
@@ -2638,12 +2616,12 @@ final class mms_search
 
 			$topic_posts_added += $topic_info['topic_replies'];
 
-			if ( $topic_info['topic_type'] != POST_GLOBAL)
+			if ($topic_info['topic_type'] != POST_GLOBAL)
 			{
 				$topics_removed++;
 				$topic_posts_removed += $topic_info['topic_replies'];
 
-				if ( $topic_info['topic_approved'])
+				if ($topic_info['topic_approved'])
 				{
 					$topics_authed_removed++;
 					$topic_posts_removed++;
@@ -2655,12 +2633,12 @@ final class mms_search
 
 		$sync_sql = array();
 
-		if ( $topic_posts_added)
+		if ($topic_posts_added)
 		{
 			$sync_sql[$this->to_fid][] = 'forum_posts = forum_posts + ' . $topic_posts_added;
 		}
 
-		if ( $topics_authed_moved)
+		if ($topics_authed_moved)
 		{
 			$sync_sql[$this->to_fid][] = 'forum_topics = forum_topics + ' . (int) $topics_authed_moved;
 		}
@@ -2671,18 +2649,18 @@ final class mms_search
 		move_topics($topic_id, $this->to_fid, false);
 
 		$forum_ids = array($this->to_fid);
-		foreach ( $topic_data AS $topic_id => $row)
+		foreach ($topic_data AS $topic_id => $row)
 		{
 			// Get the list of forums to resync, add a log entry
 			$forum_ids[] = $row['forum_id'];
 			add_log('mod', $this->to_fid, $topic_id, 'MMS_LOG_' . strtoupper($this->row_mode) . '_' . strtoupper($this->{'mms_' . $this->row_mode . '_action'}), $row['forum_name'], $forum_data['forum_name']);
 
 			$viewforum_url = append_sid("{$this->phpbb_root_path}viewforum.$this->phpEx", 'f=' . $this->to_fid . '#page-body');
-			$this->row_msg_ary[$topic_id] = $this->user->lang('MMS_STATUT_MOVED', '<a class="mms_wo" href="' . $this->build_mmsIpreview_Url($viewforum_url, $forum_data['forum_name']) . '" title="' . $forum_data['forum_name'] . '">' . $forum_data['forum_name'] . '</a>');
+			$this->row_msg_ary[$topic_id] = $this->user->lang('MMS_STATUT_MOVED', '<a class="mms_wo" href="' . $this->build_mms_ipreview_url($viewforum_url, $forum_data['forum_name']) . '" title="' . $forum_data['forum_name'] . '">' . $forum_data['forum_name'] . '</a>');
 			$this->row_statut_ary[$topic_id] = true;
 
 			// If we have moved a global announcement, we need to correct the topic type
-			if ( $row['topic_type'] == POST_GLOBAL)
+			if ($row['topic_type'] == POST_GLOBAL)
 			{
 				$sql = 'UPDATE ' . TOPICS_TABLE . '
 					SET topic_type = ' . POST_ANNOUNCE . '
@@ -2691,7 +2669,7 @@ final class mms_search
 			}
 
 			// Leave a redirection if required and only if the topic is visible to users
-			if ( $shadow && $row['topic_approved'] && $row['topic_type'] != POST_GLOBAL)
+			if ($shadow && $row['topic_approved'] && $row['topic_type'] != POST_GLOBAL)
 			{
 				$shadow = array(
 					'forum_id'				=>	(int) $row['forum_id'],
@@ -2737,26 +2715,26 @@ final class mms_search
 		}
 		unset($topic_data);
 
-		if ( $topic_posts_removed)
+		if ($topic_posts_removed)
 		{
 			$sync_sql[$forum_id][] = 'forum_posts = forum_posts - ' . $topic_posts_removed;
 		}
 
-		if ( $topics_removed)
+		if ($topics_removed)
 		{
 			$sync_sql[$forum_id][]	= 'forum_topics_real = forum_topics_real - ' . (int) $topics_removed;
 		}
 
-		if ( $topics_authed_removed)
+		if ($topics_authed_removed)
 		{
 			$sync_sql[$forum_id][]	= 'forum_topics = forum_topics - ' . (int) $topics_authed_removed;
 		}
 
-		foreach ( $sync_sql AS $forum_id_key => $array)
+		foreach ($sync_sql AS $forum_id_key => $array)
 		{
 			$sql = 'UPDATE ' . FORUMS_TABLE . '
 				SET ' . implode(', ', $array) . '
-				WHERE forum_id = ' . $forum_id_key;
+				WHERE forum_id = ' . (int) $forum_id_key;
 			$this->db->sql_query($sql);
 		}
 
@@ -2774,15 +2752,15 @@ final class mms_search
 	private function mcp_fork_topic($topic_ids, $to_forum_id)
 	{
 		$counter = array();
-		if ( $to_forum_id)
+		if ($to_forum_id)
 		{
 			$forum_data = $this->get_forum_data($to_forum_id);
 
-			if ( !sizeof($topic_ids))
+			if (!sizeof($topic_ids))
 			{
 				$this->trigger_error($this->user->lang['NO_TOPIC_SELECTED'], E_USER_NOTICE, false);
 			}
-			else if ( !sizeof($forum_data))
+			else if (!sizeof($forum_data))
 			{
 				$this->trigger_error($this->user->lang['FORUM_NOT_EXIST'], E_USER_NOTICE, false);
 			}
@@ -2790,11 +2768,11 @@ final class mms_search
 			{
 				$forum_data = $forum_data[$to_forum_id];
 
-				if ( $forum_data['forum_type'] != FORUM_POST)
+				if ($forum_data['forum_type'] != FORUM_POST)
 				{
 					$this->trigger_error($this->user->lang['FORUM_NOT_POSTABLE'], E_USER_NOTICE, false);
 				}
-				else if ( !$this->auth->acl_get('f_post', $to_forum_id))
+				else if (!$this->auth->acl_get('f_post', $to_forum_id))
 				{
 					$this->trigger_error($this->user->lang['USER_CANNOT_POST'], E_USER_NOTICE, false);
 				}
@@ -2807,19 +2785,19 @@ final class mms_search
 			$new_topic_id_list = array();
 
 
-			foreach ( $topic_data AS $topic_id => $topic_row)
+			foreach ($topic_data AS $topic_id => $topic_row)
 			{
-				if ( !isset($search_type) && $topic_row['enable_indexing'])
+				if (!isset($search_type) && $topic_row['enable_indexing'])
 				{
 					// Select the search method and do some additional checks to ensure it can actually be utilised
 					$search_type = basename($this->config['search_type']);
 
-					if ( !file_exists($this->phpbb_root_path . 'includes/search/' . $search_type . '.' . $this->phpEx))
+					if (!file_exists($this->phpbb_root_path . 'includes/search/' . $search_type . '.' . $this->phpEx))
 					{
 						$this->trigger_error($this->user->lang['NO_SUCH_SEARCH_MODULE'], E_USER_ERROR, false);
 					}
 
-					if ( !class_exists($search_type))
+					if (!class_exists($search_type))
 					{
 						//I'm just trolled by this %$$%@## include...
 						$phpbb_root_path = $this->phpbb_root_path;
@@ -2831,12 +2809,12 @@ final class mms_search
 					$search = new $search_type($error);
 					$search_mode = 'post';
 
-					if ( $error)
+					if ($error)
 					{
 						$this->trigger_error($error, E_USER_ERROR, false);
 					}
 				}
-				else if ( !isset($search_type) && !$topic_row['enable_indexing'])
+				else if (!isset($search_type) && !$topic_row['enable_indexing'])
 				{
 					$search_type = false;
 				}
@@ -2878,18 +2856,18 @@ final class mms_search
 				$viewtopic_url = append_sid("{$this->phpbb_root_path}viewtopic.$this->phpEx", 't=' . $new_topic_id . '#page-body');
 				$viewforum_url = append_sid("{$this->phpbb_root_path}viewforum.$this->phpEx", 'f=' . $to_forum_id . '#page-body');
 
-				$this->row_msg_ary[$topic_id] = $this->user->lang('MMS_STATUT_FORKED', '<a class="mms_wo" href="' . $this->build_mmsIpreview_Url($viewforum_url, $topic_row['topic_title']) . '" title="' . $topic_row['topic_title'] . '">' . $forum_data['forum_name'] . '</a>', '<a class="mms_wo" href="' . $this->build_mmsIpreview_Url($viewtopic_url, $topic_row['topic_title']) . '" title="' . $topic_row['topic_title'] . '">' . $new_topic_id . '</a>');
+				$this->row_msg_ary[$topic_id] = $this->user->lang('MMS_STATUT_FORKED', '<a class="mms_wo" href="' . $this->build_mms_ipreview_url($viewforum_url, $topic_row['topic_title']) . '" title="' . $topic_row['topic_title'] . '">' . $forum_data['forum_name'] . '</a>', '<a class="mms_wo" href="' . $this->build_mms_ipreview_url($viewtopic_url, $topic_row['topic_title']) . '" title="' . $topic_row['topic_title'] . '">' . $new_topic_id . '</a>');
 				$this->row_statut_ary[$topic_id] = true;
-				if ( $topic_row['poll_start'])
+				if ($topic_row['poll_start'])
 				{
 					$poll_rows = array();
 
 					$sql = 'SELECT *
 						FROM ' . POLL_OPTIONS_TABLE . "
-						WHERE topic_id = $topic_id";
+						WHERE topic_id = " . (int) $topic_id;
 					$result = $this->db->sql_query($sql);
 
-					while ( $row = $this->db->sql_fetchrow($result))
+					while ($row = $this->db->sql_fetchrow($result))
 					{
 						$sql_ary = array(
 							'poll_option_id'	=> (int) $row['poll_option_id'],
@@ -2909,19 +2887,19 @@ final class mms_search
 				$result = $this->db->sql_query($sql);
 
 				$post_rows = array();
-				while ( $row = $this->db->sql_fetchrow($result))
+				while ($row = $this->db->sql_fetchrow($result))
 				{
 					$post_rows[] = $row;
 				}
 				$this->db->sql_freeresult($result);
 
-				if ( !sizeof($post_rows))
+				if (!sizeof($post_rows))
 				{
 					continue;
 				}
 
 				$total_posts += sizeof($post_rows);
-				foreach ( $post_rows AS $row)
+				foreach ($post_rows AS $row)
 				{
 					$sql_ary = array(
 						'topic_id'			=> (int) $new_topic_id,
@@ -2953,7 +2931,7 @@ final class mms_search
 					// Adjust post counts... only if the post can be incremented to the user counter (else, it was not added the users post count anyway)
 					//Fixed an error of phpBB: http://tracker.phpbb.com/browse/PHPBB3-11520
 					//Do not do the query here but later, we just increment the count of posts until the loop is finished, then do new posts counters.
-					if ( $row['post_postcount'])
+					if ($row['post_postcount'])
 					{
 						isset($counter[$row['poster_id']]) ? $counter[$row['poster_id']]++ : $counter[$row['poster_id']] = 1;
 					}
@@ -2963,14 +2941,14 @@ final class mms_search
 					// Copy whether the topic is dotted
 					markread('post', $to_forum_id, $new_topic_id, 0, $row['poster_id']);
 
-					if ( !empty($search_type))
+					if (!empty($search_type))
 					{
 						$search->index($search_mode, $new_post_id, $sql_ary['post_text'], $sql_ary['post_subject'], $sql_ary['poster_id'], ($topic_row['topic_type'] == POST_GLOBAL) ? 0 : $to_forum_id);
 						$search_mode = 'reply'; // After one we index replies
 					}
 
 					// Copy Attachments
-					if ( $row['post_attachment'])
+					if ($row['post_attachment'])
 					{
 						$sql = 'SELECT * FROM ' . ATTACHMENTS_TABLE . "
 							WHERE post_msg_id = {$row['post_id']}
@@ -2979,7 +2957,7 @@ final class mms_search
 						$result = $this->db->sql_query($sql);
 
 						$sql_ary = array();
-						while ( $attach_row = $this->db->sql_fetchrow($result))
+						while ($attach_row = $this->db->sql_fetchrow($result))
 						{
 							$sql_ary[] = array(
 								'post_msg_id'		=> (int) $new_post_id,
@@ -3013,7 +2991,7 @@ final class mms_search
 				$result = $this->db->sql_query($sql);
 
 				$sql_ary = array();
-				while ( $row = $this->db->sql_fetchrow($result))
+				while ($row = $this->db->sql_fetchrow($result))
 				{
 					$sql_ary[] = array(
 						'topic_id'		=> (int) $new_topic_id,
@@ -3034,14 +3012,14 @@ final class mms_search
 
 			$sync_sql = array();
 
-			$sync_sql[$to_forum_id][]	= 'forum_posts = forum_posts + ' . $total_posts;
-			$sync_sql[$to_forum_id][]	= 'forum_topics = forum_topics + ' . sizeof($new_topic_id_list);
-			$sync_sql[$to_forum_id][]	= 'forum_topics_real = forum_topics_real + ' . sizeof($new_topic_id_list);
+			$sync_sql[$to_forum_id][]	= 'forum_posts = forum_posts + ' . (int) $total_posts;
+			$sync_sql[$to_forum_id][]	= 'forum_topics = forum_topics + ' . (int) sizeof($new_topic_id_list);
+			$sync_sql[$to_forum_id][]	= 'forum_topics_real = forum_topics_real + ' . (int) sizeof($new_topic_id_list);
 
 			if (sizeof($counter))
 			{
 				//Do only one query per user and not a query PER post!!
-				foreach ( $counter AS $uid => $count)
+				foreach ($counter AS $uid => $count)
 				{
 					$sql = 'UPDATE ' . USERS_TABLE . '
 						SET user_posts = user_posts + ' . (int) $count . '
@@ -3049,11 +3027,11 @@ final class mms_search
 					$this->db->sql_query($sql);
 				}
 			}
-			foreach ( $sync_sql AS $forum_id_key => $array)
+			foreach ($sync_sql AS $forum_id_key => $array)
 			{
 				$sql = 'UPDATE ' . FORUMS_TABLE . '
 					SET ' . implode(', ', $array) . '
-					WHERE forum_id = ' . $forum_id_key;
+					WHERE forum_id = ' . (int) $forum_id_key;
 				$this->db->sql_query($sql);
 			}
 
@@ -3072,7 +3050,7 @@ final class mms_search
 	{
 		$topic_data = $this->get_topic_data(array($to_topic_id), 'm_merge');
 
-		if ( !sizeof($topic_data))
+		if (!sizeof($topic_data))
 		{
 			$this->trigger_error($this->user->lang['NO_FINAL_TOPIC_SELECTED'], E_USER_NOTICE, false, true);
 		}
@@ -3116,7 +3094,7 @@ final class mms_search
 				foreach($rows[$this::MMS_PASSED] AS $key_ => $value_)
 				{
 					$is_me = ($this->row_full[$value_]['poster_id'] == $this->user->data['user_id']) ? true : false;
-					if ( !$this->check_post_options_acl($this->row_full[$value_]['forum_id'], $is_me))
+					if (!$this->check_post_options_acl($this->row_full[$value_]['forum_id'], $is_me))
 					{
 						//Move passed row into ignored row since the forum permission
 						//and/or "EDIT" moderator permission are not respected
@@ -3131,7 +3109,7 @@ final class mms_search
 				$sql_ary = array(
 					'enable_sig' => ($this->post_option == 'enable_sig') ? $this::MMS_DB_TRUE : $this::MMS_DB_FALSE,
 				);
-				if ( $this->post_reason)
+				if ($this->post_reason)
 				{
 					$sql_ary += array(
 						'post_edit_time'	=> $this->time,
@@ -3143,7 +3121,7 @@ final class mms_search
 				$sql = 'UPDATE ' . POSTS_TABLE . '
 					SET ' . $this->db->sql_build_array('UPDATE', $sql_ary) . '
 					WHERE ' . $this->db->sql_in_set('post_id', $rows[$this::MMS_PASSED]);
-				if ( $this->post_reason)
+				if ($this->post_reason)
 				{
 					//* Will return an SQL Error: Incorrect integer value[...]. Using preg_replace() instead of str_replace() for "limit" param...
 					$sql = preg_replace('#SET#', 'SET post_edit_count = post_edit_count + 1, ', $sql, 1);
@@ -3155,9 +3133,9 @@ final class mms_search
 			case 'enable_links':
 				$rows_passed = $rows[$this::MMS_PASSED];
 				$rows_ignored = $rows[$this::MMS_IGNORED];
-				if ( !class_exists('parse_message'))
+				if (!class_exists('parse_message'))
 				{
-					//nub more please :roll:
+					//B**** please :roll:
 					$phpbb_root_path = $this->phpbb_root_path;
 					$phpEx = $this->phpEx;
 					include($this->phpbb_root_path . 'includes/message_parser.' . $this->phpEx);
@@ -3165,7 +3143,7 @@ final class mms_search
 				foreach($rows[$this::MMS_PASSED] AS $key_ => $value_)
 				{
 					$is_me = ($this->row_full[$value_]['poster_id'] == $this->user->data['user_id']) ? true : false;
-					if ( !$this->check_post_options_acl($this->row_full[$value_]['forum_id'], $is_me))
+					if (!$this->check_post_options_acl($this->row_full[$value_]['forum_id'], $is_me))
 					{
 						//Move passed row into ignored row since the forum permission
 						//and/or "EDIT" moderator permission are not respected
@@ -3204,7 +3182,7 @@ final class mms_search
 				$sql_ary = array(
 					'enable_magic_url' => ($this->post_option == 'enable_links') ? $this::MMS_DB_TRUE : $this::MMS_DB_FALSE,
 				);
-				if ( $this->post_reason)
+				if ($this->post_reason)
 				{
 					$sql_ary += array(
 						'post_edit_time'	=> $this->time,
@@ -3216,7 +3194,7 @@ final class mms_search
 				$sql = 'UPDATE ' . POSTS_TABLE . '
 					SET ' . $this->db->sql_build_array('UPDATE', $sql_ary) . '
 					WHERE ' . $this->db->sql_in_set('post_id', $rows[$this::MMS_PASSED]);
-				if ( $this->post_reason)
+				if ($this->post_reason)
 				{
 					//* Will return an SQL Error: Incorrect integer value[...]. Using preg_replace() instead of str_replace() for "limit" param...
 					$sql = preg_replace('#SET#', 'SET post_edit_count = post_edit_count + 1, ', $sql, 1);
@@ -3228,7 +3206,7 @@ final class mms_search
 			case 'enable_bbcodes':
 				$rows_passed = $rows[$this::MMS_PASSED];
 				$rows_ignored = $rows[$this::MMS_IGNORED];
-				if ( !class_exists('parse_message'))
+				if (!class_exists('parse_message'))
 				{
 					//nub more please :roll:
 					$phpbb_root_path = $this->phpbb_root_path;
@@ -3244,12 +3222,13 @@ final class mms_search
 					$url_status		= ($this->config['allow_post_links'] && $this->row_full[$key_]['enable_magic_url'] ) ? true : false;
 					$flash_status	= ($bbcode_status && $this->auth->acl_get('f_flash', $this->row_full[$value_]['forum_id']) && $this->config['allow_post_flash']) ? true : false;
 					$quote_status	= ($this->auth->acl_get('f_reply', $this->row_full[$value_]['forum_id'])) ? true : false;
-					if ( !$this->check_post_options_acl($this->row_full[$value_]['forum_id'], $is_me))
+					if (!$this->check_post_options_acl($this->row_full[$value_]['forum_id'], $is_me))
 					{
 						//Move passed row into ignored row since the forum permission
 						//and/or "EDIT" moderator permission are not respected
 						$rows_ignored[$key_] = $value_;
 					}
+					else
 					{
 						$rows_passed[$key_] = $value_;
 					}
@@ -3266,6 +3245,7 @@ final class mms_search
 					// insert info into the sql_ary
 					$uid = $mms_parser->bbcode_uid;
 					$bitfield = $mms_parser->bbcode_bitfield;
+
 					//Don't blame me about sql query in loop: remember MMS_AJAX_PACKETS const !!
 					$sql = 'UPDATE ' . POSTS_TABLE . '
 						SET ' . $this->db->sql_build_array('UPDATE',
@@ -3283,7 +3263,7 @@ final class mms_search
 				$sql_ary = array(
 					'enable_bbcode ' => ($this->post_option == 'enable_bbcodes') ? $this::MMS_DB_TRUE : $this::MMS_DB_FALSE,
 				);
-				if ( $this->post_reason)
+				if ($this->post_reason)
 				{
 					$sql_ary += array(
 						'post_edit_time'	=> $this->time,
@@ -3295,7 +3275,7 @@ final class mms_search
 				$sql = 'UPDATE ' . POSTS_TABLE . '
 					SET ' . $this->db->sql_build_array('UPDATE', $sql_ary) . '
 					WHERE ' . $this->db->sql_in_set('post_id', $rows[$this::MMS_PASSED]);
-				if ( $this->post_reason)
+				if ($this->post_reason)
 				{
 					//* Will return an SQL Error: Incorrect integer value[...]. Using preg_replace() instead of str_replace() for "limit" param...
 					$sql = preg_replace('#SET#', 'SET post_edit_count = post_edit_count + 1, ', $sql, 1);
@@ -3307,7 +3287,7 @@ final class mms_search
 			case 'enable_smilies':
 				$rows_passed = $rows[$this::MMS_PASSED];
 				$rows_ignored = $rows[$this::MMS_IGNORED];
-				if ( !class_exists('parse_message'))
+				if (!class_exists('parse_message'))
 				{
 					//nub more please :roll:
 					$phpbb_root_path = $this->phpbb_root_path;
@@ -3323,7 +3303,7 @@ final class mms_search
 					$url_status		= ($this->config['allow_post_links'] && $this->row_full[$key_]['enable_magic_url'] ) ? true : false;
 					$flash_status	= ($bbcode_status && $this->auth->acl_get('f_flash', $this->row_full[$value_]['forum_id']) && $this->config['allow_post_flash']) ? true : false;
 					$quote_status	= ($bbcode_status && $this->auth->acl_get('f_reply', $this->row_full[$value_]['forum_id'])) ? true : false;
-					if ( !$this->check_post_options_acl($this->row_full[$value_]['forum_id'], $is_me))
+					if (!$this->check_post_options_acl($this->row_full[$value_]['forum_id'], $is_me))
 					{
 						//Move passed row into ignored row since the forum permission
 						//and/or "EDIT" moderator permission are not respected
@@ -3362,7 +3342,7 @@ final class mms_search
 				$sql_ary = array(
 					'enable_smilies ' => ($this->post_option == 'enable_smilies') ? $this::MMS_DB_TRUE : $this::MMS_DB_FALSE,
 				);
-				if ( $this->post_reason)
+				if ($this->post_reason)
 				{
 					$sql_ary += array(
 						'post_edit_time'	=> $this->time,
@@ -3374,7 +3354,7 @@ final class mms_search
 				$sql = 'UPDATE ' . POSTS_TABLE . '
 					SET ' . $this->db->sql_build_array('UPDATE', $sql_ary) . '
 					WHERE ' . $this->db->sql_in_set('post_id', $rows[$this::MMS_PASSED]);
-				if ( $this->post_reason)
+				if ($this->post_reason)
 				{
 					//* Will return an SQL Error: Incorrect integer value[...]. Using preg_replace() instead of str_replace() for "limit" param...
 					$sql = preg_replace('#SET#', 'SET post_edit_count = post_edit_count + 1, ', $sql, 1);
@@ -3387,7 +3367,7 @@ final class mms_search
 				$rows_ignored = $rows[$this::MMS_IGNORED];
 				$rowset = $this->get_post_data($rows[$this::MMS_PASSED]);
 				//(Borrowed from message_parser.php)
-				if ( !function_exists('delete_attachments'))
+				if (!function_exists('delete_attachments'))
 				{
 					include($phpbb_root_path . 'includes/functions_admin.' . $phpEx);
 				}
@@ -3395,7 +3375,7 @@ final class mms_search
 				$this->db->sql_transaction('begin');
 				foreach($rowset AS $key_ => $value_)
 				{
-					if ( $this->row_full[$key_]['post_attachment'])
+					if ($this->row_full[$key_]['post_attachment'])
 					{
 						//Remove each "attachment BBcodes" from posts
 						$post_text = utf8_normalize_nfc(preg_replace('#\[attachment=([0-9]+):([a-zA-Z0-9]+)\](.*?)\[\/attachment:([a-zA-Z0-9]+)\]#e', '', $this->row_full[$key_]['post_text']));
@@ -3404,7 +3384,7 @@ final class mms_search
 							'post_text'			=> $post_text,
 							'post_checksum'		=> md5($post_text)
 						);
-						if ( $this->post_reason)
+						if ($this->post_reason)
 						{
 							$sql_ary += array(
 								'post_edit_time'	=> $this->time,
@@ -3416,7 +3396,7 @@ final class mms_search
 						$sql = 'UPDATE ' . POSTS_TABLE . '
 							SET ' . $this->db->sql_build_array('UPDATE', $sql_ary) . '
 							WHERE post_id = ' . (int) $this->row_full[$key_]['post_id'];
-						if ( $this->post_reason)
+						if ($this->post_reason)
 						{
 							//* Will return an SQL Error: Incorrect integer value[...]. Using preg_replace() instead of str_replace() for "limit" param...
 							$sql = preg_replace('#SET#', 'SET post_edit_count = post_edit_count + 1, ', $sql, 1);
@@ -3438,7 +3418,7 @@ final class mms_search
 			//-->
 			case 'disable_hpiv':
 			case 'enable_hpiv':
-				if ( !$this->addons['hpiv'] )
+				if (!$this->addons['hpiv'])
 				{
 					//Add-on missing, stop the script definitely!
 					$this->trigger_error($this->user->lang['MMS_ADDON_DISABLED'], E_USER_ERROR, false, false);
@@ -3448,7 +3428,7 @@ final class mms_search
 				foreach($rows[$this::MMS_PASSED] AS $key_ => $value_)
 				{
 					$is_me = ($this->row_full[$value_]['poster_id'] == $this->user->data['user_id']) ? true : false;
-					if ( !$this->check_post_options_acl($this->row_full[$value_]['forum_id'], $is_me))
+					if (!$this->check_post_options_acl($this->row_full[$value_]['forum_id'], $is_me))
 					{
 						//Move passed row into ignored row since the forum permission
 						//and/or "EDIT" moderator permission are not respected
@@ -3463,7 +3443,7 @@ final class mms_search
 				$sql_ary = array(
 					'post_profile' => ($this->post_option == 'enable_hpiv') ? $this::MMS_DB_TRUE : $this::MMS_DB_FALSE,
 				);
-				if ( $this->post_reason)
+				if ($this->post_reason)
 				{
 					$sql_ary += array(
 						'post_edit_time'	=> $this->time,
@@ -3475,7 +3455,7 @@ final class mms_search
 				$sql = 'UPDATE ' . POSTS_TABLE . '
 					SET ' . $this->db->sql_build_array('UPDATE', $sql_ary) . '
 					WHERE ' . $this->db->sql_in_set('post_id', $rows[$this::MMS_PASSED]);
-				if ( $this->post_reason)
+				if ($this->post_reason)
 				{
 					//* Will return an SQL Error: Incorrect integer value[...]. Using preg_replace() instead of str_replace() for "limit" param...
 					$sql = preg_replace('#SET#', 'SET post_edit_count = post_edit_count + 1, ', $sql, 1);
@@ -3484,7 +3464,7 @@ final class mms_search
 			break;
 
 			case 'remove_ppr':
-				if ( !$this->addons['ppr'] )
+				if (!$this->addons['ppr'])
 				{
 					//Add-on missing, stop the script definitely!
 					$this->trigger_error($this->user->lang['MMS_ADDON_DISABLED'], E_USER_ERROR, false, false);
@@ -3494,7 +3474,7 @@ final class mms_search
 				foreach($rows[$this::MMS_PASSED] AS $key_ => $value_)
 				{
 					$is_me = ($this->row_full[$value_]['poster_id'] == $this->user->data['user_id']) ? true : false;
-					if ( !$this->check_post_options_acl($this->row_full[$value_]['forum_id'], $is_me))
+					if (!$this->check_post_options_acl($this->row_full[$value_]['forum_id'], $is_me))
 					{
 						//Move passed row into ignored row since the forum permission
 						//and/or "DELETE" moderator permission are not respected
@@ -3511,7 +3491,7 @@ final class mms_search
 					WHERE ' . $this->db->sql_in_set('post_id', $rows[$this::MMS_PASSED]);
 				$this->db->sql_query($sql);
 
-				if ( $this->post_reason)
+				if ($this->post_reason)
 				{
 					$sql_ary = array(
 						'post_edit_time'	=> $this->time,
@@ -3525,7 +3505,7 @@ final class mms_search
 					SET ' . $this->db->sql_build_array('UPDATE', $sql_ary) . '
 					WHERE ' . $this->db->sql_in_set('post_id', $rows[$this::MMS_PASSED]);
 
-				if ( $this->post_reason)
+				if ($this->post_reason)
 				{
 					//* Will return an SQL Error: Incorrect integer value[...]. Using preg_replace() instead of str_replace() for "limit" param...
 					$sql = preg_replace('#SET#', 'SET post_edit_count = post_edit_count + 1, ', $sql, 1);
@@ -3534,7 +3514,7 @@ final class mms_search
 			break;
 
 			case 'remove_mm':
-				if ( !$this->addons['mm'] )
+				if (!$this->addons['mm'])
 				{
 					//Add-on missing, stop the script definitely!
 					$this->trigger_error($this->user->lang['MMS_ADDON_DISABLED'], E_USER_ERROR, false, false);
@@ -3545,7 +3525,7 @@ final class mms_search
 				foreach($rows[$this::MMS_PASSED] AS $key_ => $value_)
 				{
 					$is_me = ($this->row_full[$value_]['poster_id'] == $this->user->data['user_id']) ? true : false;
-					if ( !$this->check_post_options_acl($this->row_full[$value_]['forum_id'], $is_me))
+					if (!$this->check_post_options_acl($this->row_full[$value_]['forum_id'], $is_me))
 					{
 						//Move passed row into ignored row since the forum permission
 						//and/or "EDIT" moderator permission are not respected
@@ -3553,7 +3533,14 @@ final class mms_search
 					}
 					{
 						$rows_passed[$key_] = $value_;
-						isset($mm_topic_resync[$this->row_full[$value_]['topic_id']]) ? $mm_topic_resync[$this->row_full[$value_]['topic_id']] = 1 : $mm_topic_resync[$this->row_full[$value_]['topic_id']]++;
+						if (isset($mm_topic_resync[$this->row_full[$value_]['topic_id']]))
+						{
+							$mm_topic_resync[$this->row_full[$value_]['topic_id']] = 1;
+						}
+						else
+						{
+							$mm_topic_resync[$this->row_full[$value_]['topic_id']]++;
+						}
 					}
 				}
 				$rows[$this::MMS_PASSED] = $rows_passed;
@@ -3564,7 +3551,7 @@ final class mms_search
 					'post_moderation_username' => '',
 					'post_moderation_user_colour' => '',
 				);
-				if ( $this->post_reason)
+				if ($this->post_reason)
 				{
 					$sql_ary += array(
 						'post_edit_time'	=> $this->time,
@@ -3576,7 +3563,7 @@ final class mms_search
 				$sql = 'UPDATE ' . POSTS_TABLE . '
 					SET ' . $this->db->sql_build_array('UPDATE', $sql_ary) . '
 					WHERE ' . $this->db->sql_in_set('post_id', $rows[$this::MMS_PASSED]);
-				if ( $this->post_reason)
+				if ($this->post_reason)
 				{
 					//* Will return an SQL Error: Incorrect integer value[...]. Using preg_replace() instead of str_replace() for "limit" param...
 					$sql = preg_replace('#SET#', 'SET post_edit_count = post_edit_count + 1, ', $sql, 1);
@@ -3585,7 +3572,7 @@ final class mms_search
 
 				//Update subtracted Moderation Message counter per topic
 				//This foreach will never reach 10 loop (Master packet-size setting)
-				foreach($mm_topic_resync AS $topic_id_ => $sub_count_ )
+				foreach($mm_topic_resync AS $topic_id_ => $sub_count_)
 				{
 					$sql = 'UPDATE ' . TOPICS_TABLE . '
 						SET posts_moderation_total = posts_moderation_total - ' . (int) $sub_count_ . '
@@ -3605,12 +3592,12 @@ final class mms_search
 	{
 		$rows = array();
 
-		if ( !is_array($forum_ids))
+		if (!is_array($forum_ids))
 		{
 			$forum_ids = array($forum_ids);
 		}
 
-		if ( !sizeof($forum_ids))
+		if (!sizeof($forum_ids))
 		{
 			return array();
 		}
@@ -3620,7 +3607,7 @@ final class mms_search
 			WHERE " . $this->db->sql_in_set('forum_id', $forum_ids);
 		$result = $this->db->sql_query($sql);
 
-		while ( $row = $this->db->sql_fetchrow($result))
+		while ($row = $this->db->sql_fetchrow($result))
 		{
 			$rows[$row['forum_id']] = $row;
 		}
@@ -3638,12 +3625,12 @@ final class mms_search
 	{
 		$rows = array();
 
-		if ( !is_array($topic_ids))
+		if (!is_array($topic_ids))
 		{
 			$topic_ids = array($topic_ids);
 		}
 
-		if ( !sizeof($topic_ids))
+		if (!sizeof($topic_ids))
 		{
 			return array();
 		}
@@ -3653,7 +3640,7 @@ final class mms_search
 			WHERE " . $this->db->sql_in_set('topic_id', $topic_ids);
 		$result = $this->db->sql_query($sql);
 
-		while ( $row = $this->db->sql_fetchrow($result))
+		while ($row = $this->db->sql_fetchrow($result))
 		{
 			$rows[$row['topic_id']] = $row;
 		}
@@ -3669,12 +3656,15 @@ final class mms_search
 	****/
 	private function post_resync_username()
 	{
-		$sql = 'UPDATE ' . POSTS_TABLE . " p
-			LEFT JOIN " . USERS_TABLE . " u
-				ON u.user_id = p.poster_id
-			SET p.post_username = u.username
-			WHERE " . $this->db->sql_in_set('p.post_id', $this->pids);
-		$this->db->sql_query($sql);
+		if (!empty($this->pids))
+		{
+			$sql = 'UPDATE ' . POSTS_TABLE . " p
+				LEFT JOIN " . USERS_TABLE . " u
+					ON u.user_id = p.poster_id
+				SET p.post_username = u.username
+				WHERE " . $this->db->sql_in_set('p.post_id', $this->pids);
+			$this->db->sql_query($sql);
+		}
 	}
 
 	/****
@@ -3693,24 +3683,24 @@ final class mms_search
 		$this->db->sql_query($sql);
 
 		// Resync topic/forum if needed
-		if ( $post_info['topic_last_post_id'] == $post_id || $post_info['forum_last_post_id'] == $post_id || $post_info['topic_first_post_id'] == $post_id)
+		if ($post_info['topic_last_post_id'] == $post_id || $post_info['forum_last_post_id'] == $post_id || $post_info['topic_first_post_id'] == $post_id)
 		{
 			sync('topic', 'topic_id', $post_info['topic_id'], false, false);
 			sync('forum', 'forum_id', $post_info['forum_id'], false, false);
 		}
 
 		// Adjust post counts... only if the post is approved (else, it was not added the users post count anyway)
-		if ( $post_info['post_postcount'] && $post_info['post_approved'])
+		if ($post_info['post_postcount'] && $post_info['post_approved'])
 		{
 			$sql = 'UPDATE ' . USERS_TABLE . '
 				SET user_posts = user_posts - 1
-				WHERE user_id = ' . $post_info['user_id'] .'
+				WHERE user_id = ' . (int) $post_info['user_id'] .'
 				AND user_posts > ' . $this::MMS_DB_FALSE;
 			$this->db->sql_query($sql);
 
 			$sql = 'UPDATE ' . USERS_TABLE . '
 				SET user_posts = user_posts + 1
-				WHERE user_id = ' . $userdata['user_id'];
+				WHERE user_id = ' . (int) $userdata['user_id'];
 			$this->db->sql_query($sql);
 		}
 
@@ -3718,33 +3708,33 @@ final class mms_search
 		markread('post', $post_info['forum_id'], $post_info['topic_id'], $this->time, $userdata['user_id']);
 
 		// Remove the dotted topic option if the old user has no more posts within this topic
-		if ( $this->config['load_db_track'] && $post_info['user_id'] != ANONYMOUS)
+		if ($this->config['load_db_track'] && $post_info['user_id'] != ANONYMOUS)
 		{
 			$sql = 'SELECT topic_id
 				FROM ' . POSTS_TABLE . '
-				WHERE topic_id = ' . $post_info['topic_id'] . '
-					AND poster_id = ' . $post_info['user_id'];
+				WHERE topic_id = ' . (int) $post_info['topic_id'] . '
+					AND poster_id = ' . (int) $post_info['user_id'];
 			$result = $this->db->sql_query_limit($sql, 1);
 			$topic_id = (int) $this->db->sql_fetchfield('topic_id');
 			$this->db->sql_freeresult($result);
 
-			if ( !$topic_id)
+			if (!$topic_id)
 			{
 				$sql = 'DELETE FROM ' . TOPICS_POSTED_TABLE . '
-					WHERE user_id = ' . $post_info['user_id'] . '
-						AND topic_id = ' . $post_info['topic_id'];
+					WHERE user_id = ' . (int) $post_info['user_id'] . '
+						AND topic_id = ' . (int) $post_info['topic_id'];
 				$this->db->sql_query($sql);
 			}
 		}
 
 		// change the poster_id within the attachments table, else the data becomes out of sync and errors displayed because of wrong ownership
-		if ( $post_info['post_attachment'])
+		if ($post_info['post_attachment'])
 		{
 			$sql = 'UPDATE ' . ATTACHMENTS_TABLE . '
-				SET poster_id = ' . $userdata['user_id'] . '
-				WHERE poster_id = ' . $post_info['user_id'] . '
-					AND post_msg_id = ' . $post_info['post_id'] . '
-					AND topic_id = ' . $post_info['topic_id'];
+				SET poster_id = ' . (int) $userdata['user_id'] . '
+				WHERE poster_id = ' . (int) $post_info['user_id'] . '
+					AND post_msg_id = ' . (int) $post_info['post_id'] . '
+					AND topic_id = ' . (int) $post_info['topic_id'];
 			$this->db->sql_query($sql);
 		}
 
@@ -3754,7 +3744,7 @@ final class mms_search
 		// Renew post info
 		$post_info = $this->get_post_data(array($post_id), false, true);
 
-		if ( !sizeof($post_info))
+		if (!sizeof($post_info))
 		{
 			$this->trigger_error('POST_NOT_EXIST');
 		}
@@ -3784,7 +3774,7 @@ final class mms_search
 			$error = false;
 			$search = new $search_type($error);
 
-			if ( !$error && method_exists($search, 'destroy_cache'))
+			if (!$error && method_exists($search, 'destroy_cache'))
 			{
 				$search->destroy_cache(array(), $uids);
 			}
@@ -3802,7 +3792,7 @@ final class mms_search
 	{
 		$rowset = array();
 
-		if ( !sizeof($post_ids))
+		if (!sizeof($post_ids))
 		{
 			return array();
 		}
@@ -3828,7 +3818,7 @@ final class mms_search
 				AND t.topic_id = p.topic_id',
 		);
 
-		if ( $read_tracking && $this->config['load_db_lastread'])
+		if ($read_tracking && $this->config['load_db_lastread'])
 		{
 			$sql_array['SELECT'] .= ', tt.mark_time, ft.mark_time as forum_mark_time';
 
@@ -3847,20 +3837,20 @@ final class mms_search
 		$result = $this->db->sql_query($sql);
 		unset($sql_array);
 
-		while ( $row = $this->db->sql_fetchrow($result))
+		while ($row = $this->db->sql_fetchrow($result))
 		{
-			if ( !$row['forum_id'])
+			if (!$row['forum_id'])
 			{
 				// Global Announcement?
 				$row['forum_id'] = $this->to_fid;
 			}
 
-			if ( $acl_list && !$this->auth->acl_gets($acl_list, $row['forum_id']))
+			if ($acl_list && !$this->auth->acl_gets($acl_list, $row['forum_id']))
 			{
 				continue;
 			}
 
-			if ( !$row['post_approved'] && !$this->auth->acl_get('m_approve', $row['forum_id']))
+			if (!$row['post_approved'] && !$this->auth->acl_get('m_approve', $row['forum_id']))
 			{
 				// Moderators without the permission to approve post should at least not see them. ;)
 				continue;
@@ -3886,14 +3876,14 @@ final class mms_search
 
 		$topics = array();
 
-		if ( !sizeof($topic_ids))
+		if (!sizeof($topic_ids))
 		{
 			return array();
 		}
 
 		// cache might not contain read tracking info, so we can't use it if read
 		// tracking information is requested
-		if ( !$read_tracking)
+		if (!$read_tracking)
 		{
 			$cache_topic_ids = array_intersect($topic_ids, array_keys($rowset));
 			$topic_ids = array_diff($topic_ids, array_keys($rowset));
@@ -3922,7 +3912,7 @@ final class mms_search
 				'WHERE'		=> $this->db->sql_in_set('t.topic_id', $topic_ids)
 			);
 
-			if ( $read_tracking && $this->config['load_db_lastread'])
+			if ($read_tracking && $this->config['load_db_lastread'])
 			{
 				$sql_array['SELECT'] .= ', tt.mark_time, ft.mark_time as forum_mark_time';
 
@@ -3940,9 +3930,9 @@ final class mms_search
 			$sql = $this->db->sql_build_query('SELECT', $sql_array);
 			$result = $this->db->sql_query($sql);
 
-			while ( $row = $this->db->sql_fetchrow($result))
+			while ($row = $this->db->sql_fetchrow($result))
 			{
-				if ( !$row['forum_id'])
+				if (!$row['forum_id'])
 				{
 					// Global Announcement?
 					$row['forum_id'] = $this->to_fid;
@@ -3950,7 +3940,7 @@ final class mms_search
 
 				$rowset[$row['topic_id']] = $row;
 
-				if ( $acl_list && !$this->auth->acl_gets($acl_list, $row['forum_id']))
+				if ($acl_list && !$this->auth->acl_gets($acl_list, $row['forum_id']))
 				{
 					continue;
 				}
@@ -3960,9 +3950,9 @@ final class mms_search
 			$this->db->sql_freeresult($result);
 		}
 
-		foreach ( $cache_topic_ids AS $id)
+		foreach ($cache_topic_ids AS $id)
 		{
-			if ( !$acl_list || $this->auth->acl_gets($acl_list, $rowset[$id]['forum_id']))
+			if (!$acl_list || $this->auth->acl_gets($acl_list, $rowset[$id]['forum_id']))
 			{
 				$topics[$id] = $rowset[$id];
 			}
@@ -3980,7 +3970,7 @@ final class mms_search
 		// Grab icons
 		$icons = $this->cache->obtain_icons();
 
-		if ( !$icon_id)
+		if (!$icon_id)
 		{
 			$this->template->assign_var('S_NO_ICON_CHECKED', ' checked="checked"');
 		}

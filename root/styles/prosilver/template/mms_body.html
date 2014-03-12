@@ -120,7 +120,7 @@
 				<!-- BEGIN mms_row -->
 					<div class="panel" id="div_row_id<!-- IF S_MMS_TYPE == 'post' -->{mms_row.POST_ID}<!-- ELSE -->{mms_row.TOPIC_ID}<!-- ENDIF -->"<!-- IF mms_row.S_ROW_COUNT > 49 --> style="display: none;"<!-- ENDIF -->>
 						<div class="inner"><span class="corners-top"><span></span></span>
-						<h3>#{mms_row.S_MMS_ROW_COUNT} {S_ROW_TYPE}: <a href="javascript:mmsIpreview('{mms_row.FULL_URL}', '{L_MMS_PREV}: {mms_row.ROW_TITLE}')" class="mms_wo" title="{mms_row.ROW_TITLE}">{mms_row.ROW_TITLE}</a>&nbsp;<span style="cursor: help;" class="mms_tooltip" id="span_row_id<!-- IF S_MMS_TYPE == 'post' -->{mms_row.POST_ID}<!-- ELSE -->{mms_row.TOPIC_ID}<!-- ENDIF -->">[?]<span title="{mms_row.TEXT_CONTENT}"></span></span><a style="float: right;" class="mms_top" href="javascript:void(0);">{L_MMS_CHAR_TOP}</a>&nbsp;<a style="float: right;" class="mms_bottom" href="javascript:void(0);">{L_MMS_CHAR_BOTTOM}</a></h3>
+						<h3>#{mms_row.S_MMS_ROW_COUNT} {S_ROW_TYPE}: <a href="javascript:mmsIpreview('{mms_row.FULL_URL}', '{LA_MMS_PREV}: {mms_row.ROW_TITLE}')" class="mms_wo" title="{mms_row.ROW_TITLE}">{mms_row.ROW_TITLE}</a>&nbsp;<span style="cursor: help;" class="mms_tooltip" id="span_row_id<!-- IF S_MMS_TYPE == 'post' -->{mms_row.POST_ID}<!-- ELSE -->{mms_row.TOPIC_ID}<!-- ENDIF -->">[?]<span title="{mms_row.TEXT_CONTENT}"></span></span><a style="float: right;" class="mms_top" href="javascript:void(0);">{L_MMS_CHAR_TOP}</a>&nbsp;<a style="float: right;" class="mms_bottom" href="javascript:void(0);">{L_MMS_CHAR_BOTTOM}</a></h3>
 						<span>{L_POST_BY_AUTHOR}: {mms_row.FULL_USER}</span>
 						<br /><span>{mms_row.ROW_TIME}</span>
 						<strong class="error"></strong>
@@ -160,7 +160,7 @@
 					<!-- BEGIN mms_fail_row -->
 						<div class="panel" id="div_row_id<!-- IF S_MMS_TYPE == 'post' -->{mms_fail_row.POST_ID}<!-- ELSE -->{mms_fail_row.TOPIC_ID}<!-- ENDIF -->"<!-- IF mms_fail_row.S_ROW_COUNT > 49 --> style="display: none;"<!-- ENDIF -->>
 							<div class="inner"><span class="corners-top"><span></span></span>
-							<h3>#{mms_fail_row.S_MMS_ROW_COUNT} {S_ROW_TYPE}: <a href="<!-- IF mms_fail_row.IS_VIEWABLE -->javascript:mmsIpreview('{mms_fail_row.FULL_URL}', '{L_MMS_PREV}: {mms_fail_row.ROW_TITLE}')<!-- ELSE -->javascript:void(0);<!-- ENDIF -->" class="mms_wo" title="<!-- IF mms_fail_row.IS_VIEWABLE -->{mms_fail_row.ROW_TITLE}<!-- ELSE -->{L_MMS_PRIV}<!-- ENDIF -->"><!-- IF mms_fail_row.IS_VIEWABLE -->{mms_fail_row.ROW_TITLE}<!-- ELSE --><em>{L_MMS_PRIV}</em><!-- ENDIF --></a>&nbsp;<span style="cursor: help;" class="mms_tooltip" id="span_row_id<!-- IF S_MMS_TYPE == 'post' -->{mms_fail_row.POST_ID}<!-- ELSE -->{mms_fail_row.TOPIC_ID}<!-- ENDIF -->">[?]<span title="<!-- IF mms_fail_row.IS_VIEWABLE -->{mms_fail_row.TEXT_CONTENT}<!-- ELSE -->{L_MMS_PRIVATE}<!-- ENDIF -->"></span></span></h3>
+							<h3>#{mms_fail_row.S_MMS_ROW_COUNT} {S_ROW_TYPE}: <a href="<!-- IF mms_fail_row.IS_VIEWABLE -->javascript:mmsIpreview('{mms_fail_row.FULL_URL}', '{LA_MMS_PREV}: {mms_fail_row.ROW_TITLE}')<!-- ELSE -->javascript:void(0);<!-- ENDIF -->" class="mms_wo" title="<!-- IF mms_fail_row.IS_VIEWABLE -->{mms_fail_row.ROW_TITLE}<!-- ELSE -->{L_MMS_PRIV}<!-- ENDIF -->"><!-- IF mms_fail_row.IS_VIEWABLE -->{mms_fail_row.ROW_TITLE}<!-- ELSE --><em>{L_MMS_PRIV}</em><!-- ENDIF --></a>&nbsp;<span style="cursor: help;" class="mms_tooltip" id="span_row_id<!-- IF S_MMS_TYPE == 'post' -->{mms_fail_row.POST_ID}<!-- ELSE -->{mms_fail_row.TOPIC_ID}<!-- ENDIF -->">[?]<span title="<!-- IF mms_fail_row.IS_VIEWABLE -->{mms_fail_row.TEXT_CONTENT}<!-- ELSE -->{L_MMS_PRIVATE}<!-- ENDIF -->"></span></span></h3>
 							<span>{L_POST_BY_AUTHOR}: {mms_fail_row.FULL_USER}</span>
 							<br /><span>{mms_fail_row.ROW_TIME}</span>
 							<br /><strong class="error"><em>{L_MMS_REASON}: {mms_fail_row.FAIL_REASON}</em></strong>
@@ -445,16 +445,16 @@ function init_confirm(){
 	mms_confirm(mmsLang['INFORMATION'], mmsLang['CONFIRM_OPERATION'], true, 'ajax_init()', '')
 }
 function mms_IfSrc(url){
-var patt=/imms=1/g;
-if (!patt.test(url)){
-	url = url.replace('?', '?imms=1&');
+	var patt = /imms=1/g;
 	if (!patt.test(url)){
-		url += '?imms=1';
+		url = url.replace('?', '?imms=1&');
+		if (!patt.test(url)){
+			url += '?imms=1';
+		}
 	}
-}
-$('#mmsFakeUrl').addClass('mms_url_loading')
-$("#mmsTopicIframe").attr("src",url);
-return false;
+	$('#mmsFakeUrl').addClass('mms_url_loading')
+	$("#mmsTopicIframe").attr("src",url);
+	return false;
 }
 function mmsIpreview(u,t)
 {
@@ -766,7 +766,7 @@ function final_resync(){
 		$('.display-options').children('strong.error').remove();
 		$('#loadavgbar').parent('div').remove();
 		$('#mms_showToleft').remove();
-		$('<div class="panel"><div class="inner"><span class="corners-top"><span></span></span><p>{L_MMS_LEFTNO}</p><span class="corners-bottom"><span></span></span></div></div>').appendTo('#div_mms_left');
+		$('<div class="panel"><div class="inner"><span class="corners-top"><span></span></span><p>{LA_MMS_LEFTNO}</p><span class="corners-bottom"><span></span></span></div></div>').appendTo('#div_mms_left');
 		$("#mms_statut").html('<span>' + mmsLang['MMS_STATUT'] + ': <strong style="color: green;">' + mmsLang['MMS_DATA_TERMINATED'] + '</strong></span>');
 		mms_info(mmsLang['INFORMATION'], '<span class="ui-icon ui-icon-check" style="float: left;"></span> ' + mmsLang['MMS_SUCCESS']);
 		$('<hr /><strong style="color: green;">' + result
@@ -950,7 +950,7 @@ function mms_confirm(title, message, alert, btn_yes_callback, btn_no_callback, p
 			modal: true, title: (title ? title : mmsLang['CONFIRM']), 
 			zIndex: 10000, autoOpen: true,
 			width: (autoSize ? 'auto' : '350px'), resizable: true,
-			buttons : btns, "{L_QUIT}": function (event, ui) {
+			buttons : btns, "{LA_QUIT}": function (event, ui) {
 		}
 	});
 	//hack the submit key if we request a password...

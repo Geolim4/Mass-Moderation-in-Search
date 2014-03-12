@@ -19,8 +19,8 @@ if (!defined('IN_PHPBB'))
 /**
 * @package acp
 */
-define('MMS_HOST', 'geolim4.com');
-define('MMS_PATH', '/buildversion');
+define('MMS_HOST', 'gl4.fr');
+define('MMS_PATH', '');
 define('MMS_FILE', 'mms.txt');
 class acp_mms
 {
@@ -33,7 +33,7 @@ class acp_mms
 		//Check install before all !!
 		$this->mms_check_install();
 
-		//No $error? Okey boss load the settings please :)
+		//No $error? We can continue.
 		global $db, $user, $template, $phpbb_root_path, $phpbb_admin_path, $phpEx, $auth, $cache;
 
 		//tpl settings..
@@ -165,6 +165,7 @@ class acp_mms
 			break;
 		}
 	}
+
 //Fast Install checking
 /**
 * Check all the steps of the install of the mod
@@ -176,11 +177,12 @@ class acp_mms
 		global $cache, $config, $user, $phpbb_root_path, $phpbb_admin_path, $phpEx, $db;
 		if ( !empty($config['mms_check_install']) && $config['mms_check_install'] < time() )
 		{
-			if ( !class_exists('phpbb_db_tools') || !class_exists('dbal') )
+/* 			if ( !class_exists('phpbb_db_tools') || !class_exists('dbal') )
 			{
-				@include($phpbb_root_path . 'includes/db/db_tools.' . $phpEx);
+				include($phpbb_root_path . 'includes/db/db_tools.' . $phpEx);
 			}
-			$mms_db	= new phpbb_db_tools($db);
+			$mms_db	= new phpbb_db_tools($db); */
+
 			$error = '';
 			$sql = 'SELECT style_name
 				FROM ' . STYLES_TABLE . "
@@ -239,7 +241,6 @@ class acp_mms
 					add_log('critical', 'ACP_MMS_LOG_OFF', $error);
 				}
 				set_config('mms_mod_enable', 0, false);
-				//Die, die, die, die, die, die, die, die, die, die, die, die, die, die, die!!!
 				trigger_error($error . adm_back_link($this->u_action), E_USER_WARNING);
 			}
 			//Install look fine (we've passed the trigger_error() ), cache it 1 hour...
