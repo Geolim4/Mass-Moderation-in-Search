@@ -2,7 +2,7 @@
 /**
 *
 * @package phpBB3 Mass Moderation in Search Class
-^>@version $Id: class_mms.php v1.1.0 22h14 06/07/2013 Geolim4 Exp $
+^>@version $Id: class_mms.php v1.1.1 07h79 03/16/2014 Geolim4 Exp $
 * @copyright (c) 2013 Geolim4.com  http://Geolim4.com
 * @bug/function request: http://geolim4.com/tracker.php
 * @license http://opensource.org/licenses/gpl-license.php GNU Public License
@@ -93,6 +93,7 @@ final class mms_search
 
 	// SYS const, do not modify them!!!!
 	const MMS_HARD_PAGINATION	= 5000;		//Hard pagination limit
+	const MMS_HARD_RESYNC_LIMIT	= 250;		//Hard resync limit
 	const MMS_IGNORED			= 'ignored';//Rows ignored such deleted posts/topics, unallowed permissions, from->to same topic/forum destination etc.
 	const MMS_PASSED			= 'passed';	//Rows correctly treated
 	const MMS_DB_FALSE			= 0;		//False value for DB
@@ -581,7 +582,7 @@ final class mms_search
 				//Extra security measure for variables variable.
 				case 'topics':
 				case 'posts':
-					$this->row_mode = substr($mode, 0, -1);//remove the last letter
+					$this->row_mode = substr($mode, 0, -1);//remove the "s"
 				break;
 
 				default:
@@ -653,6 +654,7 @@ final class mms_search
 			'S_MMS_TYPE'			=> $this->row_mode,
 			'S_MMS_AJAX_PACKETS'	=> $this->MMS_AJAX_PACKETS,
 			'S_MMS_MOD_TIMEOUT'		=> ($this->config['mms_mod_timeout'] * 1000),
+			'S_MMS_MAX_ATTEMPTS'	=> (int) $this->config['mms_max_attempts'],
 			'S_MMS_TOPIC_ACTION'	=> in_array($this->mms_topic_action, $this->mms_topic_mode) ? $this->mms_topic_action : '',
 			'S_MMS_POST_ACTION'		=> in_array($this->mms_post_action, $this->mms_post_mode) ? $this->mms_post_action : '',
 			'S_MMS_MASS_TOOL'		=> (!empty($this->row_mode) ? $this->user->lang['MMS_MASS_' . strtoupper($this->row_mode) . '_TOOL'][$this->{'mms_' . $this->row_mode . '_action'}] : ''),
@@ -1236,7 +1238,7 @@ final class mms_search
 		foreach ($rows[$this::MMS_PASSED] AS $key_ => $val_)
 		{
 			$this->final_eval .= "$('#span_row_id{$val_}').remove();";
-			$this->row_msg_ary[$val_] = $this->user->lang['MMS_STATUT_DELETED'];
+			$this->row_msg_ary[$val_] = $this->user->lang['MMS_STATUS_DELETED'];
 			$this->row_statut_ary[$val_] = true;
 			add_log('mod', $this->fids[$val_], $this->tids[$val_], 'MMS_LOG_' . strtoupper($this->row_mode) . '_' . strtoupper($this->{'mms_' . $this->row_mode . '_action'}), $this->rids_title[$val_], $this->unms[$val_]);
 		}
@@ -1346,7 +1348,16 @@ final class mms_search
 
 		$to_forum_id = $this->ajax_data['forum_id'];
 
-		$this->mcp_fork_topic($rows[$this::MMS_PASSED], $to_forum_id, $this->row_msg_ary, $this->row_statut_ary);
+		if(!empty($rows[$this::MMS_PASSED]))
+		{
+			$this->mcp_fork_topic($rows[$this::MMS_PASSED], $to_forum_id);
+		}
+
+		foreach ($rows[$this::MMS_IGNORED] AS $key_ => $reason_)
+		{
+			$this->row_msg_ary[$key_] = $reason_;
+			$this->row_statut_ary[$key_] = false;
+		}
 
 		//Special treatment for this mode:
 		$this->fdata['f'][] = (int)  $to_forum_id;
@@ -1388,7 +1399,7 @@ final class mms_search
 		}
 		foreach ($rows[$this::MMS_PASSED] AS $key_ => $val_)
 		{
-			$this->row_msg_ary[$val_] = $this->user->lang['MMS_STATUT_LOCKED'];
+			$this->row_msg_ary[$val_] = $this->user->lang['MMS_STATUS_LOCKED'];
 			$this->row_statut_ary[$val_] = true;
 			add_log('mod', $this->fids[$val_], $this->tids[$val_], 'MMS_LOG_' . strtoupper($this->row_mode) . '_' . strtoupper($this->{'mms_' . $this->row_mode . '_action'}), $this->rids_title[$val_]);
 		}
@@ -1434,7 +1445,7 @@ final class mms_search
 		}
 		foreach ($rows[$this::MMS_PASSED] AS $key_ => $val_)
 		{
-			$this->row_msg_ary[$val_] = $this->user->lang['MMS_STATUT_UNLOCKED'];
+			$this->row_msg_ary[$val_] = $this->user->lang['MMS_STATUS_UNLOCKED'];
 			$this->row_statut_ary[$val_] = true;
 			add_log('mod', $this->fids[$val_], $this->tids[$val_], 'MMS_LOG_' . strtoupper($this->row_mode) . '_' . strtoupper($this->{'mms_' . $this->row_mode . '_action'}), $this->rids_title[$val_]);
 		}
@@ -1474,7 +1485,7 @@ final class mms_search
 
 		foreach ($rows[$this::MMS_PASSED] AS $key_ => $val_)
 		{
-			$this->row_msg_ary[$val_] = $this->user->lang['MMS_STATUT_RECYNC'];
+			$this->row_msg_ary[$val_] = $this->user->lang['MMS_STATUS_RECYNC'];
 			$this->row_statut_ary[$val_] = true;
 			add_log('mod', $this->fids[$val_], $this->tids[$val_], 'MMS_LOG_' . strtoupper($this->row_mode) . '_' . strtoupper($this->{'mms_' . $this->row_mode . '_action'}), $this->rids_title[$val_]);
 		}
@@ -1546,7 +1557,7 @@ final class mms_search
 		$viewtopic_url = append_sid("{$this->phpbb_root_path}viewtopic.$this->phpEx", 't=' . $topicdata['topic_id']);
 		foreach ($rows[$this::MMS_PASSED] AS $key_ => $val_)
 		{
-			$this->row_msg_ary[$val_] = $this->user->lang('MMS_STATUT_MERGED', '<a class="mms_wo" href="' . $this->build_mms_ipreview_url($viewtopic_url, $topicdata['topic_title']) . '" title="' . $topicdata['topic_title'] . '">' . $topicdata['topic_title'] . '</a>');
+			$this->row_msg_ary[$val_] = $this->user->lang('MMS_STATUS_MERGED', '<a class="mms_wo" href="' . $this->build_mms_ipreview_url($viewtopic_url, $topicdata['topic_title']) . '" title="' . $topicdata['topic_title'] . '">' . $topicdata['topic_title'] . '</a>');
 			$this->row_statut_ary[$val_] = true;
 			add_log('mod', $this->fids[$val_], $topicdata['topic_id'], 'MMS_LOG_' . strtoupper($this->row_mode) . '_' . strtoupper($this->{'mms_' . $this->row_mode . '_action'}), $this->rids_title[$val_], $this->unms[$val_], $topicdata['topic_title']);
 		}
@@ -1636,7 +1647,7 @@ final class mms_search
 		}
 		foreach ($rows[$this::MMS_PASSED] AS $key_ => $val_)
 		{
-			$this->row_msg_ary[$val_] = $this->user->lang['MMS_STATUT_ICONCHD'];
+			$this->row_msg_ary[$val_] = $this->user->lang['MMS_STATUS_ICONCHD'];
 			$this->row_statut_ary[$val_] = true;
 			add_log('mod', $this->fids[$val_], $this->tids[$val_], 'MMS_LOG_' . strtoupper($this->row_mode) . '_' . strtoupper($this->{'mms_' . $this->row_mode . '_action'}), $this->rids_title[$val_]);
 		}
@@ -1748,7 +1759,7 @@ final class mms_search
 
 		foreach ($rows[$this::MMS_PASSED] AS $key_ => $val_)
 		{
-			$this->row_msg_ary[$val_] = $this->user->lang['MMS_STATUT_DELETED'];
+			$this->row_msg_ary[$val_] = $this->user->lang['MMS_STATUS_DELETED'];
 			$this->row_statut_ary[$val_] = true;
 			add_log('mod', $this->fids[$val_], $this->tids[$val_], 'MMS_LOG_' . strtoupper($this->row_mode) . '_' . strtoupper($this->{'mms_' . $this->row_mode . '_action'}), $this->rids_title[$val_], $this->unms[$val_]);
 		}
@@ -1811,7 +1822,7 @@ final class mms_search
 		$viewtopic_url = append_sid("{$this->phpbb_root_path}viewtopic.$this->phpEx", 't=' . $topicdata['topic_id']);
 		foreach ($rows[$this::MMS_PASSED] AS $key_ => $val_)
 		{
-			$this->row_msg_ary[$val_] = $this->user->lang('MMS_STATUT_MOVED', '<a class="mms_wo" href="' . $this->build_mms_ipreview_url($viewtopic_url, $topicdata['topic_title']) . '" title="' . $topicdata['topic_title'] . '">' . $topicdata['topic_title'] . '</a>');
+			$this->row_msg_ary[$val_] = $this->user->lang('MMS_STATUS_MOVED', '<a class="mms_wo" href="' . $this->build_mms_ipreview_url($viewtopic_url, $topicdata['topic_title']) . '" title="' . $topicdata['topic_title'] . '">' . $topicdata['topic_title'] . '</a>');
 			$this->row_statut_ary[$val_] = true;
 			add_log('mod', $this->fids[$val_], $this->tids[$val_], 'MMS_LOG_' . strtoupper($this->row_mode) . '_' . strtoupper($this->{'mms_' . $this->row_mode . '_action'}), $this->unms[$val_], $this->rids_title[$val_], $topicdata['topic_title']);
 		}
@@ -1864,7 +1875,7 @@ final class mms_search
 		}
 		foreach ($rows[$this::MMS_PASSED] AS $key_ => $val_)
 		{
-			$this->row_msg_ary[$val_] = $this->user->lang['MMS_STATUT_LOCKED'];
+			$this->row_msg_ary[$val_] = $this->user->lang['MMS_STATUS_LOCKED'];
 			$this->row_statut_ary[$val_] = true;
 			add_log('mod', $this->fids[$val_], $this->tids[$val_], 'MMS_LOG_' . strtoupper($this->row_mode) . '_' . strtoupper($this->{'mms_' . $this->row_mode . '_action'}), $this->rids_title[$val_], $this->unms[$val_]);
 		}
@@ -1911,7 +1922,7 @@ final class mms_search
 		}
 		foreach ($rows[$this::MMS_PASSED] AS $key_ => $val_)
 		{
-			$this->row_msg_ary[$val_] = $this->user->lang['MMS_STATUT_UNLOCKED'];
+			$this->row_msg_ary[$val_] = $this->user->lang['MMS_STATUS_UNLOCKED'];
 			$this->row_statut_ary[$val_] = true;
 			add_log('mod', $this->fids[$val_], $this->tids[$val_], 'MMS_LOG_' . strtoupper($this->row_mode) . '_' . strtoupper($this->{'mms_' . $this->row_mode . '_action'}), $this->rids_title[$val_]);
 		}
@@ -1962,7 +1973,7 @@ final class mms_search
 		$rows = $this->check_ids($this->{MOD_MODE}, POSTS_TABLE, 'post_id', 'post_subject', 'm_chgposter', true);
 		foreach ($rows[$this::MMS_PASSED] AS $key_ => $val_)
 		{
-			$this->row_msg_ary[$val_] = $this->user->lang('MMS_STATUT_POSTER_CHGED', get_username_string('full', $this->to_uid['user_id'], $this->to_uid['username'], $this->to_uid['user_colour']));
+			$this->row_msg_ary[$val_] = $this->user->lang('MMS_STATUS_POSTER_CHGED', get_username_string('full', $this->to_uid['user_id'], $this->to_uid['username'], $this->to_uid['user_colour']));
 			$this->row_statut_ary[$val_] = true;
 			$this->change_poster($this->row_full[$val_], $this->to_uid);
 			add_log('mod', $this->fids[$val_], $this->tids[$val_], 'MMS_LOG_' . strtoupper($this->row_mode) . '_' . strtoupper($this->{'mms_' . $this->row_mode . '_action'}), $this->rids_title[$val_], $this->row_full[$val_]['post_username'], $this->to_uid['username']);
@@ -2055,7 +2066,7 @@ final class mms_search
 
 		foreach ($rows[$this::MMS_PASSED] AS $key_ => $val_)
 		{
-			$this->row_msg_ary[$val_] = $this->user->lang['MMS_STATUT_IPGRABBED'];
+			$this->row_msg_ary[$val_] = $this->user->lang['MMS_STATUS_IPGRABBED'];
 			$this->row_statut_ary[$val_] = $this->row_full[$val_]['poster_ip'];
 		}
 		foreach ($rows[$this::MMS_IGNORED] AS $key_ => $reason_)
@@ -2099,6 +2110,9 @@ final class mms_search
 	public function final_resync($mode)
 	{
 		$this->data_to_resync = array_keys(json_decode($this->unescape_gpc(utf8_normalize_nfc(request_var('data', '', true))), true));
+		//Set hard-size limit
+		$this->data_to_resync = array_slice($this->data_to_resync, 0, $this::MMS_HARD_RESYNC_LIMIT, true);
+
 		//Uncomment below to see transformed input values.
 		//print_r($this->data_to_resync);
 		//exit;
@@ -2153,7 +2167,7 @@ final class mms_search
 							$i = 0;
 							foreach($this->data_to_resync AS $id)
 							{
-								if ($i > 500)
+								if ($i > $this::MMS_HARD_RESYNC_LIMIT)
 								{
 									break;//Hard-limit...
 								}
@@ -2382,7 +2396,7 @@ final class mms_search
 	****/
 	private function check_ids($ids, $table, $collumn, $title_collumn, $acl, $full = false)
 	{
-		$rows = array($this::MMS_IGNORED => array(), $this::MMS_PASSED => array(), $this::MMS_IGNORED => array(), $this::MMS_IGNORED => array());
+		$rows = array($this::MMS_IGNORED => array(), $this::MMS_PASSED => array());
 		if (!$full)
 		{
 			$sql = "SELECT " . $this->db->sql_escape($collumn) . ", " . $this->db->sql_escape($title_collumn) . ", forum_id" . ($table == POSTS_TABLE ? ', topic_id, post_username, poster_id, post_edit_locked' : ', topic_first_poster_name, topic_first_post_id, topic_poster, topic_status') . "
@@ -2487,6 +2501,7 @@ final class mms_search
 		{
 			$rows[$this::MMS_IGNORED][$missing_rows_] = $this->user->lang['MMS_' . strtoupper($this->row_mode) . '_DELETED'];
 		}
+
 		return $rows;
 	}
 
@@ -2656,7 +2671,7 @@ final class mms_search
 			add_log('mod', $this->to_fid, $topic_id, 'MMS_LOG_' . strtoupper($this->row_mode) . '_' . strtoupper($this->{'mms_' . $this->row_mode . '_action'}), $row['forum_name'], $forum_data['forum_name']);
 
 			$viewforum_url = append_sid("{$this->phpbb_root_path}viewforum.$this->phpEx", 'f=' . $this->to_fid . '#page-body');
-			$this->row_msg_ary[$topic_id] = $this->user->lang('MMS_STATUT_MOVED', '<a class="mms_wo" href="' . $this->build_mms_ipreview_url($viewforum_url, $forum_data['forum_name']) . '" title="' . $forum_data['forum_name'] . '">' . $forum_data['forum_name'] . '</a>');
+			$this->row_msg_ary[$topic_id] = $this->user->lang('MMS_STATUS_MOVED', '<a class="mms_wo" href="' . $this->build_mms_ipreview_url($viewforum_url, $forum_data['forum_name']) . '" title="' . $forum_data['forum_name'] . '">' . $forum_data['forum_name'] . '</a>');
 			$this->row_statut_ary[$topic_id] = true;
 
 			// If we have moved a global announcement, we need to correct the topic type
@@ -2752,6 +2767,10 @@ final class mms_search
 	private function mcp_fork_topic($topic_ids, $to_forum_id)
 	{
 		$counter = array();
+		if($topic_ids && !is_array($topic_ids))
+		{
+			$topic_ids = array($topic_ids);
+		}
 		if ($to_forum_id)
 		{
 			$forum_data = $this->get_forum_data($to_forum_id);
@@ -2779,265 +2798,264 @@ final class mms_search
 			}
 		}
 
-			$topic_data = $this->get_full_topic_data($topic_ids, 'f_post');
+		$topic_data = $this->get_full_topic_data($topic_ids, 'f_post');
 
-			$total_posts = $this::MMS_DB_FALSE;
-			$new_topic_id_list = array();
+		$total_posts = $this::MMS_DB_FALSE;
+		$new_topic_id_list = array();
 
-
-			foreach ($topic_data AS $topic_id => $topic_row)
+		foreach ($topic_data AS $topic_id => $topic_row)
+		{
+			if (!isset($search_type) && $topic_row['enable_indexing'])
 			{
-				if (!isset($search_type) && $topic_row['enable_indexing'])
+				// Select the search method and do some additional checks to ensure it can actually be utilised
+				$search_type = basename($this->config['search_type']);
+
+				if (!file_exists($this->phpbb_root_path . 'includes/search/' . $search_type . '.' . $this->phpEx))
 				{
-					// Select the search method and do some additional checks to ensure it can actually be utilised
-					$search_type = basename($this->config['search_type']);
-
-					if (!file_exists($this->phpbb_root_path . 'includes/search/' . $search_type . '.' . $this->phpEx))
-					{
-						$this->trigger_error($this->user->lang['NO_SUCH_SEARCH_MODULE'], E_USER_ERROR, false);
-					}
-
-					if (!class_exists($search_type))
-					{
-						//I'm just trolled by this %$$%@## include...
-						$phpbb_root_path = $this->phpbb_root_path;
-						$phpEx = $this->phpEx;
-						include($this->phpbb_root_path . "includes/search/$search_type." . $this->phpEx);
-					}
-
-					$error = false;
-					$search = new $search_type($error);
-					$search_mode = 'post';
-
-					if ($error)
-					{
-						$this->trigger_error($error, E_USER_ERROR, false);
-					}
-				}
-				else if (!isset($search_type) && !$topic_row['enable_indexing'])
-				{
-					$search_type = false;
+					$this->trigger_error($this->user->lang['NO_SUCH_SEARCH_MODULE'], E_USER_ERROR, false);
 				}
 
-				$sql_ary = array(
-					'forum_id'					=> (int) $to_forum_id,
-					'icon_id'					=> (int) $topic_row['icon_id'],
-					'topic_attachment'			=> (int) $topic_row['topic_attachment'],
-					'topic_approved'			=> $this::MMS_DB_TRUE,
-					'topic_reported'			=> $this::MMS_DB_FALSE,
-					'topic_title'				=> (string) $topic_row['topic_title'],
-					'topic_poster'				=> (int) $topic_row['topic_poster'],
-					'topic_time'				=> (int) $topic_row['topic_time'],
-					'topic_replies'				=> (int) $topic_row['topic_replies_real'],
-					'topic_replies_real'		=> (int) $topic_row['topic_replies_real'],
-					'topic_status'				=> (int) $topic_row['topic_status'],
-					'topic_type'				=> (int) $topic_row['topic_type'],
-					'topic_first_poster_name'	=> (string) $topic_row['topic_first_poster_name'],
-					'topic_last_poster_id'		=> (int) $topic_row['topic_last_poster_id'],
-					'topic_last_poster_name'	=> (string) $topic_row['topic_last_poster_name'],
-					'topic_last_post_time'		=> (int) $topic_row['topic_last_post_time'],
-					'topic_last_view_time'		=> (int) $topic_row['topic_last_view_time'],
-					'topic_bumped'				=> (int) $topic_row['topic_bumped'],
-					'topic_bumper'				=> (int) $topic_row['topic_bumper'],
-					'poll_title'				=> (string) $topic_row['poll_title'],
-					'poll_start'				=> (int) $topic_row['poll_start'],
-					'poll_length'				=> (int) $topic_row['poll_length'],
-					'poll_max_options'			=> (int) $topic_row['poll_max_options'],
-					'poll_vote_change'			=> (int) $topic_row['poll_vote_change'],
-				);
-
-				$this->db->sql_query('INSERT INTO ' . TOPICS_TABLE . ' ' . $this->db->sql_build_array('INSERT', $sql_ary));
-				$new_topic_id = $this->db->sql_nextid();
-
-				//Special treatment for this mode:
-				$this->fdata['t'][] = (int)  $new_topic_id;
-
-				$new_topic_id_list[$topic_id] = $new_topic_id;
-				$viewtopic_url = append_sid("{$this->phpbb_root_path}viewtopic.$this->phpEx", 't=' . $new_topic_id . '#page-body');
-				$viewforum_url = append_sid("{$this->phpbb_root_path}viewforum.$this->phpEx", 'f=' . $to_forum_id . '#page-body');
-
-				$this->row_msg_ary[$topic_id] = $this->user->lang('MMS_STATUT_FORKED', '<a class="mms_wo" href="' . $this->build_mms_ipreview_url($viewforum_url, $topic_row['topic_title']) . '" title="' . $topic_row['topic_title'] . '">' . $forum_data['forum_name'] . '</a>', '<a class="mms_wo" href="' . $this->build_mms_ipreview_url($viewtopic_url, $topic_row['topic_title']) . '" title="' . $topic_row['topic_title'] . '">' . $new_topic_id . '</a>');
-				$this->row_statut_ary[$topic_id] = true;
-				if ($topic_row['poll_start'])
+				if (!class_exists($search_type))
 				{
-					$poll_rows = array();
-
-					$sql = 'SELECT *
-						FROM ' . POLL_OPTIONS_TABLE . "
-						WHERE topic_id = " . (int) $topic_id;
-					$result = $this->db->sql_query($sql);
-
-					while ($row = $this->db->sql_fetchrow($result))
-					{
-						$sql_ary = array(
-							'poll_option_id'	=> (int) $row['poll_option_id'],
-							'topic_id'			=> (int) $new_topic_id,
-							'poll_option_text'	=> (string) $row['poll_option_text'],
-							'poll_option_total'	=> $this::MMS_DB_FALSE
-						);
-
-						$this->db->sql_query('INSERT INTO ' . POLL_OPTIONS_TABLE . ' ' . $this->db->sql_build_array('INSERT', $sql_ary));
-					}
+					//I'm just trolled by this %$$%@## include...
+					$phpbb_root_path = $this->phpbb_root_path;
+					$phpEx = $this->phpEx;
+					include($this->phpbb_root_path . "includes/search/$search_type." . $this->phpEx);
 				}
+
+				$error = false;
+				$search = new $search_type($error);
+				$search_mode = 'post';
+
+				if ($error)
+				{
+					$this->trigger_error($error, E_USER_ERROR, false);
+				}
+			}
+			else if (!isset($search_type) && !$topic_row['enable_indexing'])
+			{
+				$search_type = false;
+			}
+
+			$sql_ary = array(
+				'forum_id'					=> (int) $to_forum_id,
+				'icon_id'					=> (int) $topic_row['icon_id'],
+				'topic_attachment'			=> (int) $topic_row['topic_attachment'],
+				'topic_approved'			=> $this::MMS_DB_TRUE,
+				'topic_reported'			=> $this::MMS_DB_FALSE,
+				'topic_title'				=> (string) $topic_row['topic_title'],
+				'topic_poster'				=> (int) $topic_row['topic_poster'],
+				'topic_time'				=> (int) $topic_row['topic_time'],
+				'topic_replies'				=> (int) $topic_row['topic_replies_real'],
+				'topic_replies_real'		=> (int) $topic_row['topic_replies_real'],
+				'topic_status'				=> (int) $topic_row['topic_status'],
+				'topic_type'				=> (int) $topic_row['topic_type'],
+				'topic_first_poster_name'	=> (string) $topic_row['topic_first_poster_name'],
+				'topic_last_poster_id'		=> (int) $topic_row['topic_last_poster_id'],
+				'topic_last_poster_name'	=> (string) $topic_row['topic_last_poster_name'],
+				'topic_last_post_time'		=> (int) $topic_row['topic_last_post_time'],
+				'topic_last_view_time'		=> (int) $topic_row['topic_last_view_time'],
+				'topic_bumped'				=> (int) $topic_row['topic_bumped'],
+				'topic_bumper'				=> (int) $topic_row['topic_bumper'],
+				'poll_title'				=> (string) $topic_row['poll_title'],
+				'poll_start'				=> (int) $topic_row['poll_start'],
+				'poll_length'				=> (int) $topic_row['poll_length'],
+				'poll_max_options'			=> (int) $topic_row['poll_max_options'],
+				'poll_vote_change'			=> (int) $topic_row['poll_vote_change'],
+			);
+
+			$this->db->sql_query('INSERT INTO ' . TOPICS_TABLE . ' ' . $this->db->sql_build_array('INSERT', $sql_ary));
+			$new_topic_id = $this->db->sql_nextid();
+
+			//Special treatment for this mode:
+			$this->fdata['t'][] = (int)  $new_topic_id;
+
+			$new_topic_id_list[$topic_id] = $new_topic_id;
+			$viewtopic_url = append_sid("{$this->phpbb_root_path}viewtopic.$this->phpEx", 't=' . $new_topic_id . '#page-body');
+			$viewforum_url = append_sid("{$this->phpbb_root_path}viewforum.$this->phpEx", 'f=' . $to_forum_id . '#page-body');
+
+			$this->row_msg_ary[$topic_id] = $this->user->lang('MMS_STATUS_FORKED', '<a class="mms_wo" href="' . $this->build_mms_ipreview_url($viewforum_url, $topic_row['topic_title']) . '" title="' . $topic_row['topic_title'] . '">' . $forum_data['forum_name'] . '</a>', '<a class="mms_wo" href="' . $this->build_mms_ipreview_url($viewtopic_url, $topic_row['topic_title']) . '" title="' . $topic_row['topic_title'] . '">' . $new_topic_id . '</a>');
+			$this->row_statut_ary[$topic_id] = true;
+			if ($topic_row['poll_start'])
+			{
+				$poll_rows = array();
 
 				$sql = 'SELECT *
-					FROM ' . POSTS_TABLE . "
-					WHERE topic_id = $topic_id
-					ORDER BY post_time ASC";
+					FROM ' . POLL_OPTIONS_TABLE . "
+					WHERE topic_id = " . (int) $topic_id;
 				$result = $this->db->sql_query($sql);
 
-				$post_rows = array();
 				while ($row = $this->db->sql_fetchrow($result))
-				{
-					$post_rows[] = $row;
-				}
-				$this->db->sql_freeresult($result);
-
-				if (!sizeof($post_rows))
-				{
-					continue;
-				}
-
-				$total_posts += sizeof($post_rows);
-				foreach ($post_rows AS $row)
 				{
 					$sql_ary = array(
+						'poll_option_id'	=> (int) $row['poll_option_id'],
 						'topic_id'			=> (int) $new_topic_id,
-						'forum_id'			=> (int) $to_forum_id,
-						'poster_id'			=> (int) $row['poster_id'],
-						'icon_id'			=> (int) $row['icon_id'],
-						'poster_ip'			=> (string) $row['poster_ip'],
-						'post_time'			=> (int) $row['post_time'],
-						'post_approved'		=> $this::MMS_DB_TRUE,
-						'post_reported'		=> $this::MMS_DB_FALSE,
-						'enable_bbcode'		=> (int) $row['enable_bbcode'],
-						'enable_smilies'	=> (int) $row['enable_smilies'],
-						'enable_magic_url'	=> (int) $row['enable_magic_url'],
-						'enable_sig'		=> (int) $row['enable_sig'],
-						'post_username'		=> (string) $row['post_username'],
-						'post_subject'		=> (string) $row['post_subject'],
-						'post_text'			=> (string) $row['post_text'],
-						'post_edit_reason'	=> (string) $row['post_edit_reason'],
-						'post_edit_user'	=> (int) $row['post_edit_user'],
-						'post_checksum'		=> (string) $row['post_checksum'],
-						'post_attachment'	=> (int) $row['post_attachment'],
-						'bbcode_bitfield'	=> $row['bbcode_bitfield'],
-						'bbcode_uid'		=> (string) $row['bbcode_uid'],
-						'post_edit_time'	=> (int) $row['post_edit_time'],
-						'post_edit_count'	=> (int) $row['post_edit_count'],
-						'post_edit_locked'	=> (int) $row['post_edit_locked'],
-						'post_postcount'	=> $row['post_postcount'],
+						'poll_option_text'	=> (string) $row['poll_option_text'],
+						'poll_option_total'	=> $this::MMS_DB_FALSE
 					);
-					// Adjust post counts... only if the post can be incremented to the user counter (else, it was not added the users post count anyway)
-					//Fixed an error of phpBB: http://tracker.phpbb.com/browse/PHPBB3-11520
-					//Do not do the query here but later, we just increment the count of posts until the loop is finished, then do new posts counters.
-					if ($row['post_postcount'])
-					{
-						isset($counter[$row['poster_id']]) ? $counter[$row['poster_id']]++ : $counter[$row['poster_id']] = 1;
-					}
-					$this->db->sql_query('INSERT INTO ' . POSTS_TABLE . ' ' . $this->db->sql_build_array('INSERT', $sql_ary));
-					$new_post_id = $this->db->sql_nextid();
 
-					// Copy whether the topic is dotted
-					markread('post', $to_forum_id, $new_topic_id, 0, $row['poster_id']);
-
-					if (!empty($search_type))
-					{
-						$search->index($search_mode, $new_post_id, $sql_ary['post_text'], $sql_ary['post_subject'], $sql_ary['poster_id'], ($topic_row['topic_type'] == POST_GLOBAL) ? 0 : $to_forum_id);
-						$search_mode = 'reply'; // After one we index replies
-					}
-
-					// Copy Attachments
-					if ($row['post_attachment'])
-					{
-						$sql = 'SELECT * FROM ' . ATTACHMENTS_TABLE . "
-							WHERE post_msg_id = {$row['post_id']}
-								AND topic_id = $topic_id
-								AND in_message = " . $this::MMS_DB_FALSE;
-						$result = $this->db->sql_query($sql);
-
-						$sql_ary = array();
-						while ($attach_row = $this->db->sql_fetchrow($result))
-						{
-							$sql_ary[] = array(
-								'post_msg_id'		=> (int) $new_post_id,
-								'topic_id'			=> (int) $new_topic_id,
-								'in_message'		=> $this::MMS_DB_FALSE,
-								'is_orphan'			=> (int) $attach_row['is_orphan'],
-								'poster_id'			=> (int) $attach_row['poster_id'],
-								'physical_filename'	=> (string) utf8_basename($attach_row['physical_filename']),
-								'real_filename'		=> (string) utf8_basename($attach_row['real_filename']),
-								'download_count'	=> (int) $attach_row['download_count'],
-								'attach_comment'	=> (string) $attach_row['attach_comment'],
-								'extension'			=> (string) $attach_row['extension'],
-								'mimetype'			=> (string) $attach_row['mimetype'],
-								'filesize'			=> (int) $attach_row['filesize'],
-								'filetime'			=> (int) $attach_row['filetime'],
-								'thumbnail'			=> (int) $attach_row['thumbnail']
-							);
-						}
-						$this->db->sql_freeresult($result);
-
-						if (sizeof($sql_ary))
-						{
-							$this->db->sql_multi_insert(ATTACHMENTS_TABLE, $sql_ary);
-						}
-					}
-				}
-
-				$sql = 'SELECT user_id, notify_status
-					FROM ' . TOPICS_WATCH_TABLE . '
-					WHERE topic_id = ' . $topic_id;
-				$result = $this->db->sql_query($sql);
-
-				$sql_ary = array();
-				while ($row = $this->db->sql_fetchrow($result))
-				{
-					$sql_ary[] = array(
-						'topic_id'		=> (int) $new_topic_id,
-						'user_id'		=> (int) $row['user_id'],
-						'notify_status'	=> (int) $row['notify_status'],
-					);
-				}
-				$this->db->sql_freeresult($result);
-
-				if (sizeof($sql_ary))
-				{
-					$this->db->sql_multi_insert(TOPICS_WATCH_TABLE, $sql_ary);
-				}
-				add_log('mod', $to_forum_id, $new_topic_id, 'MMS_LOG_' . strtoupper($this->row_mode) . '_' . strtoupper($this->{'mms_' . $this->row_mode . '_action'}), $topic_row['forum_name']);
-			}
-			// Sync new topics, parent forums and board stats
-			sync('topic', 'topic_id', $new_topic_id_list);
-
-			$sync_sql = array();
-
-			$sync_sql[$to_forum_id][]	= 'forum_posts = forum_posts + ' . (int) $total_posts;
-			$sync_sql[$to_forum_id][]	= 'forum_topics = forum_topics + ' . (int) sizeof($new_topic_id_list);
-			$sync_sql[$to_forum_id][]	= 'forum_topics_real = forum_topics_real + ' . (int) sizeof($new_topic_id_list);
-
-			if (sizeof($counter))
-			{
-				//Do only one query per user and not a query PER post!!
-				foreach ($counter AS $uid => $count)
-				{
-					$sql = 'UPDATE ' . USERS_TABLE . '
-						SET user_posts = user_posts + ' . (int) $count . '
-						WHERE user_id = ' . (int) $uid;
-					$this->db->sql_query($sql);
+					$this->db->sql_query('INSERT INTO ' . POLL_OPTIONS_TABLE . ' ' . $this->db->sql_build_array('INSERT', $sql_ary));
 				}
 			}
-			foreach ($sync_sql AS $forum_id_key => $array)
+
+			$sql = 'SELECT *
+				FROM ' . POSTS_TABLE . "
+				WHERE topic_id = $topic_id
+				ORDER BY post_time ASC";
+			$result = $this->db->sql_query($sql);
+
+			$post_rows = array();
+			while ($row = $this->db->sql_fetchrow($result))
 			{
-				$sql = 'UPDATE ' . FORUMS_TABLE . '
-					SET ' . implode(', ', $array) . '
-					WHERE forum_id = ' . (int) $forum_id_key;
+				$post_rows[] = $row;
+			}
+			$this->db->sql_freeresult($result);
+
+			if (!sizeof($post_rows))
+			{
+				continue;
+			}
+
+			$total_posts += sizeof($post_rows);
+			foreach ($post_rows AS $row)
+			{
+				$sql_ary = array(
+					'topic_id'			=> (int) $new_topic_id,
+					'forum_id'			=> (int) $to_forum_id,
+					'poster_id'			=> (int) $row['poster_id'],
+					'icon_id'			=> (int) $row['icon_id'],
+					'poster_ip'			=> (string) $row['poster_ip'],
+					'post_time'			=> (int) $row['post_time'],
+					'post_approved'		=> $this::MMS_DB_TRUE,
+					'post_reported'		=> $this::MMS_DB_FALSE,
+					'enable_bbcode'		=> (int) $row['enable_bbcode'],
+					'enable_smilies'	=> (int) $row['enable_smilies'],
+					'enable_magic_url'	=> (int) $row['enable_magic_url'],
+					'enable_sig'		=> (int) $row['enable_sig'],
+					'post_username'		=> (string) $row['post_username'],
+					'post_subject'		=> (string) $row['post_subject'],
+					'post_text'			=> (string) $row['post_text'],
+					'post_edit_reason'	=> (string) $row['post_edit_reason'],
+					'post_edit_user'	=> (int) $row['post_edit_user'],
+					'post_checksum'		=> (string) $row['post_checksum'],
+					'post_attachment'	=> (int) $row['post_attachment'],
+					'bbcode_bitfield'	=> $row['bbcode_bitfield'],
+					'bbcode_uid'		=> (string) $row['bbcode_uid'],
+					'post_edit_time'	=> (int) $row['post_edit_time'],
+					'post_edit_count'	=> (int) $row['post_edit_count'],
+					'post_edit_locked'	=> (int) $row['post_edit_locked'],
+					'post_postcount'	=> $row['post_postcount'],
+				);
+				// Adjust post counts... only if the post can be incremented to the user counter (else, it was not added the users post count anyway)
+				//Fixed an error of phpBB: http://tracker.phpbb.com/browse/PHPBB3-11520
+				//Do not do the query here but later, we just increment the count of posts until the loop is finished, then do new posts counters.
+				if ($row['post_postcount'])
+				{
+					isset($counter[$row['poster_id']]) ? $counter[$row['poster_id']]++ : $counter[$row['poster_id']] = 1;
+				}
+				$this->db->sql_query('INSERT INTO ' . POSTS_TABLE . ' ' . $this->db->sql_build_array('INSERT', $sql_ary));
+				$new_post_id = $this->db->sql_nextid();
+
+				// Copy whether the topic is dotted
+				markread('post', $to_forum_id, $new_topic_id, 0, $row['poster_id']);
+
+				if (!empty($search_type))
+				{
+					$search->index($search_mode, $new_post_id, $sql_ary['post_text'], $sql_ary['post_subject'], $sql_ary['poster_id'], ($topic_row['topic_type'] == POST_GLOBAL) ? 0 : $to_forum_id);
+					$search_mode = 'reply'; // After one we index replies
+				}
+
+				// Copy Attachments
+				if ($row['post_attachment'])
+				{
+					$sql = 'SELECT * FROM ' . ATTACHMENTS_TABLE . "
+						WHERE post_msg_id = {$row['post_id']}
+							AND topic_id = $topic_id
+							AND in_message = " . $this::MMS_DB_FALSE;
+					$result = $this->db->sql_query($sql);
+
+					$sql_ary = array();
+					while ($attach_row = $this->db->sql_fetchrow($result))
+					{
+						$sql_ary[] = array(
+							'post_msg_id'		=> (int) $new_post_id,
+							'topic_id'			=> (int) $new_topic_id,
+							'in_message'		=> $this::MMS_DB_FALSE,
+							'is_orphan'			=> (int) $attach_row['is_orphan'],
+							'poster_id'			=> (int) $attach_row['poster_id'],
+							'physical_filename'	=> (string) utf8_basename($attach_row['physical_filename']),
+							'real_filename'		=> (string) utf8_basename($attach_row['real_filename']),
+							'download_count'	=> (int) $attach_row['download_count'],
+							'attach_comment'	=> (string) $attach_row['attach_comment'],
+							'extension'			=> (string) $attach_row['extension'],
+							'mimetype'			=> (string) $attach_row['mimetype'],
+							'filesize'			=> (int) $attach_row['filesize'],
+							'filetime'			=> (int) $attach_row['filetime'],
+							'thumbnail'			=> (int) $attach_row['thumbnail']
+						);
+					}
+					$this->db->sql_freeresult($result);
+
+					if (sizeof($sql_ary))
+					{
+						$this->db->sql_multi_insert(ATTACHMENTS_TABLE, $sql_ary);
+					}
+				}
+			}
+
+			$sql = 'SELECT user_id, notify_status
+				FROM ' . TOPICS_WATCH_TABLE . '
+				WHERE topic_id = ' . $topic_id;
+			$result = $this->db->sql_query($sql);
+
+			$sql_ary = array();
+			while ($row = $this->db->sql_fetchrow($result))
+			{
+				$sql_ary[] = array(
+					'topic_id'		=> (int) $new_topic_id,
+					'user_id'		=> (int) $row['user_id'],
+					'notify_status'	=> (int) $row['notify_status'],
+				);
+			}
+			$this->db->sql_freeresult($result);
+
+			if (sizeof($sql_ary))
+			{
+				$this->db->sql_multi_insert(TOPICS_WATCH_TABLE, $sql_ary);
+			}
+			add_log('mod', $to_forum_id, $new_topic_id, 'MMS_LOG_' . strtoupper($this->row_mode) . '_' . strtoupper($this->{'mms_' . $this->row_mode . '_action'}), $topic_row['forum_name']);
+		}
+		// Sync new topics, parent forums and board stats
+		sync('topic', 'topic_id', $new_topic_id_list);
+
+		$sync_sql = array();
+
+		$sync_sql[$to_forum_id][]	= 'forum_posts = forum_posts + ' . (int) $total_posts;
+		$sync_sql[$to_forum_id][]	= 'forum_topics = forum_topics + ' . (int) sizeof($new_topic_id_list);
+		$sync_sql[$to_forum_id][]	= 'forum_topics_real = forum_topics_real + ' . (int) sizeof($new_topic_id_list);
+
+		if (sizeof($counter))
+		{
+			//Do only one query per user and not a query PER post!!
+			foreach ($counter AS $uid => $count)
+			{
+				$sql = 'UPDATE ' . USERS_TABLE . '
+					SET user_posts = user_posts + ' . (int) $count . '
+					WHERE user_id = ' . (int) $uid;
 				$this->db->sql_query($sql);
 			}
+		}
+		foreach ($sync_sql AS $forum_id_key => $array)
+		{
+			$sql = 'UPDATE ' . FORUMS_TABLE . '
+				SET ' . implode(', ', $array) . '
+				WHERE forum_id = ' . (int) $forum_id_key;
+			$this->db->sql_query($sql);
+		}
 
-			sync('forum', 'forum_id', $to_forum_id, false, true);
-			set_config_count('num_topics', sizeof($new_topic_id_list), true);
-			set_config_count('num_posts', $total_posts, true);
+		sync('forum', 'forum_id', $to_forum_id, false, true);
+		set_config_count('num_topics', sizeof($new_topic_id_list), true);
+		set_config_count('num_posts', $total_posts, true);
 	}
 
 	/****
@@ -3658,6 +3676,9 @@ final class mms_search
 	{
 		if (!empty($this->pids))
 		{
+			//Set hard-size limit
+			$this->pids = array_slice($this->pids, 0, $this::MMS_HARD_RESYNC_LIMIT, true);
+
 			$sql = 'UPDATE ' . POSTS_TABLE . " p
 				LEFT JOIN " . USERS_TABLE . " u
 					ON u.user_id = p.poster_id

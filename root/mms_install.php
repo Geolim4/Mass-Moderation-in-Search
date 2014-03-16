@@ -2,7 +2,7 @@
 /**
 *
 * @package UMIL Mass Moderation in Search
-^>@version $Id: mms_install.php v1.1.0 22h14 06/07/2013 Geolim4 Exp $
+^>@version $Id: mms_install.php v1.1.1 07h79 03/16/2014 Geolim4 Exp $
 * @copyright (c) 2013 Geolim4.com  http://Geolim4.com
 * @bug/function request: http://geolim4.com/tracker.php
 * @license http://opensource.org/licenses/gpl-license.php GNU Public License
@@ -62,20 +62,16 @@ $options = array(
 * The version numbering must otherwise be compatible with the version_compare function - http://php.net/manual/en/function.version-compare.php
 */
 
-/*
-* Generate a fully unique and unfindable API ID....
-*
-*	[quote="Bertie"]Huuuuh Geo, are you a psychopath??[/quote]
-*	[quote="Geolim4"]Yes, why? There is a problem with that?[/quote]
-*	[quote="Bertie"]Nope! :shock: [/quote]
-*	[quote="Geolim4"]Great! 8)[/quote]
-*/
 $api = strrev(gen_rand_string(6)) . str_shuffle(gen_rand_string(6)) . strrev(gen_rand_string(6)) . str_shuffle(gen_rand_string(6)) . strrev(gen_rand_string(6));
 
 $versions = array(
+	'1.1.1' => array(
+		'config_add' => array(
+			array('mms_max_attempts', 5),
+		),
+	),
 	'1.1.0' => array(
 		'config_add' => array(
-			//Not use for now, but later, beggining to generate unique keys now....
 			array('mms_mod_api', $api),
 		),
 	),

@@ -1,8 +1,8 @@
 <?php
 /**
 *
-* @package acp INFO Forbidden Passwords
-* @version $Id: acp_mms.php v1.1.0 22h14 06/07/2013 Geolim4 Exp $
+* @package acp INFO Mass Moderation In Search
+* @version $Id: acp_mms.php v1.1.1 07h79 03/16/2014 Geolim4 Exp $
 * @copyright (c) 2012 Geolim4.com  http://Geolim4.com
 * @bug/function request: http://geolim4.com/tracker.php
 * @license http://opensource.org/licenses/gpl-license.php GNU Public License
@@ -25,7 +25,7 @@ class acp_mms_info
 		return array(
 			'filename'	=> 'acp_mms',
 			'title'		=> 'ACP_MMS_CONFIG',
-			'version'	=> '1.1.0',
+			'version'	=> '1.1.1',
 			'modes'		=> array(
 			'configuration'		=> array('title' => 'ACP_MMS_CONFIG', 'auth' => '', 'cat' => array('ACP_MMS_CONFIG')),
 			),

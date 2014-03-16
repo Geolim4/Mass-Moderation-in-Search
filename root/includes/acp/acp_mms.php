@@ -2,7 +2,7 @@
 /**
 *
 * @package acp Mass Moederation in Search
-* @version $Id: acp_mms.php v1.1.0 22h14 06/07/2013 Geolim4 Exp $
+* @version $Id: acp_mms.php v1.1.1 07h79 03/16/2014 Geolim4 Exp $
 * @copyright (c) 2012 Geolim4.com  http://Geolim4.com
 * @bug/function request: http://geolim4.com/tracker.php
 * @license http://opensource.org/licenses/gpl-license.php GNU Public License
@@ -62,7 +62,6 @@ class acp_mms
 				$info = get_remote_file(MMS_HOST, MMS_PATH, MMS_FILE, $errstr, $errno);
 				if ( $update )
 				{
-					//before all check form integrity pls !!
 					if ( !check_form_key($form_key) )
 					{
 						trigger_error($user->lang['FORM_INVALID'], E_USER_WARNING);
@@ -76,8 +75,9 @@ class acp_mms
 						'mms_mod_preview'			=> request_var('mms_mod_preview', 200),
 						'mms_mod_timeout'			=> request_var('mms_mod_timeout', 5),
 						'mms_mod_addons'			=> request_var('mms_mod_addons', 1),
+						'mms_max_attempts'			=> request_var('mms_max_attempts', 5),
 					);
-					//Define some hard limit
+					//Define some hard limits
 					if($settings['mms_mod_pagination'] > 5000 || $settings['mms_mod_pagination'] < 50 )
 					{
 						$settings['mms_mod_pagination'] = 500;
@@ -155,7 +155,7 @@ class acp_mms
 					'MMS_MOD_PAGINATION'	=> isset($config['mms_mod_pagination'])			? (int)		$config['mms_mod_pagination']			: '',
 					'MMS_MOD_PREVIEW'		=> isset($config['mms_mod_preview'])			? (int)		$config['mms_mod_preview']				: '',
 					'MMS_MOD_TIMEOUT'		=> isset($config['mms_mod_timeout'])			? (int)		$config['mms_mod_timeout']				: '',
-
+					'MMS_MAX_ATTEMPTS'		=> isset($config['mms_max_attempts'])			? (int)		$config['mms_max_attempts']				: 5,
 
 				));
 			break;

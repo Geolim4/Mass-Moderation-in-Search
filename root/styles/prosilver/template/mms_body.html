@@ -200,6 +200,8 @@ var mmsLang = {
 	"INFORMATION" : "{LA_INFORMATION}",
 	"LEAVE_SHADOW" : "{LA_LEAVE_SHADOW}",
 	"MMS_ABORTED" : "{LA_MMS_ABORTED}",
+	"MMS_ATTEMPT" : "{LA_MMS_ATTEMPT}",
+	"MMS_ATTEMPTS" : "{LA_MMS_ATTEMPTS}",
 	"MMS_BAD_DATA_FORMAT" : "{LA_MMS_BAD_DATA_FORMAT}",
 	"MMS_CHRONO" : <!-- IF S_MMS_TYPE == 'post' -->"{LA_MMS_CHRONO_POSTS}"<!-- ELSE -->"{LA_MMS_CHRONO_TOPICS}"<!-- ENDIF -->,
 	"MMS_CONNECTION_FAIL" : "{LA_MMS_CONNECTION_FAIL}",
@@ -210,6 +212,7 @@ var mmsLang = {
 	"MMS_HTML_DUMP" : "{LA_MMS_HTML_DUMP}",
 	"MMS_IGNORE" : "{LA_MMS_IGNORE}",
 	"MMS_IGNORED" : "{LA_MMS_IGNORED}",
+	"MMS_IGNORED_JS" : "{LA_MMS_IGNORED_JS}",
 	"MMS_IPS_GRABBED" : "{LA_MMS_IPS_GRABBED}",
 	"MMS_MORE_INFORMATIONS" : "{LA_MMS_MORE_INFORMATIONS}",
 	"MMS_NOT_AVAILABLE" : "{LA_MMS_NOT_AVAILABLE}",
@@ -219,7 +222,7 @@ var mmsLang = {
 	"MMS_SHOW_POST_REASON" : "{LA_MMS_SHOW_POST_REASON}",
 	"MMS_SQL_QUERIES" : "{LA_MMS_SQL_QUERIES}",
 	"MMS_SQL_WARN" : "{LA_MMS_SQL_WARN}",
-	"MMS_STATUT" : "{LA_MMS_STATUT}",
+	"MMS_STATUS" : "{LA_MMS_STATUS}",
 	"MMS_SUCCESS" : "{LA_MMS_SUCCESS}",
 	"MMS_TIMEOUT" : "{LA_MMS_TIMEOUT}",
 	"MMS_TIMEOUT_EXP" : "{LA_MMS_TIMEOUT_EXP}",
@@ -235,7 +238,7 @@ var mmsLang = {
 	<!-- ENDIF -->
 
 };
-var e_ary = {"a" : "mms_left" ,"b" : "mms_treated" ,"c" : "mms_failed"}, f_resync = {"f" : false, "t" : false, "s" : false, "u" : false}, f_data = {"f" : {}, "t" : {}, "s" : {}, "u" : {}}, rowAry = {MMS_JSON_ROW}, rowPackets = {S_MMS_AJAX_PACKETS}, rowTimeout = {S_MMS_MOD_TIMEOUT}, rowTime = 5, mms_treated = 0, mms_num_queries = 0, mms_failed = 0, mms_left = {MMS_ROWS_COUNT}, mmsIgnoreDirtyFlag = false;
+var e_ary = {"a" : "mms_left" ,"b" : "mms_treated" ,"c" : "mms_failed"}, f_resync = {"f" : false, "t" : false, "s" : false, "u" : false}, mms_ids_sent = {}, f_data = {"f" : {}, "t" : {}, "s" : {}, "u" : {}}, rowAry = {MMS_JSON_ROW}, rowPackets = {S_MMS_AJAX_PACKETS}, rowTimeout = {S_MMS_MOD_TIMEOUT}, rowTime = 5, mms_treated = 0, mms_num_queries = 0, mms_failed = 0, mms_left = {MMS_ROWS_COUNT}, mmsIgnoreDirtyFlag = false;
 var snow = 0, mnow = 0, scounter = '', mcounter = '', user_pwd = '', pwd_confirmed = false, ajaxmms = '', fallback = '', mms_aborted = false, timer_started = false, mms_loading_src = '{T_THEME_PATH}/images/mms_loading.gif', squeries = mmsLang['MMS_SQL_QUERIES'];
 <!-- IF MMS_ACTION == 'move' or MMS_ACTION == 'fork' -->var mms_forum_id = 0<!-- IF S_MMS_TYPE == 'topic' -->, mms_shadow = 0<!-- ENDIF -->;<!-- ENDIF -->
 <!-- IF MMS_ACTION == 'chgposter' -->var username = 0;<!-- ENDIF -->
@@ -553,11 +556,43 @@ function mms_ajax(errorback){
 		post_data = fallback;
 		i = 1;
 	}
+	for(key in post_data){
+		//mms_ids_sent
+		if(typeof(mms_ids_sent[post_data[key]]) == 'undefined'){
+			mms_ids_sent[post_data[key]] = 1;
+		}else{
+			//The server has too many times ignored that post/topic. Remove it from waiting list.
+			//That step will prevent infinite loops submitting, if the server is ignoring a post/topic without specified reason.
+			if(mms_ids_sent[post_data[key]] > ({S_MMS_MAX_ATTEMPTS} - 1)){
+				if(!mms_failed){
+					$("#mms_showTofailed").show();
+					$("#div_mms_failed").children("div:first").remove();
+				}
+				$('#div_row_id' + post_data[key]).insertBefore("#mms_showTofailed");
+				var attempt_text = ((mms_ids_sent[post_data[key]] > 1) ? mmsLang['MMS_ATTEMPTS'].replace('%d', mms_ids_sent[post_data[key]]) : mmsLang['MMS_ATTEMPT'].replace('%d', mms_ids_sent[post_data[key]]));
+				$('<br /><em>' + mmsLang['MMS_REASON'] + ': ' + mmsLang['MMS_IGNORED_JS'].replace('%s', attempt_text) + '</em>').appendTo($('#div_row_id' + post_data[key]).children("div").children(".error"));
+				mms_failed++;
+				mms_left--;
+				$('#spanli_left_count, #spandiv_left_count').html(' (' + mms_left + ')');
+				$('#spanli_fail_count, #spandiv_failed_count').html(' (' + mms_failed + ')');
+				delete post_data[post_data[key]];
+				delete rowAry[post_data[key]];
+				i--;
+				var percent = Math.round((((mms_failed + mms_treated) * 100) / {MMS_ROWS_COUNT}) * 10) / 10;
+				$(function() {
+					$("#progressbar" ).progressbar({value: percent});
+					$("#progressbar_text" ).html(percent + '% ' + ((percent < 100) ? squeries.replace('*s*', mms_num_queries) : ''));
+				});
+			}else{
+				mms_ids_sent[post_data[key]]++;
+			}
+		}
+	}
 	if(i){
 		ajaxmms = $.ajax({
 			type: 'POST',
 			url: '{S_MMS_ACTION}',
-			beforeSend : function() {$("#mms_statut").html('<span>' + mmsLang['MMS_STATUT'] + ': <strong style="color: green;">' + mmsLang['MMS_DATA_SENDING'] + '</strong><img style="margin-bottom: -6px;" height="24" src="{T_THEME_PATH}/images/mms_loading.gif" alt=""/></span>')},
+			beforeSend : function() {$("#mms_statut").html('<span>' + mmsLang['MMS_STATUS'] + ': <strong style="color: green;">' + mmsLang['MMS_DATA_SENDING'] + '</strong><img style="margin-bottom: -6px;" height="24" src="{T_THEME_PATH}/images/mms_loading.gif" alt=""/></span>')},
 			data: {'ajax' : 1,
 				<!-- IF S_MMS_TYPE == 'post' -->'mms_post_action'<!-- ELSE -->'mms_topic_action'<!-- ENDIF --> : '{MMS_ACTION}',
 				'mms_type' : '{S_MMS_TYPE}',
@@ -572,7 +607,7 @@ function mms_ajax(errorback){
 						mms_ajax_callback(data);
 					}else{
 						$('#cp-main').children('div:first').effect('highlight', {color: 'orange'}, 1000);
-						$("#mms_statut").html('<span>' + mmsLang['MMS_STATUT'] + ': <strong style="color: darkorange;">' + mmsLang['MMS_DATA_INTERRUPTED'] + '</strong></span>');
+						$("#mms_statut").html('<span>' + mmsLang['MMS_STATUS'] + ': <strong style="color: darkorange;">' + mmsLang['MMS_DATA_INTERRUPTED'] + '</strong></span>');
 						var errorData = mmsLang['MMS_BAD_DATA_FORMAT'] + '<br />' + mmsLang['MMS_HTML_DUMP'] + ':<br /><textarea class="inputbox" tabindex="3" cols="70" rows="10" name="message" >' + ajaxmms.getAllResponseHeaders() + data + '</textarea>';
 						mms_confirm(mmsLang['INFORMATION'], mmsLang['MMS_CONNECTION_FAIL'], true, 'mms_ajax(fallback)', 'mms_abort()', false, false, errorData, true, true);
 					}
@@ -590,16 +625,16 @@ function mms_ajax(errorback){
 				if(!mms_aborted){
 					if(typeof(data['responseText']) != 'object' && data['status'] == 200){
 						$('#cp-main').children('div:first').effect('highlight', {color: 'orange'}, 1000);
-						$("#mms_statut").html('<span>' + mmsLang['MMS_STATUT'] + ': <strong style="color: darkorange;">' + mmsLang['MMS_DATA_INTERRUPTED'] + '</strong></span>');
+						$("#mms_statut").html('<span>' + mmsLang['MMS_STATUS'] + ': <strong style="color: darkorange;">' + mmsLang['MMS_DATA_INTERRUPTED'] + '</strong></span>');
 						var errorData = mmsLang['MMS_BAD_DATA_FORMAT'] + '<br />' + mmsLang['MMS_HTML_DUMP'] + ':<br /><textarea class="inputbox" tabindex="3" cols="70" rows="10" name="message" >' + ajaxmms.getAllResponseHeaders() + data['responseText'] + '</textarea>';
 						mms_confirm(mmsLang['INFORMATION'], mmsLang['MMS_CONNECTION_FAIL'], true, 'mms_ajax(fallback)', 'mms_abort()', false, false, errorData, true, true);
 					}else if(typeof(data['responseText']) == 'object' && data['status'] != 200){
 						$('#cp-main').children('div:first').effect('highlight', {color: 'orange'}, 1000);
-						$("#mms_statut").html('<span>' + mmsLang['MMS_STATUT'] + ': <strong style="color: darkorange;">' + mmsLang['MMS_DATA_INTERRUPTED'] + '</strong></span>');
+						$("#mms_statut").html('<span>' + mmsLang['MMS_STATUS'] + ': <strong style="color: darkorange;">' + mmsLang['MMS_DATA_INTERRUPTED'] + '</strong></span>');
 						mms_info(data['responseText']['title'], data['responseText']['message'], true, 'mms_abort()');
 					}else{
 						$('#cp-main').children('div:first').effect('highlight', {color: 'orange'}, 1000);
-						$("#mms_statut").html('<span>' + mmsLang['MMS_STATUT'] + ': <strong style="color: darkorange;">' + mmsLang['MMS_DATA_INTERRUPTED'] + '</strong></span>');
+						$("#mms_statut").html('<span>' + mmsLang['MMS_STATUS'] + ': <strong style="color: darkorange;">' + mmsLang['MMS_DATA_INTERRUPTED'] + '</strong></span>');
 						if(textStts == 'error'){
 							var errorData = textStts + ': ' + data.status + ' ' + errThrown + '<br />' + mmsLang['MMS_HTML_DUMP'] + ':<br /><textarea class="inputbox" tabindex="3" cols="70" rows="10" name="message" >' + ajaxmms.getAllResponseHeaders() + data.responseText + '</textarea>';
 						} else {
@@ -626,7 +661,7 @@ function mms_ajax_callback(data){
 			}else{
 				mms_info(data['title'], data['message'], true, '');
 			}
-			$("#mms_statut").html('<span>' + mmsLang['MMS_STATUT'] + ': <strong style="color: darkorange;">' + mmsLang['MMS_DATA_INTERRUPTED'] + '</strong></span>')
+			$("#mms_statut").html('<span>' + mmsLang['MMS_STATUS'] + ': <strong style="color: darkorange;">' + mmsLang['MMS_DATA_INTERRUPTED'] + '</strong></span>')
 		}else{
 			$('#mms_submit').parent('div').remove();
 			mms_abort();
@@ -656,7 +691,7 @@ function mms_ajax_callback(data){
 					$('#div_row_id' + key).insertBefore("#mms_showTotreated");
 					mms_treated++;
 					mms_left--;
-					$('<br /><em>' + mmsLang['MMS_STATUT'] + ': ' + data['message'][key] + '</em>').appendTo($('#div_row_id' + key).children("div").children(".error"));
+					$('<br /><em>' + mmsLang['MMS_STATUS'] + ': ' + data['message'][key] + '</em>').appendTo($('#div_row_id' + key).children("div").children(".error"));
 					$('#spanli_left_count, #spandiv_left_count').html(' (' + mms_left + ')');
 					$('#spanli_treat_count, #spandiv_treated_count').html(' (' + mms_treated + ')');
 					if(data['fdata'] !== false){
@@ -751,7 +786,7 @@ function final_resync(){
 	<!-- IF MMS_SYNC_NEEDED -->
 	if(!f_resync["f"]){
 		action = "f";
-		$("#mms_statut").html('<span>' + mmsLang['MMS_STATUT'] + ': <strong style="color: green;">{S_RESYNC_NEXT_FORUMS}<img style="margin-bottom: -6px;" height="24" src="{T_THEME_PATH}/images/mms_loading.gif" alt=""/></strong></span>')
+		$("#mms_statut").html('<span>' + mmsLang['MMS_STATUS'] + ': <strong style="color: green;">{S_RESYNC_NEXT_FORUMS}<img style="margin-bottom: -6px;" height="24" src="{T_THEME_PATH}/images/mms_loading.gif" alt=""/></strong></span>')
 	}else if(!f_resync["t"]){
 		action = "t";
 	}else if(!f_resync["s"]){
@@ -767,7 +802,7 @@ function final_resync(){
 		$('#loadavgbar').parent('div').remove();
 		$('#mms_showToleft').remove();
 		$('<div class="panel"><div class="inner"><span class="corners-top"><span></span></span><p>{LA_MMS_LEFTNO}</p><span class="corners-bottom"><span></span></span></div></div>').appendTo('#div_mms_left');
-		$("#mms_statut").html('<span>' + mmsLang['MMS_STATUT'] + ': <strong style="color: green;">' + mmsLang['MMS_DATA_TERMINATED'] + '</strong></span>');
+		$("#mms_statut").html('<span>' + mmsLang['MMS_STATUS'] + ': <strong style="color: green;">' + mmsLang['MMS_DATA_TERMINATED'] + '</strong></span>');
 		mms_info(mmsLang['INFORMATION'], '<span class="ui-icon ui-icon-check" style="float: left;"></span> ' + mmsLang['MMS_SUCCESS']);
 		$('<hr /><strong style="color: green;">' + result
 			.replace('*d*', mms_treated)
@@ -806,7 +841,7 @@ function final_resync(){
 									mms_num_queries += data['num_queries'];
 								}
 								if (data['action_next']){
-									$("#mms_statut").html('<span>' + mmsLang['MMS_STATUT'] + ': <strong style="color: green;">' + data['action_next'] + '<img style="margin-bottom: -6px;" height="24" src="{T_THEME_PATH}/images/mms_loading.gif" alt=""/></strong></span>')
+									$("#mms_statut").html('<span>' + mmsLang['MMS_STATUS'] + ': <strong style="color: green;">' + data['action_next'] + '<img style="margin-bottom: -6px;" height="24" src="{T_THEME_PATH}/images/mms_loading.gif" alt=""/></strong></span>')
 								}
 								f_resync[data['action_done']] = true;
 								if (typeof data['loadavg'] !== 'undefined'){
@@ -827,7 +862,7 @@ function final_resync(){
 						}
 					}else{
 						$('#cp-main').children('div:first').effect('highlight', {color: 'orange'}, 1000);
-						$("#mms_statut").html('<span>' + mmsLang['MMS_STATUT'] + ': <strong style="color: darkorange;">' + mmsLang['MMS_DATA_INTERRUPTED'] + '</strong></span>');
+						$("#mms_statut").html('<span>' + mmsLang['MMS_STATUS'] + ': <strong style="color: darkorange;">' + mmsLang['MMS_DATA_INTERRUPTED'] + '</strong></span>');
 						var errorData = mmsLang['MMS_BAD_DATA_FORMAT'] + '<br />' + mmsLang['MMS_HTML_DUMP'] + ':<br /><textarea class="inputbox" tabindex="3" cols="70" rows="10" name="message" >' + ajaxmms.getAllResponseHeaders() + data + '</textarea>';
 						mms_confirm(mmsLang['INFORMATION'], mmsLang['MMS_CONNECTION_FAIL'], true, 'final_resync()', 'mms_abort()', false, false, errorData, true);
 					}
@@ -836,7 +871,7 @@ function final_resync(){
 			error: function(data, textStts, errThrown) {
 				if(!mms_aborted){
 					$('#cp-main').children('div:first').effect('highlight', {color: 'orange'}, 1000);
-					$("#mms_statut").html('<span>' + mmsLang['MMS_STATUT'] + ': <strong style="color: darkorange;">' + mmsLang['MMS_DATA_INTERRUPTED'] + '</strong></span>');
+					$("#mms_statut").html('<span>' + mmsLang['MMS_STATUS'] + ': <strong style="color: darkorange;">' + mmsLang['MMS_DATA_INTERRUPTED'] + '</strong></span>');
 					if(textStts == 'error'){
 						var errorData = textStts + ': ' + data.status + ' ' + errThrown + '<br />' + mmsLang['MMS_HTML_DUMP'] + ':<br /><textarea class="inputbox" tabindex="3" cols="70" rows="10" name="message" >' + ajaxmms.getAllResponseHeaders() + data.responseText + '</textarea>';
 					} else {

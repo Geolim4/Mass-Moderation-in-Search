@@ -3,7 +3,7 @@
 *
 * mms_search.php [Français]
 * @package search Mass Moderation In Search
-^>@version $Id: class_mms.php v1.1.0 22h14 06/07/2013 Geolim4 Exp $
+^>@version $Id: class_mms.php v1.1.1 07h79 03/16/2014 Geolim4 Exp $
 * @copyright (c) 2012 Geolim4.com  http://Geolim4.com
 * @package language
 * @copyright (c) 2005 phpBB Group
@@ -91,7 +91,11 @@ $lang = array_merge($lang, array(
 	'MMS_FORUM_ID'					=> 'Forum de destination',
 	'MMS_IGNORE'					=> 'Ignorer',
 	'MMS_IGNORED'					=> 'Ignoré par l’utilisateur',
-	'MMS_ITEM_MOVED'				=> 'Le sujet de destination ne peux pas être un sujet traçeur!',
+	'MMS_IGNORED_JS'			=> array(
+			'post'					=> 'Le serveur à trop souvent ignoré ce message (%s). Requête abandonnée.',
+			'topic'					=> 'Le serveur à trop souvent ignoré ce sujet (%s). Requête abandonnée.'
+	),
+	'MMS_ITEM_MOVED'				=> 'Le sujet de destination ne peux pas être un sujet traceur!',
 	'MMS_LEFT'				=> array(
 			'post'					=> 'Messages restants',
 			'topic'					=> 'Sujets restants',
@@ -258,23 +262,25 @@ $lang = array_merge($lang, array(
 	'MMS_SQL_QUERIES'				=> '(*s* requêtes SQL)',
 																//To translators: Please keep this line as a single line!!
 	'MMS_SQL_WARN'					=> 'Attention, la copie de sujets populaires peux entraîner une quantité de requête SQL considérable souhaitez-vous activer la temporisation des requêtes?<br />Ce procédé augmentera le temps de traîtement nécéssaire mais réduira considérablement le <a href="http://dev.mysql.com/doc/refman/5.0/fr/gone-away.html" onclick="window.open(this.href); return false;">risque de timeout</a> de la base de données.',
-	'MMS_STATUT'					=> 'Statut',
-	'MMS_STATUT_ATTR_CHGED'			=> 'Attribut de sujet modifié en %s',
-	'MMS_STATUT_DELETED'			=> 'Supprimé',
-	'MMS_STATUT_FORKED'				=> 'Copié dans %1$s avec l’ID %2$s',
-	'MMS_STATUT_ICONCHD'			=> 'Icône de sujet modifié',
-	'MMS_STATUT_IPGRABBED'			=> 'IP récupérée',
-	'MMS_STATUT_LOCKED'				=> 'Verouillé',
-	'MMS_STATUT_MERGED'				=> 'Fusionné dans %s',
-	'MMS_STATUT_MOVED'				=> 'Déplacé dans %s',
-	'MMS_STATUT_POSTER_CHGED'		=> 'Posteur changé en %s',
-	'MMS_STATUT_RECYNC'				=> 'Resynchronisé',
-	'MMS_STATUT_UNLOCKED'			=> 'Déverouillé',
+	'MMS_STATUS'					=> 'Statut',
+	'MMS_STATUS_ATTR_CHGED'			=> 'Attribut de sujet modifié en %s',
+	'MMS_STATUS_DELETED'			=> 'Supprimé',
+	'MMS_STATUS_FORKED'				=> 'Copié dans %1$s avec l’ID %2$s',
+	'MMS_STATUS_ICONCHD'			=> 'Icône de sujet modifié',
+	'MMS_STATUS_IPGRABBED'			=> 'IP récupérée',
+	'MMS_STATUS_LOCKED'				=> 'Verouillé',
+	'MMS_STATUS_MERGED'				=> 'Fusionné dans %s',
+	'MMS_STATUS_MOVED'				=> 'Déplacé dans %s',
+	'MMS_STATUS_POSTER_CHGED'		=> 'Posteur changé en %s',
+	'MMS_STATUS_RECYNC'				=> 'Resynchronisé',
+	'MMS_STATUS_UNLOCKED'			=> 'Déverouillé',
 	'MMS_SUB_ARROW'					=> '╚═►',
 	'MMS_SUCCESS'					=> 'Le processus s’est terminé avec succès!',
 	'MMS_TIMEOUT'					=> 'Connection timed out',//To translators: Do not translate this line !This an HTTP code
 	'MMS_TIMEOUT_EXP'				=> 'Délai imparti à l’opération dépassé',
 	'MMS_TITLE'						=> 'Outil de modération de masse',
+	'MMS_ATTEMPT'					=> '%d tentative',
+	'MMS_ATTEMPTS'					=> '%d tentatives',
 									//To translators: Please Keep the first <br /> too !!
 	'MMS_TOO_MANY_USERS'			=> 'Pour des raisons de sécurité l’outil de modération de masse ne peux pas être utilisé par plusieurs utilisateurs simultanément!
 										<br />Merci d’attendre 20 secondes avant de ré-éssayer.

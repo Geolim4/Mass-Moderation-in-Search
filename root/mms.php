@@ -1,8 +1,8 @@
 <?php
 /**
 *
-* @package phpBB3 Mass Moderation in Search Class
-^>@version $Id: class_mms.php v1.1.0 22h14 06/07/2013 Geolim4 Exp $
+* @package phpBB3 Mass Moderation in Search
+^>@version $Id: mms.php v1.1.1 07h79 03/16/2014 Geolim4 Exp $
 * @copyright (c) 2013 Geolim4.com  http://Geolim4.com
 * @bug/function request: http://geolim4.com/tracker.php
 * @license http://opensource.org/licenses/gpl-license.php GNU Public License
@@ -18,7 +18,6 @@ $phpEx = substr(strrchr(__FILE__, '.'), 1);
 include($phpbb_root_path . 'common.' . $phpEx);
 include($phpbb_root_path . 'includes/functions_admin.' . $phpEx);
 require($phpbb_root_path . 'includes/class_mms.' . $phpEx);
-
 // Start session management
 $user->session_begin();
 $auth->acl($user->data);
@@ -151,9 +150,10 @@ if ($mms->is_ajax)
 	}
 }
 $template->assign_vars(array(
-	'L_MMS_LEFT'	=> $user->lang['MMS_LEFT'][$mms->row_mode],
-	'L_MMS_TREATED' => $user->lang['MMS_TREATED'][$mms->row_mode],
-	'L_MMS_FAIL'	=> $user->lang['MMS_FAIL'][$mms->row_mode]
+	'L_MMS_LEFT'		=> $user->lang['MMS_LEFT'][$mms->row_mode],
+	'L_MMS_TREATED'		=> $user->lang['MMS_TREATED'][$mms->row_mode],
+	'L_MMS_FAIL'		=> $user->lang['MMS_FAIL'][$mms->row_mode],
+	'L_MMS_IGNORED_JS'	=> $user->lang['MMS_IGNORED_JS'][$mms->row_mode],
 ));
 
 // Output the page

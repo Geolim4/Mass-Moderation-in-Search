@@ -3,7 +3,7 @@
 *
 * mms_search.php [English]
 * @package search Mass Moderation In Search
-^>@version $Id: class_mms.php v1.1.0 22h14 06/07/2013 Geolim4 Exp $
+^>@version $Id: class_mms.php v1.1.1 07h79 03/16/2014 Geolim4 Exp $
 * @copyright (c) 2012 Geolim4.com  http://Geolim4.com
 * @package language
 * @copyright (c) 2005 phpBB Group
@@ -91,6 +91,10 @@ $lang = array_merge($lang, array(
 	'MMS_FORUM_ID'				=> 'Destination forum',
 	'MMS_IGNORE'				=> 'Ignore',
 	'MMS_IGNORED'				=> 'Ignored by user',
+	'MMS_IGNORED_JS'			=> array(
+			'post'					=> 'The server has too many times ignored that post (%s). Aborted request.',
+			'topic'					=> 'The server has too many times ignored that topic (%s). Aborted request.'
+	),
 	'MMS_ITEM_MOVED'			=> 'The destination topic cannot be a shadow topic!',
 	'MMS_LEFT'					=> array(
 			'post'					=> 'Left posts',
@@ -148,7 +152,7 @@ $lang = array_merge($lang, array(
 			'merge'					=> 'Mass topic merge',
 			'unlock'				=> 'Mass topic unlock',
 			'delete'				=> 'Mass topic delete',
-			'fork'					=> 'Mass topic forking',
+			'fork'					=> 'Mass topic copying',
 			'move'					=> 'Mass topic moving',
 			'resync'				=> 'Mass topic resynchronizing',
 			'chgicon'				=> 'Mass topic icon change',
@@ -258,23 +262,25 @@ $lang = array_merge($lang, array(
 	'MMS_SQL_QUERIES'			=> '(*s* SQL queries)',
 																//To translators: Please keep this line as a single line!!
 	'MMS_SQL_WARN'				=> 'Please note that the copy of popular topics can increase substantially the amount of SQL queries, do you want to enable the query temporisation? <br />This process will increase the required load time treatement but will considerably reduce the <a href="http://dev.mysql.com/doc/refman/5.0/en/gone-away.html" onclick="window.open(this.href); return false;">timeout risk</a> from the database.',
-	'MMS_STATUT'				=> 'Statut',
-	'MMS_STATUT_ATTR_CHGED'		=> 'Topic attribute modified as %s',
-	'MMS_STATUT_DELETED'		=> 'Deleted',
-	'MMS_STATUT_FORKED'			=> 'Copied in %1$s with the ID %2$s',
-	'MMS_STATUT_LOCKED'			=> 'Locked',
-	'MMS_STATUT_ICONCHD'		=> 'Topic icon modified',
-	'MMS_STATUT_IPGRABBED'		=> 'IP grabbed',
-	'MMS_STATUT_MERGED'			=> 'Merged into %s',
-	'MMS_STATUT_MOVED'			=> 'Moved in %s',
-	'MMS_STATUT_POSTER_CHGED'	=> 'Poster changed as %s',
-	'MMS_STATUT_RECYNC'			=> 'Resynchronised',
-	'MMS_STATUT_UNLOCKED'		=> 'Unlocked',
+	'MMS_STATUS'				=> 'Status',
+	'MMS_STATUS_ATTR_CHGED'		=> 'Topic attribute modified as %s',
+	'MMS_STATUS_DELETED'		=> 'Deleted',
+	'MMS_STATUS_FORKED'			=> 'Copied in %1$s with the ID %2$s',
+	'MMS_STATUS_LOCKED'			=> 'Locked',
+	'MMS_STATUS_ICONCHD'		=> 'Topic icon modified',
+	'MMS_STATUS_IPGRABBED'		=> 'IP grabbed',
+	'MMS_STATUS_MERGED'			=> 'Merged into %s',
+	'MMS_STATUS_MOVED'			=> 'Moved in %s',
+	'MMS_STATUS_POSTER_CHGED'	=> 'Poster changed as %s',
+	'MMS_STATUS_RECYNC'			=> 'Resynchronized',
+	'MMS_STATUS_UNLOCKED'		=> 'Unlocked',
 	'MMS_SUB_ARROW'				=> '╚═►',
 	'MMS_SUCCESS'				=> 'Process terminated successful!',
 	'MMS_TIMEOUT'				=> 'Connection timed out',
 	'MMS_TIMEOUT_EXP'			=> 'Time limit for the operation exceeded',
 	'MMS_TITLE'					=> 'Mass moderation tool',
+	'MMS_ATTEMPT'				=> '%d attempt',
+	'MMS_ATTEMPTS'				=> '%d attempts',
 									//To translators: Please Keep the first <br /> too !!
 	'MMS_TOO_MANY_USERS'		=> '<br />For safety reasons the Mass-Tool cannot be used by multi users simultaneously!
 									<br />Please wait 20 seconds and try again.
@@ -284,7 +290,7 @@ $lang = array_merge($lang, array(
 			'unlock'				=> 'Unlock posts',
 			'delete'				=> 'Delete posts',
 			'chgposter'				=> 'Change poster',
-			//'fork'					=> 'Fork posts',
+			//'fork'					=> 'Copy posts',
 			'move'					=> 'Move posts',
 			'options'				=> 'Edit posts options',
 			'grabip'				=> 'Grab IPs',
@@ -293,7 +299,7 @@ $lang = array_merge($lang, array(
 			'lock'					=> 'Lock topics',
 			'unlock'				=> 'Unlock topics',
 			'delete'				=> 'Delete topics',
-			'fork'					=> 'Fork topics',
+			'fork'					=> 'Copy topics',
 			'move'					=> 'Move topics',
 			'merge'					=> 'Merge topics',
 			'resync'				=> 'Resynchronize topics',

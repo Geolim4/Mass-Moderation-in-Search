@@ -1,5 +1,5 @@
 <!-- INCLUDE overall_header.html -->
-<!-- * @version $Id: acp_mms.html v{S_VERSION} 22h14 06/07/2013 Geolim4 Exp $ -->
+<!-- * @version $Id: acp_mms.html v{S_VERSION} 07h79 03/16/2014 Geolim4 Exp $ -->
 <!-- IF S_CONFIG -->
 <a name="maincontent"></a>
 <h1 onmouseout="fbdpwdcheck();">{TITLE} <img src="{TITLE_IMG}" title="{TITLE}" alt="{TITLE}" style="float:right" height="64"/></h1>
@@ -66,6 +66,12 @@
 				<dt><label for="mms_mod_offline_time">{L_ACP_MMS_OFFLINE_TIME}:</label><br /><span>{L_ACP_MMS_OFFLINE_TIME_EXP}</span></dt>
 				<dd>
 					<label><input type="text" class="inputbox small" name="mms_mod_offline_time" value="{MMS_MOD_OFFLINE_TIME}" id="mms_mod_offline_time" size="2" />&nbsp;{L_SECONDS}</label>
+				</dd>
+			</dl>
+			<dl>
+				<dt><label for="mms_max_attempts">{L_ACP_MMS_MAX_ATTEMPTS}:</label><br /><span>{L_ACP_MMS_MAX_ATTEMPTS_EXP}</span></dt>
+				<dd>
+					<label><input type="text" class="inputbox small" name="mms_max_attempts" value="{MMS_MAX_ATTEMPTS}" id="mms_max_attempts" size="2" /></label>
 				</dd>
 			</dl>
 			<dl>

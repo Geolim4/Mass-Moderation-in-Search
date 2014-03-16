@@ -2,7 +2,7 @@
 /**
 *
 * @package language	[English] Mass Moderation in Search
-^>@version $Id: info_acp_mms.php v1.1.0 22h14 06/07/2013 Geolim4 Exp $
+^>@version $Id: info_acp_mms.php v1.1.1 07h79 03/16/2014 Geolim4 Exp $
 * @copyright (c) 2012 Geolim4.com  http://Geolim4.com
 * @bug/function request: http://geolim4.com/tracker.php
 * @license http://opensource.org/licenses/gpl-license.php GNU Public License
@@ -62,6 +62,8 @@ $lang = array_merge($lang, array(
 	'ACP_MMS_ADDONS_LIST'		=> '<a href="https://www.phpbb.com/customise/db/mod/qte">Quick Title Edition</a>, <a href="https://www.phpbb.com/customise/db/mod/hide_profile_in_viewtopic/">Hide profile in Viewtopic</a>, <a href="http://forums.phpbb-fr.com/mods-en-dev-phpbb3/sujet188266.html">Moderator Message</a>, <a href="https://www.phpbb.com/customise/db/mod/prime_post_revisions/">Prime Post Revision</a>',
 	'ACP_MMS_MOD'				=> 'Enable mass moderation',
 	'ACP_MMS_UPDATED_CFG'		=> 'The parameters were updated.',
+	'ACP_MMS_MAX_ATTEMPTS'		=> 'Maximum attempts',
+	'ACP_MMS_MAX_ATTEMPTS_EXP'	=> 'If the client has reached the maximum attempt limit of topic/post moderation, the script will consider that the topic/post is ignored.',
 	'ACP_MMS_MULTI_USERS'		=> 'Allow multi-user use (not recommended)',
 	'ACP_MMS_MULTI_USERS_EXP'	=> 'If you allow the use multi-user use, this can result in a significant increase of the server load if multiple users are using the mass moderation at the same time.',
 	'ACP_MMS_OFFLINE_TIME'		=> 'Inactivity period',

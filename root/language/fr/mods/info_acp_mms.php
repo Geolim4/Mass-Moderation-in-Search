@@ -2,7 +2,7 @@
 /**
 *
 * @package language	[Standard french] Mass Moderation in Search
-^>@version $Id: info_acp_mms.php v1.1.0 22h14 06/07/2013 Geolim4 Exp $
+^>@version $Id: info_acp_mms.php v1.1.1 07h79 03/16/2014 Geolim4 Exp $
 * @copyright (c) 2012 Geolim4.com  http://Geolim4.com
 * @bug/function request: http://geolim4.com/tracker.php
 * @license http://opensource.org/licenses/gpl-license.php GNU Public License
@@ -61,6 +61,8 @@ $lang = array_merge($lang, array(
 	'ACP_MMS_ADDONS_EXP'		=> 'Cette option permettras à Mass Moderation in Search de détecter et d’activer les plugs-in automatiquement.
 									<br />Les plugs-in disponibles actuellement sont les suivant:',
 	'ACP_MMS_ADDONS_LIST'		=> '<a href="https://www.phpbb.com/customise/db/mod/qte">Quick Title Edition</a>, <a href="https://www.phpbb.com/customise/db/mod/hide_profile_in_viewtopic/">Hide profile in Viewtopic</a>, <a href="http://forums.phpbb-fr.com/mods-en-dev-phpbb3/sujet188266.html">Moderator Message</a>, <a href="https://www.phpbb.com/customise/db/mod/prime_post_revisions/">Prime Post Revision</a>',
+	'ACP_MMS_MAX_ATTEMPTS'		=> 'Tentatives maximum',
+	'ACP_MMS_MAX_ATTEMPTS_EXP'	=> 'Si le client atteint la limite de tentatives maximum de modération de sujet/message, le script considérera que le sujet/message est ignoré.',
 	'ACP_MMS_MOD'				=> 'Activer la modération de masse',
 	'ACP_MMS_UPDATED_CFG'		=> 'Les paramètres ont été mis à jour.',
 	'ACP_MMS_MULTI_USERS'		=> 'Autoriser l’utilisation multi-utilisateur (déconseillé)',
