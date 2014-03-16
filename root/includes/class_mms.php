@@ -31,6 +31,7 @@ final class mms_search
 	*	@ is_unix()						=> Check if we are on UNIX platform: sys_getloadavg()	@ Access private
 	*	@ load_timecheck()				=> Check if have only one user at the same time [...]	@ Access private
 	*	@ load_sizecheck()				=> Check the packet size sent by the client				@ Access private
+	*	@ load_token()					=> Load the MMS token									@ Access private
 	*	@ check_post_options_acl()		=> Extra forums ACL checking for posts options			@ Access private
 	*	@ row_mode()					=> Define the Master Script row mode (post/topic)		@ Access private
 	*	@ extra_pagination()			=> Hack the url for add MMS params						@ Access public
@@ -68,6 +69,7 @@ final class mms_search
 	*Json client interaction function:
 	*	@ final_resync()				=> Do a final resync once the Ajax Job is finished!!	@ Access public
 	*	@ ajax_check_pwd()				=> Check password and update last auth time if needed	@ Access public
+	*	@ unlock()						=> Unlock the Mass-tool									@ Access public
 	*	@ ajax_error()					=> Show up an error to the user as of Ajax-mode			@ Access public
 	*	@ ajax_echo()					=> Show up some datas to the user as of Ajax-mode		@ Access private
 	*	@ youmadbro()					=> Terminate correctly the script... Awesome name heh ? @ Access private
@@ -103,18 +105,18 @@ final class mms_search
 	private $MMS_AJAX_PACKETS = 6;//Define the maximum topics/posts treated by the server in the same time. (default 6)
 
 	//root phpBB vars
-	private static $template;
-	private static $auth;
-	private static $user;
-	private static $config;
-	private static $phpbb_root_path;
-	private static $phpEx;
-	private static $cache;
-	private static $table_prefix;
-	private static $db_tools;
+	private $template;
+	private $auth;
+	private $user;
+	private $config;
+	private $phpbb_root_path;
+	private $phpEx;
+	private $cache;
+	private $table_prefix;
+	private $db_tools;
 
 	//Global Var for Addons
-	private static $qte;
+	private $qte;
 
 	private $mms_acl = array('lock' => false, 'unlock' => false, 'delete' => false, 'move' => false, 'fork' => false, 'chgposter' => false, 'merge' => false, 'edit' => false, 'info' => false);
 	private $mms_f_acl = array('attach' => false, 'bbcode' => false, 'sigs' => false, 'smilies' => false);
@@ -154,6 +156,7 @@ final class mms_search
 		't' => array(),//Topics IDs to resync
 		'u' => array(),//Users IDs to resync
 	);
+	private $token = '';
 
 	//Available Addons (4)
 	private $addons = array(
@@ -183,8 +186,9 @@ final class mms_search
 	* MMS constructor
 	* @noparam
 	****/
-	public function __construct()
+	public function __construct($token = '')
 	{
+		$this->load_token($token);
 		$this->load_vars();
 		$this->load_addons();
 		$this->load_ext_vars();
@@ -239,6 +243,7 @@ final class mms_search
 		$this->mms_topic_action =  request_var('mms_topic_action', '');
 		$this->mms_post_action =  request_var('mms_post_action', '');
 		$this->resync = request_var('resync', '');
+		$this->unlock = request_var('unlock', false);
 		$this->mms_from_sr =  request_var('mms_from_sr', '');
 		$this->config['posts_per_page'] = &$this->mms_pagination;
 		$this->config['topics_per_page'] = &$this->mms_pagination;
@@ -248,12 +253,12 @@ final class mms_search
 			$this->config['mms_mod_pagination'] = $this::MMS_HARD_PAGINATION;
 		}
 		$this->mms_load = request_var('mms_load', 0);
-		$this->is_ajax = request_var('ajax', 0);
+		$this->is_ajax = request_var('ajax', false);
 		$this->ajax_data = request_var('ajax_data', '');
 
 		if ($this->mms_load || defined('IN_MMS'))
 		{
-			if (empty($this->resync))
+			if (empty($this->resync) && empty($this->unlock))
 			{
 				$this->row_mode($mode);
 				$this->request_vars();
@@ -276,7 +281,7 @@ final class mms_search
 		switch ($this->mms_action)
 		{
 			case 'fork':
-				$this->MMS_AJAX_PACKETS = 4;//Topic forking is really an huge load for the server!
+				$this->MMS_AJAX_PACKETS = 4;
 			break;
 
 			case 'move':
@@ -359,10 +364,15 @@ final class mms_search
 		}
 		$timecheck = unserialize($this->config['mms_timecheck']);
 		$now = $this->time;
-		if ($timecheck['last_sid'] != $this->user->session_id || $timecheck['last_uid'] != $this->user->data['user_id'])
+		$token = ($this->token) ? $this->token : md5(unique_id());
+		if ($timecheck['last_sid'] != $this->user->session_id || $timecheck['last_uid'] != $this->user->data['user_id'] || $token != $timecheck['last_tkn'])
 		{
 			if ($timecheck['last_time'] > ($now - $this->config['mms_mod_offline_time']))
 			{
+				if ($token != $timecheck['last_tkn'] && $timecheck['last_sid'] == $this->user->session_id && $timecheck['last_uid'] == $this->user->data['user_id'])
+				{
+					$this->trigger_error('MMS_TOO_MANY_TABS', E_USER_WARNING, false, true);
+				}
 				$sql = "SELECT user_id, username, user_colour
 					FROM " .  USERS_TABLE  . '
 					WHERE user_id = ' . (int) $timecheck['last_uid'];
@@ -370,10 +380,12 @@ final class mms_search
 				$row = $this->db->sql_fetchrow($result);
 				$this->db->sql_freeresult($result);
 				$user_string = get_username_string('full', $row['user_id'], $row['username'], $row['user_colour']);
-				$this->trigger_error($this->user->lang('MMS_TOO_MANY_USERS', $user_string), E_USER_WARNING, false, true);
+				$this->trigger_error($this->user->lang('MMS_TOO_MANY_USERS', ($timecheck['last_time'] - ($now - $this->config['mms_mod_offline_time'])), $user_string), E_USER_WARNING, false, true);
 			}
 		}
+
 		$timecheck = array(
+			'last_tkn'	=> $token,
 			'last_sid'	=> $this->user->session_id,
 			'last_uid'	=> $this->user->data['user_id'],
 			'last_time'	=> $now,
@@ -414,6 +426,24 @@ final class mms_search
 			//There is maybe a potential exploit attempt...Broke the script now!
 			$this->trigger_error($this->user->lang['MMS_PACKET_SIZE'], E_USER_ERROR, append_sid("{$this->phpbb_root_path}index.{$this->phpEx}", ""), false);
 		}
+	}
+
+	/****
+	* load_token()
+	* Load the MMS token
+	* @param string $token The token we'll set
+	****/
+	private function load_token($token, $cfg_update = false)
+	{
+		$this->token = $token;
+		if($cfg_update && $token)
+		{
+			$timecheck = unserialize($this->config['mms_timecheck']);
+			$timecheck['last_tkn'] = $token;
+
+			set_config('mms_timecheck', serialize($timecheck));
+		}
+		return $token;
 	}
 
 	/****
@@ -643,6 +673,7 @@ final class mms_search
 				$this->mms_pagination = $this->config['mms_mod_pagination'];//Set the hardlimit
 			}
 		}
+
 		$this->template->assign_vars(array(
 			'S_MMS_SEARCH'			=> $this->auth->acl_get('m_mms') ? true : false,
 			'S_MMS_LOAD'			=> request_var('mms_load', 0),
@@ -655,6 +686,7 @@ final class mms_search
 			'S_MMS_AJAX_PACKETS'	=> $this->MMS_AJAX_PACKETS,
 			'S_MMS_MOD_TIMEOUT'		=> ($this->config['mms_mod_timeout'] * 1000),
 			'S_MMS_MAX_ATTEMPTS'	=> (int) $this->config['mms_max_attempts'],
+			'S_MMS_TOKEN'			=> (($this->is_ajax) ? false : $this->load_token(md5(unique_id()), true)),
 			'S_MMS_TOPIC_ACTION'	=> in_array($this->mms_topic_action, $this->mms_topic_mode) ? $this->mms_topic_action : '',
 			'S_MMS_POST_ACTION'		=> in_array($this->mms_post_action, $this->mms_post_mode) ? $this->mms_post_action : '',
 			'S_MMS_MASS_TOOL'		=> (!empty($this->row_mode) ? $this->user->lang['MMS_MASS_' . strtoupper($this->row_mode) . '_TOOL'][$this->{'mms_' . $this->row_mode . '_action'}] : ''),
@@ -2252,6 +2284,7 @@ final class mms_search
 					$addtional_msg = '<span class="ui-icon ui-icon-alert" style="float: left; margin: 0 7px 20px 0;"></span><span class="error">' . $this->user->lang['MMS_PASSWORD_BAD'] . '</span><br />';
 				}
 				$timecheck = array(
+					'last_tkn'	=> $this->token,
 					'last_sid'	=> $this->user->session_id,
 					'last_uid'	=> $this->user->data['user_id'],
 					'last_time'	=> $now,
@@ -2285,6 +2318,7 @@ final class mms_search
 				$this->ajax_echo(json_encode($this->ajax_ary), JSON_HEX_QUOT);
 			}
 			$timecheck = array(
+				'last_tkn'	=> $this->token,
 				'last_sid'	=> $this->user->session_id,
 				'last_uid'	=> $this->user->data['user_id'],
 				'last_time'	=> $now,
@@ -2292,6 +2326,39 @@ final class mms_search
 			);
 			set_config('mms_timecheck', serialize($timecheck));
 		}
+	}
+
+	/****
+	* unlock()
+	* Unlock the Mass-tool
+	* @noparam
+	****/
+	public function unlock()
+	{
+		$timecheck = unserialize($this->config['mms_timecheck']);
+		//Unlock the Mass-tool
+		$timecheck['last_time'] = ($this->time - $this->config['mms_mod_offline_time']);
+		//Update the token to force the user to reload the page.
+		$timecheck['last_tkn'] = md5(unique_id());
+		set_config('mms_timecheck', serialize($timecheck));
+
+		$this->ajax_ary = array(
+			'error' 		=> false,
+			'title'			=> '',
+			'message'		=> $this->user->lang['MMS_UNLOCKED_TOOL'],
+			'rids_treated'	=> false,
+			'continue'		=> false,
+			'redirect'		=> '',
+			'num_queries'	=> $this->db->sql_num_queries(),
+			'final_eval'	=> false,
+			'pwd_confirm'	=> true,
+			'fdata'			=> false,
+		);
+		if ($this->auth->acl_get('a_') && $this->load !== false)
+		{
+			$this->ajax_ary += array('loadavg' => $this->load);
+		}
+		$this->ajax_echo(json_encode($this->ajax_ary), JSON_HEX_QUOT);
 	}
 
 	/****

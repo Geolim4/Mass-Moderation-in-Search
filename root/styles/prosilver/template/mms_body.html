@@ -250,6 +250,7 @@ var snow = 0, mnow = 0, scounter = '', mcounter = '', user_pwd = '', pwd_confirm
 var result = mmsLang['MMS_CHRONO'];
 onload_functions.push('init()');
 window.history.forward(1);
+
 function init(){
 	$(document).ready(function (){
 		jQuery.browser = {};
@@ -286,9 +287,9 @@ function init(){
 		document.getElementById(this.id).parentNode.id = 'active-subsection';
 		for(key in e_ary){
 			if (e_ary[key] == this.id.replace('li_', '')){
-				$('#div_' + e_ary[key]).show('puf');
+				$('#div_' + e_ary[key]).show();
 			}else{
-				$('#div_' + e_ary[key]).hide('puf');
+				$('#div_' + e_ary[key]).hide();
 			}
 		}
 	});
@@ -364,6 +365,7 @@ function mms_showAll(cat){
 		$("#mms_doc_loading").fadeOut(300);
 	});
 }
+
 function mms_showReset(cat){
 	$("#mms_doc_loading").fadeIn(300, function(){
 		var loop = 0, toFirst = '';
@@ -382,6 +384,7 @@ function mms_showReset(cat){
 		$("#mms_doc_loading").fadeOut(300);
 	});
 }
+
 function mms_showLess(cat){
 	var loop = 0, toFirst = '';
 	$($("#div_mms_" + cat).children('div:visible').get().reverse()).each(function(i) {
@@ -404,6 +407,7 @@ function mms_showLess(cat){
 		window.location = '#' + toFirst;
 	}
 }
+
 function mms_showMore(cat){
 	var loop = 0, toFirst = '';
 	$("#div_mms_" + cat).children('div:hidden').each(function(i) {
@@ -424,6 +428,7 @@ function mms_showMore(cat){
 		window.location = '#' + toFirst;
 	}
 }
+
 function mms_stickMe(resize) {
 	var window_top = $(window).scrollTop(), div_top = $('#sticky-mms_tools').offset().top, $el = $('#mms_tools'), $pl = $('#sticky-mms_tools');
 	if(resize === true && window_top > div_top){
@@ -436,6 +441,7 @@ function mms_stickMe(resize) {
 		$('#mms_tools').css({'position': '', 'top': '0px', 'width' : "auto"});
 	}
 }
+
 function mms_tooltip(){
 	$( ".mms_title" ).tooltip({
 		show: null,
@@ -444,9 +450,11 @@ function mms_tooltip(){
 		open: function( event, ui ) {ui.tooltip.animate({ top: ui.tooltip.position().top + 10 }, "fast" )}
 	});
 }
+
 function init_confirm(){
 	mms_confirm(mmsLang['INFORMATION'], mmsLang['CONFIRM_OPERATION'], true, 'ajax_init()', '')
 }
+
 function mms_IfSrc(url){
 	var patt = /imms=1/g;
 	if (!patt.test(url)){
@@ -459,8 +467,8 @@ function mms_IfSrc(url){
 	$("#mmsTopicIframe").attr("src",url);
 	return false;
 }
-function mmsIpreview(u,t)
-{
+
+function mmsIpreview(u,t){
 	$("#mms_iframe")
 	.html($('<iframe></iframe>')
 		.attr({ src : u, width : "100%", height : "100%", id : "mmsTopicIframe", name : "mmsTopicIframe"})
@@ -473,6 +481,7 @@ function mmsIpreview(u,t)
 		show: {effect : 'drop'}
 	});
 }
+
 function ajax_init(){
 	<!-- IF MMS_ACTION == 'move' and S_MMS_TYPE == 'topic' -->
 	mms_confirm(mmsLang['CONFIRM'], mmsLang['LEAVE_SHADOW'] + '<span class="ui-icon ui-icon-help mms_Qicon"></span>', false, 'mms_shadow=1;mms_forum_id = $("#mms_forum_id").val();mms_ajax();', 'mms_shadow=0;mms_forum_id = $("#mms_forum_id").val();mms_ajax();')
@@ -512,16 +521,19 @@ function ajax_init(){
 	mms_ajax();
 	<!-- ENDIF -->
 }
+
 function stimer(){
 	if(snow == 60){
 		mtimer();
 	}
 	snow++;
 }
+
 function mtimer(){
 	snow = 0;
 	mnow++;
 }
+
 function is_int(n){
 	if( Math.floor(n) == n && $.isNumeric(n)){
 		return true;
@@ -529,6 +541,7 @@ function is_int(n){
 		return false;
 	}
 }
+
 function mms_abort(){
 	$('.display-options').children('strong.error').remove();
 	$('#loadavgbar, #mms_submit').parent('div').remove();
@@ -539,6 +552,7 @@ function mms_abort(){
 	$('#progressbar, #mms_statut, #progressbar, .rules').remove();
 	setTimeout(function(){window.location.href = '{S_MMS_INSTANT_REDIRECT}'}, 5000);
 }
+
 function mms_ajax(errorback){
 	if(!errorback){
 		var post_data = {}, i = 0, a = '', b = '';
@@ -593,7 +607,8 @@ function mms_ajax(errorback){
 			type: 'POST',
 			url: '{S_MMS_ACTION}',
 			beforeSend : function() {$("#mms_statut").html('<span>' + mmsLang['MMS_STATUS'] + ': <strong style="color: green;">' + mmsLang['MMS_DATA_SENDING'] + '</strong><img style="margin-bottom: -6px;" height="24" src="{T_THEME_PATH}/images/mms_loading.gif" alt=""/></span>')},
-			data: {'ajax' : 1,
+			data: {'ajax' : true,
+				'tkn' : '{S_MMS_TOKEN}',
 				<!-- IF S_MMS_TYPE == 'post' -->'mms_post_action'<!-- ELSE -->'mms_topic_action'<!-- ENDIF --> : '{MMS_ACTION}',
 				'mms_type' : '{S_MMS_TYPE}',
 				'password' : (pwd_confirmed ? '' : user_pwd),
@@ -649,6 +664,7 @@ function mms_ajax(errorback){
 		final_resync();
 	}
 }
+
 function mms_ajax_callback(data){
 	var keyIndex = '', ttaa = '';
 	if(data['error']){
@@ -764,6 +780,7 @@ function mms_ajax_callback(data){
 		}
 	}
 }
+
 function mms_runTimer(){
 	if(!timer_started)
 	{
@@ -781,6 +798,7 @@ function mms_runTimer(){
 		});
 	}
 }
+
 function final_resync(){
 	var action = '';
 	<!-- IF MMS_SYNC_NEEDED -->
@@ -797,13 +815,17 @@ function final_resync(){
 	<!-- ENDIF -->
 		clearInterval(scounter);
 		clearInterval(mcounter);
+		unlock_mtool();
 		window.onbeforeunload = true;
+
 		$('.display-options').children('strong.error').remove();
 		$('#loadavgbar').parent('div').remove();
 		$('#mms_showToleft').remove();
 		$('<div class="panel"><div class="inner"><span class="corners-top"><span></span></span><p>{LA_MMS_LEFTNO}</p><span class="corners-bottom"><span></span></span></div></div>').appendTo('#div_mms_left');
 		$("#mms_statut").html('<span>' + mmsLang['MMS_STATUS'] + ': <strong style="color: green;">' + mmsLang['MMS_DATA_TERMINATED'] + '</strong></span>');
+
 		mms_info(mmsLang['INFORMATION'], '<span class="ui-icon ui-icon-check" style="float: left;"></span> ' + mmsLang['MMS_SUCCESS']);
+
 		$('<hr /><strong style="color: green;">' + result
 			.replace('*d*', mms_treated)
 			.replace('*f*', (mms_failed ? '<em class="error">' + mms_failed + '</em>' : mms_failed))
@@ -821,7 +843,8 @@ function final_resync(){
 		$.ajax({
 			type: 'POST',
 			url: '{S_MMS_ACTION}',
-			data: {'ajax' : 1,
+			data: {'ajax' : true,
+				'tkn' : '{S_MMS_TOKEN}',
 				'resync' : action,
 				'data' : JSON.stringify(f_data[action]),
 				'password' : (pwd_confirmed ? '' : user_pwd),
@@ -884,6 +907,29 @@ function final_resync(){
 	}
 	<!-- ENDIF -->
 }
+
+function unlock_mtool (){
+	$.ajax({
+		type: 'POST',
+		url: '{S_MMS_ACTION}',
+		data: {'ajax' : true,
+			'tkn' : '{S_MMS_TOKEN}',
+			'unlock' : true,
+			'data' : '',
+			'password' : (pwd_confirmed ? '' : user_pwd),
+		},
+		timeout: 1500,
+		success: function(data, textStts, errThrown) {
+			if (data['num_queries']){
+				mms_num_queries += data['num_queries'];
+			}
+		},
+		error: function(data, textStts, errThrown) {
+
+		},
+	});
+}
+
 function confirmExit(){
 	//IE, coincidentally....
 	//http://goo.gl/Rt9ki
@@ -893,9 +939,11 @@ function confirmExit(){
 	mmsIgnoreDirtyFlag = false;
     return;
 }
+
 function confirmAbort(msg){
 	mms_confirm(mmsLang['INFORMATION'], msg, true, 'mms_abort()', '');
 }
+
 function mms_info(title, message, alert, callback){
 	okBtn = mmsLang['MMS_OK'];
 	btns = {};
@@ -914,6 +962,7 @@ function mms_info(title, message, alert, callback){
 		buttons: btns, 
 	});
 }
+
 function mms_confirm(title, message, alert, btn_yes_callback, btn_no_callback, pwd_cfm, choice, mInfos, autoSize, btn_ignore){
 	if(pwd_cfm && !pwd_confirmed){
 		field = '<br /><br /><span class="ui-icon ui-icon-key" style="float: left;"></span><input type="password" name="pwd_field" id="pwd_field" class="inputbox ui-widget-content ui-corner-all">';

@@ -24,9 +24,10 @@ $auth->acl($user->data);
 $user->setup('mcp');
 
 $redirect = request_var('r', 0);
-$is_ajax = request_var('ajax', 0);
+$token = request_var('tkn', '');
+$is_ajax = request_var('ajax', false);
 $resync = request_var('resync', '');
-
+$unlock = request_var('unlock', false);
 if ($redirect)
 {	if ($redirect == 1)
 	{
@@ -59,7 +60,7 @@ if (!$auth->acl_get('m_mms') && !$is_ajax)
 	meta_refresh(5, $phpbb_root_path . 'index.' . $phpEx);
 	trigger_error($user->lang['NOT_AUTHORISED']);
 }
-$mms = new mms_search;
+$mms = new mms_search($token);
 
 if (empty($config['mms_mod_enable']))
 {
@@ -70,7 +71,7 @@ if ($mms->is_ajax)
 	// Report only fatal errors as in Ajax mode
 	error_reporting(E_ERROR | E_PARSE);
 
-	if (empty($resync))
+	if (empty($resync) && empty($unlock))
 	{
 		if ($mms->row_mode == 'post')
 		{
@@ -131,7 +132,7 @@ if ($mms->is_ajax)
 			trigger_error('MMS_UNALLOWED_MODE');
 		}
 	}
-	else
+	else if($resync)
 	{
 		switch ($resync)
 		{
@@ -147,6 +148,11 @@ if ($mms->is_ajax)
 					trigger_error('NO_MODE');
 			break;
 		}
+	}
+	else if($unlock)
+	{
+		$mms->ajax_check_pwd();
+		$mms->unlock();
 	}
 }
 $template->assign_vars(array(

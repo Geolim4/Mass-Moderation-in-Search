@@ -283,8 +283,10 @@ $lang = array_merge($lang, array(
 	'MMS_ATTEMPTS'					=> '%d tentatives',
 									//To translators: Please Keep the first <br /> too !!
 	'MMS_TOO_MANY_USERS'			=> 'Pour des raisons de sécurité l’outil de modération de masse ne peux pas être utilisé par plusieurs utilisateurs simultanément!
-										<br />Merci d’attendre 20 secondes avant de ré-éssayer.
-										<br />Utilisateur connecté actuellement: %s',
+										<br />Merci d’attendre %1$s secondes avant de ré-éssayer.
+										<br />Utilisateur connecté actuellement: %2$s',
+	'MMS_TOO_MANY_TABS'				=> 'Vous ne pouvez pas utiliser l’outil de modération de masse dans plusieurs fenêtres/onglets simultanément!
+										<br />Merci d’attendre %1$s secondes avant de ré-éssayer.',
 	'MMS_TOOLS_POSTS'		=> array(
 			'lock'					=> 'Verrouiller les messages  [ Empêche l’édition du message ]',
 			'unlock'				=> 'Déverrouiller les messages',
@@ -323,6 +325,7 @@ $lang = array_merge($lang, array(
 			'post'					=> 'Aucun messages traîté actuellement',
 			'topic'					=> 'Aucun sujet traîté actuellement'
 	),
+	'MMS_UNLOCKED_TOOL'			=> 'Outil de modération de masse déverrouillé',
 	'MMS_UP_ARROW'				=> '╔►',
 	'MMS_USERNAME'				=> 'Nouveau nom d’utilisateur',
 	'MMS_USERNAME_CASE'			=> 'Le nom d’utilisateur est sensible à la casse',

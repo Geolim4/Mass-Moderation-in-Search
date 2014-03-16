@@ -275,7 +275,7 @@ $lang = array_merge($lang, array(
 	'MMS_STATUS_RECYNC'			=> 'Resynchronized',
 	'MMS_STATUS_UNLOCKED'		=> 'Unlocked',
 	'MMS_SUB_ARROW'				=> '╚═►',
-	'MMS_SUCCESS'				=> 'Process terminated successful!',
+	'MMS_SUCCESS'				=> 'Process successfully terminated!',
 	'MMS_TIMEOUT'				=> 'Connection timed out',
 	'MMS_TIMEOUT_EXP'			=> 'Time limit for the operation exceeded',
 	'MMS_TITLE'					=> 'Mass moderation tool',
@@ -283,8 +283,10 @@ $lang = array_merge($lang, array(
 	'MMS_ATTEMPTS'				=> '%d attempts',
 									//To translators: Please Keep the first <br /> too !!
 	'MMS_TOO_MANY_USERS'		=> '<br />For safety reasons the Mass-Tool cannot be used by multi users simultaneously!
-									<br />Please wait 20 seconds and try again.
-									<br />User connected currently: %s',
+									<br />Please wait %1$s seconds and try again.
+									<br />User connected currently: %2$s',
+	'MMS_TOO_MANY_TABS'			=> 'You cannot use the Mass-Tool in many windows/tabs simultaneously!
+									<br />Please wait %1$s seconds and try again',
 	'MMS_TOOLS_POSTS'			=> array(
 			'lock'					=> 'Lock posts  [ Prevent message editing ]',
 			'unlock'				=> 'Unlock posts',
@@ -323,6 +325,7 @@ $lang = array_merge($lang, array(
 			'post'					=> 'Any treated post for now',
 			'topic'					=> 'Any treated topic for now'
 	),
+	'MMS_UNLOCKED_TOOL'			=> 'Mass-toll unlocked',
 	'MMS_UP_ARROW'				=> '╔►',
 	'MMS_USERNAME'				=> 'New username',
 	'MMS_USERNAME_CASE'			=> 'Username is case sensitive',

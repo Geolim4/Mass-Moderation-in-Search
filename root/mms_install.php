@@ -69,6 +69,16 @@ $versions = array(
 		'config_add' => array(
 			array('mms_max_attempts', 5),
 		),
+		'config_update' => array(
+			array('mms_timecheck', serialize(array(
+					'last_tkn'	=> md5(unique_id()),
+					'last_sid'	=> $user->session_id,
+					'last_uid'	=> $user->data['user_id'],
+					'last_time'	=> time() - 3600,
+					'last_pwd'	=> time() - 3600,
+				))
+			)
+		)
 	),
 	'1.1.0' => array(
 		'config_add' => array(
