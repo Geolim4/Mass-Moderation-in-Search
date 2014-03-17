@@ -1,6 +1,14 @@
 /* @package Cascading Style Sheets Mass Moderation in Search
-^>@version $Id: mms.css v1.1.0 22h14 06/07/2013 Geolim4 Exp $
+^>@version v1.1.1 07h79 03/16/2014 Geolim4 Exp $
 -------------------------------------------------*/
+.ui-widget-header { color: #FFF; background-image: url("images/bg_list.gif"); background-clip: padding-box; }
+.ui-widget-content .ui-state-default, .ui-state-default { background-clip: padding-box; }
+.ui-dialog .ui-dialog-buttonpane { margin: 0; padding: 0; }
+.univ li.header dt, .univ li.header dd, .univ li.row dt, .univ li.row dd { width: 15%; font-weight: normal; }
+.univ li.row strong { color: #4C5D77; font-weight: bold; }
+.univ li.header dt + dd, .univ li.header dt + dd + dd, .univ li.row dt + dd, .univ li.row dt + dd + dd { text-align: center; }
+.univ li.header dt:last-child, .univ li.header dd:last-child, .univ li.row dt:last-child, .univ li.row dd:last-child { text-align: left; width: auto; padding: 2px 0 2px 5px; }
+.univ + a.right:link { color: #105289; padding-right: 18px; }
 
 .ui-selectable-helper {
 	position: absolute;
