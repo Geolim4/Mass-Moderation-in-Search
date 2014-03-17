@@ -17,11 +17,11 @@
 				<homepage><![CDATA[http://geolim4.com]]></homepage>
 			</author>
 		</author-group>
-		<mod-version>1.1.0</mod-version>
+		<mod-version>1.1.1</mod-version>
 		<installation>
 			<level>easy</level>
 			<time>60</time>
-			<target-version>3.0.11</target-version>
+			<target-version>3.0.12</target-version>
 		</installation>
 		<link-group>
 			<link type="parent" href="./../install_mod.xml" lang="en">Main Install</link>

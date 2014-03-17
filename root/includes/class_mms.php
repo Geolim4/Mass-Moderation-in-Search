@@ -897,8 +897,8 @@ final class mms_search
 	{
 		define('MOD_MODE', "mms_{$this->row_mode}_ary");
 		$this->{MOD_MODE} = array();
+
 		//This IF statement will never be used, but will keep it if someone want do an addon for non-JSON server.
-		//As in Jquery all input like "mms_(topic|post)_(int)" are automatically transformed into a nice JSON object recovered in the next "ELSE alternative statement"
 		if (sizeof($_POST) && !$this->is_ajax && empty($this->mms_from_sr))
 		{
 			foreach ($_POST AS $_POST_KEY_ => $_POST_VALUE_)
