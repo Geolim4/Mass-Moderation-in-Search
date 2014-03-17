@@ -66,9 +66,9 @@ $lang = array_merge($lang, array(
 	'ACP_MMS_MOD'				=> 'Activer la modération de masse',
 	'ACP_MMS_UPDATED_CFG'		=> 'Les paramètres ont été mis à jour.',
 	'ACP_MMS_MULTI_USERS'		=> 'Autoriser l’utilisation multi-utilisateur (déconseillé)',
-	'ACP_MMS_MULTI_USERS_EXP'	=> 'Si vous autorisez l’utilisation multi-utilisateur celà peux résulter d’une hausse de charge significative du serveur si plusieurs utilisateurs utilisent la modération de masse en même temps.',
-	'ACP_MMS_OFFLINE_TIME'		=> 'Periode d’inactivité',
-	'ACP_MMS_OFFLINE_TIME_EXP'	=> 'Periode d’inactivité (en secondes) a partir duquel un utilisateur ne seras plus considéré comme connecté à la modération de masse.<br />Valeur par défaut: 20',
+	'ACP_MMS_MULTI_USERS_EXP'	=> 'Si vous autorisez l’utilisation multi-utilisateur cela peux résulter d’une hausse de charge significative du serveur si plusieurs utilisateurs utilisent la modération de masse en même temps.',
+	'ACP_MMS_OFFLINE_TIME'		=> 'Période d’inactivité',
+	'ACP_MMS_OFFLINE_TIME_EXP'	=> 'Période d’inactivité (en secondes) a partir duquel un utilisateur ne seras plus considéré comme connecté à la modération de masse.<br />Valeur par défaut: 20',
 	'ACP_MMS_PAGINATION'		=> 'Résultat par page',
 	'ACP_MMS_PAGINATION_EXP'	=> 'Nombre de résultat maximum proposé par l’outil de modération de masse.<br />Limite maximum: 5000',
 	'ACP_MMS_PASSWORD'			=> 'Confirmation par mot de passe',
@@ -78,11 +78,11 @@ $lang = array_merge($lang, array(
 	'ACP_MMS_TIMEOUT_EXP'		=> 'Temps limite (en secondes) d’attente des requêtes en Ajax avant que le client avorte la connexion.<br />Valeur par défaut: 5',
 
 //Mod install error
-	'ACP_MMS_ERR_INSTALL'			=> 'Le mod est maintenant désactivé par mesure de sécurité jusqu’à ce que l’installation soit terminée.',
+	'ACP_MMS_ERR_INSTALL'				=> 'Le mod est maintenant désactivé par mesure de sécurité jusqu’à ce que l’installation soit terminée.',
 
 	'MMS_INSTALL_NO_COLLUMN'			=> 'La colonne SQL <strong>« %1$s »</strong> de la table <strong>« %2$s »</strong> est absente.',
-	'MMS_INSTALL_NO_FILE'			=> 'Le fichier <strong>« %s »</strong> est absent.',
-	'MMS_INSTALL_NO_TABLE'			=> 'La table SQL <strong>« %1$s »</strong> est absente.',
+	'MMS_INSTALL_NO_FILE'				=> 'Le fichier <strong>« %s »</strong> est absent.',
+	'MMS_INSTALL_NO_TABLE'				=> 'La table SQL <strong>« %1$s »</strong> est absente.',
 
 //Version Check
 	'ACP_ERRORS'						=> 'Erreurs',
@@ -92,7 +92,7 @@ $lang = array_merge($lang, array(
 	'MMS_ERRORS_CONFIG_ALT'				=> 'Vérification de version et configuration du Mod Mass Moderation in Search',
 	'MMS_ERRORS_CONFIG_EXPLAIN'			=> 'Sur cette page, vous pouvez vérifier si votre version de ce Mod est bien à jour et, dans le cas contraire, les actions à effectuer pour le mettre à jour.<br />Vous pouvez également régler des points simples de configuration qui s’y rapportent.',
 
-	'MMS_ERRORS_INSTRUCTIONS'		=> '<br /><h1>Utilisation du Mod Mass Moderation in Search v%1$s</h1><br />
+	'MMS_ERRORS_INSTRUCTIONS'			=> '<br /><h1>Utilisation du Mod Mass Moderation in Search v%1$s</h1><br />
 										<p>L’équipe de Geolim4.com vous remercie de votre confiance et espère que vous apprécierez les fonctionalités de ce Mod.<br />
 										N’hésitez pas à faire un don pour faire du développement durable et de soutien... Rendez-vous <strong><a href="%2$s" title="Mass Moderation in Search">sur cette page.</a></strong>.</p>
 										<p>Pour toute demande de support, rendez vous dans le <strong><a href="%3$s" title="forum de support">forum de support</a></strong>.</p>
@@ -107,7 +107,7 @@ $lang = array_merge($lang, array(
 	'MMS_ERRORS_VERSION_NOT_UP_TO_DATE'	=> 'Votre version du Mod « mots de passe interdits » n’est pas à jour.<br />Ci-dessous vous trouverez un lien vers l’annonce de sortie de la version la plus récente ainsi que des instructions sur la façon d’effectuer la mise à jour.',
 	'MMS_ERRORS_VERSION_UP_TO_DATE'		=> 'Votre installation est à jour.',
 
-	'MMS_ERRORS_UPDATE_INSTRUCTIONS'		=> '
+	'MMS_ERRORS_UPDATE_INSTRUCTIONS'	=> '
 		<h1>Annonce de sortie</h1>
 		<p>Veuillez lire <a href="%1$s" title="%1$s"><strong>le sujet de la version la plus récente</strong></a> pour accéder au processus de mise à jour, il peut contenir des informations utiles. Il incluera également le lien de téléchargement ainsi que le journal des modifications.</p>
 		<br />
@@ -116,9 +116,9 @@ $lang = array_merge($lang, array(
 		<p>► Décompressez l’archive et ouvrez le fichier install.xml, il contient toutes les informations de mise à jour.</p>
 		<p>► Annonce officielle de la dernière version : (%2$s).</p>',
 
-	'MMS_LATEST_VERSION'					=> 'Dernière version',
+	'MMS_LATEST_VERSION'				=> 'Dernière version',
 	'MMS_NEW_VERSION'					=> 'Votre version du Mod « mots de passe interdits » n’est pas à jour. Votre version est la %1$s, la version la plus récente est la %2$s. Veuillez lire la suite pour plus d’informations.',
-	'MMS_UNABLE_CONNECT'					=> 'Impossible de récupérer la version du Mod depuis le serveur, message d’erreur : %s',
+	'MMS_UNABLE_CONNECT'				=> 'Impossible de récupérer la version du Mod depuis le serveur, message d’erreur : %s',
 
 ));
 

@@ -42,8 +42,8 @@ if (empty($lang) || !is_array($lang))
 $lang = array_merge($lang, array(
 
 //Mod Name
-	'ACP_MMS_CONFIG'		=> 'Mass Moderation in Search',
-	'ACP_MMS_SETTINGS'		=> 'Mass Moderation in Search settings',
+	'ACP_MMS_CONFIG'			=> 'Mass Moderation in Search',
+	'ACP_MMS_SETTINGS'			=> 'Mass Moderation in Search settings',
 //UMIL
 	'ACP_MMS_CONFIG_UMIL'		=> 'Mass Moderation in Search',
 	'MMS_UMIL_LOG'				=> 'Managing’s logs of Mass Moderation in Search',
@@ -69,7 +69,7 @@ $lang = array_merge($lang, array(
 	'ACP_MMS_OFFLINE_TIME'		=> 'Inactivity period',
 	'ACP_MMS_OFFLINE_TIME_EXP'	=> 'Inactivity period (in seconds) starting an user will no longer be considered logged to the mass moderation.<br />Default value: 20',
 	'ACP_MMS_PAGINATION'		=> 'Result per page',
-	'ACP_MMS_PAGINATION_EXP'	=> 'The maximum number offered by the mass moderation tool.<br />Maximum limit: 5000',
+	'ACP_MMS_PAGINATION_EXP'	=> 'The maximum pagination available in the mass moderation tool.<br />Maximum limit: 5000',
 	'ACP_MMS_PASSWORD'			=> 'Password confirmation',
 	'ACP_MMS_PASSWORD_EXP'		=> 'Ask a password confirmation when starting mass moderation procedure (recommended).',
 	'ACP_MMS_PREVIEW'			=> 'Preview chars count limit',
@@ -77,21 +77,21 @@ $lang = array_merge($lang, array(
 	'ACP_MMS_TIMEOUT_EXP'		=> 'Max timeout (in seconds) waiting Ajax requests before the client aborts the connection.<br />Default value: 5',
 
 //Mod install error
-	'ACP_MMS_ERR_INSTALL'			=> 'The Mod is now disabled for security reasons until the installation is complete.',
+	'ACP_MMS_ERR_INSTALL'		=> 'The Mod is now disabled for security reasons until the installation is complete.',
 
-	'MMS_INSTALL_NO_COLLUMN'			=> 'The SQL column <strong>“ %1$s ”</strong> from the <strong>“ %2$s ”</strong> table is missing.',
-	'MMS_INSTALL_NO_FILE'			=> 'The file<strong>“ %s ”</strong> is missing.',
-	'MMS_INSTALL_NO_TABLE'			=> 'The SQL table <strong>“ %1$s ”</strong> is missing.',
+	'MMS_INSTALL_NO_COLLUMN'	=> 'The SQL column <strong>“ %1$s ”</strong> from the <strong>“ %2$s ”</strong> table is missing.',
+	'MMS_INSTALL_NO_FILE'		=> 'The file<strong>“ %s ”</strong> is missing.',
+	'MMS_INSTALL_NO_TABLE'		=> 'The SQL table <strong>“ %1$s ”</strong> is missing.',
 
 //Version Check
-	'ACP_ERRORS'						=> 'Errors',
+	'ACP_ERRORS'					=> 'Errors',
 
-	'MMS_CURRENT_VERSION'				=> 'Current version',
+	'MMS_CURRENT_VERSION'			=> 'Current version',
 
-	'MMS_ERRORS_CONFIG_ALT'				=> 'Configuration of the Mass Moderation in Search MOD',
-	'MMS_ERRORS_CONFIG_EXPLAIN'			=> 'On this page you can check if your version of this mod is up to date, otherwise, it is actions to take for the update.<br />You can also set related simple configuration points.',
+	'MMS_ERRORS_CONFIG_ALT'			=> 'Configuration of the Mass Moderation in Search MOD',
+	'MMS_ERRORS_CONFIG_EXPLAIN'		=> 'On this page you can check if your version of this mod is up to date, otherwise, it is actions to take for the update.<br />You can also set related simple configuration points.',
 
-	'MMS_ERRORS_INSTRUCTIONS'			=> '<br /><h1>To use the Mass Moderation in Search Mod v%1$s</h1><br />
+	'MMS_ERRORS_INSTRUCTIONS'		=> '<br /><h1>To use the Mass Moderation in Search Mod v%1$s</h1><br />
 											<p>The team Geolim4.com thank you for your trust and hope you enjoy the features of this Mod.<br />
 											Feel free to donate to make durable development and support... Go <strong><a href="%2$s" title="Mass Moderation in Search">on this page</a></strong>.</p>
 											<p>For any support request, go to the <strong><a href="%3$s" title="Support Forum">Support Forum</a></strong>.</p>
@@ -106,7 +106,7 @@ $lang = array_merge($lang, array(
 	'MMS_ERRORS_VERSION_NOT_UP_TO_DATE'	=> 'Your version of the Mass Moderation in Search Mod is outdated.<br />Below you will find a link to the release announcement of the latest version and instructions on how to perform the update.',
 	'MMS_ERRORS_VERSION_UP_TO_DATE'		=> 'Your installation is up to date.',
 
-	'MMS_ERRORS_UPDATE_INSTRUCTIONS'		=> '
+	'MMS_ERRORS_UPDATE_INSTRUCTIONS'	=> '
 				<h1>Release announcement</h1>
 				<p>Please read <a href="%1$s" title="%1$s"><strong>the release announcement of the latest version</strong></a> before beginning the process of updating, it may contain useful information. It also contains download links and a complete change log.</p>
 				<br />
@@ -115,9 +115,9 @@ $lang = array_merge($lang, array(
 				<p>► Unzip the archive and open the install.xml file, it contains all the information update.</p>
 				<p>► Official announcement of the latest version : (%2$s).</p>',
 
-	'MMS_LATEST_VERSION'					=> 'Latest version',
+	'MMS_LATEST_VERSION'				=> 'Latest version',
 	'MMS_NEW_VERSION'					=> 'Your version of Mass Moderation in Search Mod is not up to date. Your version is %1$s, the latest version is %2$s. Please read on for more information.',
-	'MMS_UNABLE_CONNECT'					=> 'Can not connect to server version checking, error message : %s',
+	'MMS_UNABLE_CONNECT'				=> 'Can not connect to server version checking, error message : %s',
 ));
 
 ?>

@@ -20,7 +20,7 @@ if (!defined('IN_PHPBB'))
 final class mms_search
 {
 	/**
-	* Class Summary(56):
+	* Class Summary(57):
 	*
 	*Basic MOD methods:
 	*	@ __construct()					=> MMS constructor										@ Access public
@@ -207,7 +207,10 @@ final class mms_search
 		global $template, $db, $user, $auth, $config;
 		global $phpbb_root_path, $phpEx, $cache, $table_prefix;
 
-		include($phpbb_root_path . 'includes/db/db_tools.' . $phpEx);
+		if (!class_exists('phpbb_db_tools'))
+		{
+			include($phpbb_root_path . 'includes/db/db_tools.' . $phpEx);
+		}
 
 		//Do the globals vars fork
 		$this->template			= &$template;
@@ -240,11 +243,11 @@ final class mms_search
 	private function load_ext_vars()
 	{
 		$this->user->add_lang('mods/mms_search');
-		$this->mms_topic_action =  request_var('mms_topic_action', '');
-		$this->mms_post_action =  request_var('mms_post_action', '');
+		$this->mms_topic_action = request_var('mms_topic_action', '');
+		$this->mms_post_action = request_var('mms_post_action', '');
 		$this->resync = request_var('resync', '');
 		$this->unlock = request_var('unlock', false);
-		$this->mms_from_sr =  request_var('mms_from_sr', '');
+		$this->mms_from_sr = request_var('mms_from_sr', '');
 		$this->config['posts_per_page'] = &$this->mms_pagination;
 		$this->config['topics_per_page'] = &$this->mms_pagination;
 		$this->config['search_block_size'] = &$this->mms_pagination;
@@ -371,10 +374,10 @@ final class mms_search
 			{
 				if ($token != $timecheck['last_tkn'] && $timecheck['last_sid'] == $this->user->session_id && $timecheck['last_uid'] == $this->user->data['user_id'])
 				{
-					$this->trigger_error('MMS_TOO_MANY_TABS', E_USER_WARNING, false, true);
+					$this->trigger_error($this->user->lang('MMS_TOO_MANY_TABS', ($timecheck['last_time'] - ($now - $this->config['mms_mod_offline_time']))), E_USER_WARNING, false, true);
 				}
-				$sql = "SELECT user_id, username, user_colour
-					FROM " .  USERS_TABLE  . '
+				$sql = 'SELECT user_id, username, user_colour
+					FROM ' .  USERS_TABLE  . '
 					WHERE user_id = ' . (int) $timecheck['last_uid'];
 				$result = $this->db->sql_query($sql);
 				$row = $this->db->sql_fetchrow($result);
@@ -436,7 +439,7 @@ final class mms_search
 	private function load_token($token, $cfg_update = false)
 	{
 		$this->token = $token;
-		if($cfg_update && $token)
+		if ($cfg_update && $token)
 		{
 			$timecheck = unserialize($this->config['mms_timecheck']);
 			$timecheck['last_tkn'] = $token;
@@ -658,11 +661,16 @@ final class mms_search
 		// Number of chars returned
 		$pagination = '<option value="25">25</option>';
 		$pagination .= '<option value="50" selected="selected">50</option>';
-		$pagination .= '<option value="75">50</option>';
+		$pagination .= '<option value="75">75</option>';
 
-		for ($i = 100; $i <= $this->config['mms_mod_pagination'] ; (($i >= 1000) ? $i += 200 :$i += 50))
+		for ($i = 100; $i <= $this->config['mms_mod_pagination'] ; (($i >= 1000) ? $i += 200 : $i += 50))
 		{
 			$pagination .= '<option value="' . $i . '">' . $i . '</option>';
+			$v = $i;
+		}
+		if ($v < $this->config['mms_mod_pagination'])
+		{
+			$pagination .= '<option value="' . $this->config['mms_mod_pagination'] . '">' . $this->config['mms_mod_pagination'] . '</option>';
 		}
 		if ($this->mms_load)
 		{
@@ -1380,7 +1388,7 @@ final class mms_search
 
 		$to_forum_id = $this->ajax_data['forum_id'];
 
-		if(!empty($rows[$this::MMS_PASSED]))
+		if (!empty($rows[$this::MMS_PASSED]))
 		{
 			$this->mcp_fork_topic($rows[$this::MMS_PASSED], $to_forum_id);
 		}
@@ -2197,7 +2205,7 @@ final class mms_search
 						case 'postgres':
 						case 'firebird':
 							$i = 0;
-							foreach($this->data_to_resync AS $id)
+							foreach ($this->data_to_resync AS $id)
 							{
 								if ($i > $this::MMS_HARD_RESYNC_LIMIT)
 								{
@@ -2277,6 +2285,7 @@ final class mms_search
 			{
 				if (phpbb_check_hash($password, $this->user->data['user_password']))
 				{
+					add_log('mod', false, false, 'MMS_LOG_AUTHED');
 					$password_confirmed = true;
 				}
 				else if ($password)
@@ -2834,7 +2843,7 @@ final class mms_search
 	private function mcp_fork_topic($topic_ids, $to_forum_id)
 	{
 		$counter = array();
-		if($topic_ids && !is_array($topic_ids))
+		if ($topic_ids && !is_array($topic_ids))
 		{
 			$topic_ids = array($topic_ids);
 		}
@@ -3176,7 +3185,7 @@ final class mms_search
 			case 'enable_sig':
 				$rows_passed = $rows[$this::MMS_PASSED];
 				$rows_ignored = $rows[$this::MMS_IGNORED];
-				foreach($rows[$this::MMS_PASSED] AS $key_ => $value_)
+				foreach ($rows[$this::MMS_PASSED] AS $key_ => $value_)
 				{
 					$is_me = ($this->row_full[$value_]['poster_id'] == $this->user->data['user_id']) ? true : false;
 					if (!$this->check_post_options_acl($this->row_full[$value_]['forum_id'], $is_me))
@@ -3225,7 +3234,7 @@ final class mms_search
 					$phpEx = $this->phpEx;
 					include($this->phpbb_root_path . 'includes/message_parser.' . $this->phpEx);
 				}
-				foreach($rows[$this::MMS_PASSED] AS $key_ => $value_)
+				foreach ($rows[$this::MMS_PASSED] AS $key_ => $value_)
 				{
 					$is_me = ($this->row_full[$value_]['poster_id'] == $this->user->data['user_id']) ? true : false;
 					if (!$this->check_post_options_acl($this->row_full[$value_]['forum_id'], $is_me))
@@ -3298,7 +3307,7 @@ final class mms_search
 					$phpEx = $this->phpEx;
 					include($this->phpbb_root_path . 'includes/message_parser.' . $this->phpEx);
 				}
-				foreach($rows[$this::MMS_PASSED] AS $key_ => $value_)
+				foreach ($rows[$this::MMS_PASSED] AS $key_ => $value_)
 				{
 					$is_me = ($this->row_full[$value_]['poster_id'] == $this->user->data['user_id']) ? true : false;
 					$bbcode_status	= ($this->config['allow_bbcode'] && $this->post_option == 'enable_bbcodes' &&($this->auth->acl_get('f_bbcode', $this->row_full[$value_]['forum_id']) || $this->row_full[$value_]['forum_id'] == 0)) ? true : false;
@@ -3379,7 +3388,7 @@ final class mms_search
 					$phpEx = $this->phpEx;
 					include($this->phpbb_root_path . 'includes/message_parser.' . $this->phpEx);
 				}
-				foreach($rows[$this::MMS_PASSED] AS $key_ => $value_)
+				foreach ($rows[$this::MMS_PASSED] AS $key_ => $value_)
 				{
 					$is_me = ($this->row_full[$value_]['poster_id'] == $this->user->data['user_id']) ? true : false;
 					$bbcode_status	= ($this->config['allow_bbcode'] && ($this->auth->acl_get('f_bbcode', $this->row_full[$value_]['forum_id']) || $this->row_full[$value_]['forum_id'] == 0)) ? true : false;
@@ -3458,7 +3467,7 @@ final class mms_search
 				}
 				delete_attachments('post', $rows[$this::MMS_PASSED], true);//Do the resync now!
 				$this->db->sql_transaction('begin');
-				foreach($rowset AS $key_ => $value_)
+				foreach ($rowset AS $key_ => $value_)
 				{
 					if ($this->row_full[$key_]['post_attachment'])
 					{
@@ -3510,7 +3519,7 @@ final class mms_search
 				}
 				$rows_passed = $rows[$this::MMS_PASSED];
 				$rows_ignored = $rows[$this::MMS_IGNORED];
-				foreach($rows[$this::MMS_PASSED] AS $key_ => $value_)
+				foreach ($rows[$this::MMS_PASSED] AS $key_ => $value_)
 				{
 					$is_me = ($this->row_full[$value_]['poster_id'] == $this->user->data['user_id']) ? true : false;
 					if (!$this->check_post_options_acl($this->row_full[$value_]['forum_id'], $is_me))
@@ -3556,7 +3565,7 @@ final class mms_search
 				}
 				$rows_passed = $rows[$this::MMS_PASSED];
 				$rows_ignored = $rows[$this::MMS_IGNORED];
-				foreach($rows[$this::MMS_PASSED] AS $key_ => $value_)
+				foreach ($rows[$this::MMS_PASSED] AS $key_ => $value_)
 				{
 					$is_me = ($this->row_full[$value_]['poster_id'] == $this->user->data['user_id']) ? true : false;
 					if (!$this->check_post_options_acl($this->row_full[$value_]['forum_id'], $is_me))
@@ -3607,7 +3616,7 @@ final class mms_search
 				$mm_topic_resync = array();
 				$rows_passed = $rows[$this::MMS_PASSED];
 				$rows_ignored = $rows[$this::MMS_IGNORED];
-				foreach($rows[$this::MMS_PASSED] AS $key_ => $value_)
+				foreach ($rows[$this::MMS_PASSED] AS $key_ => $value_)
 				{
 					$is_me = ($this->row_full[$value_]['poster_id'] == $this->user->data['user_id']) ? true : false;
 					if (!$this->check_post_options_acl($this->row_full[$value_]['forum_id'], $is_me))
@@ -3657,7 +3666,7 @@ final class mms_search
 
 				//Update subtracted Moderation Message counter per topic
 				//This foreach will never reach 10 loop (Master packet-size setting)
-				foreach($mm_topic_resync AS $topic_id_ => $sub_count_)
+				foreach ($mm_topic_resync AS $topic_id_ => $sub_count_)
 				{
 					$sql = 'UPDATE ' . TOPICS_TABLE . '
 						SET posts_moderation_total = posts_moderation_total - ' . (int) $sub_count_ . '

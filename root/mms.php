@@ -18,6 +18,8 @@ $phpEx = substr(strrchr(__FILE__, '.'), 1);
 include($phpbb_root_path . 'common.' . $phpEx);
 include($phpbb_root_path . 'includes/functions_admin.' . $phpEx);
 require($phpbb_root_path . 'includes/class_mms.' . $phpEx);
+require($phpbb_root_path . 'includes/constants_mms.' . $phpEx);
+
 // Start session management
 $user->session_begin();
 $auth->acl($user->data);
@@ -29,13 +31,13 @@ $is_ajax = request_var('ajax', false);
 $resync = request_var('resync', '');
 $unlock = request_var('unlock', false);
 if ($redirect)
-{	if ($redirect == 1)
+{	if ($redirect == MMS_DELAYED_REDIRECT)
 	{
 		meta_refresh(5, $phpbb_root_path . 'index.' . $phpEx);
 		$user->add_lang('mods/mms_search');
 		trigger_error($user->lang['MMS_REDIRECT']);
 	}
-	else if ($redirect == 2)
+	else if ($redirect == MMS_INSTANT_REDIRECT)
 	{
 		redirect($phpbb_root_path . 'index.' . $phpEx);
 	}
@@ -132,7 +134,7 @@ if ($mms->is_ajax)
 			trigger_error('MMS_UNALLOWED_MODE');
 		}
 	}
-	else if($resync)
+	else if ($resync)
 	{
 		switch ($resync)
 		{
@@ -149,7 +151,7 @@ if ($mms->is_ajax)
 			break;
 		}
 	}
-	else if($unlock)
+	else if ($unlock)
 	{
 		$mms->ajax_check_pwd();
 		$mms->unlock();

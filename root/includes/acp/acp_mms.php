@@ -60,9 +60,9 @@ class acp_mms
 				$errstr = '';
 				$errno = 0;
 				$info = get_remote_file(MMS_HOST, MMS_PATH, MMS_FILE, $errstr, $errno);
-				if ( $update )
+				if ($update)
 				{
-					if ( !check_form_key($form_key) )
+					if (!check_form_key($form_key))
 					{
 						trigger_error($user->lang['FORM_INVALID'], E_USER_WARNING);
 					}
@@ -78,7 +78,7 @@ class acp_mms
 						'mms_max_attempts'			=> request_var('mms_max_attempts', 5),
 					);
 					//Define some hard limits
-					if($settings['mms_mod_pagination'] > 5000 || $settings['mms_mod_pagination'] < 50 )
+					if ($settings['mms_mod_pagination'] > 5000 || $settings['mms_mod_pagination'] < 50)
 					{
 						$settings['mms_mod_pagination'] = 500;
 					}
@@ -93,7 +93,7 @@ class acp_mms
 					add_log('admin', 'ACP_MMS_LOG_ALTERED');
 					trigger_error($user->lang['ACP_MMS_UPDATED_CFG'] . $trigger_info . adm_back_link($this->u_action) );
 				}
-				if ( $info === false )
+				if ($info === false)
 				{
 					$template->assign_vars(array(
 						'S_ERROR'   => true,
@@ -107,7 +107,7 @@ class acp_mms
 					$announcement_url 	= trim($info[1]);
 					$up_to_date			= phpbb_version_compare($config['mms_mod_version'], $latest_version, '<') ? false : true;
 
-					if ( !$up_to_date )
+					if (!$up_to_date)
 					{
 						$template->assign_vars(array(
 							'S_ERROR'   			=> true,
@@ -175,9 +175,9 @@ class acp_mms
 	function mms_check_install()
 	{
 		global $cache, $config, $user, $phpbb_root_path, $phpbb_admin_path, $phpEx, $db;
-		if ( !empty($config['mms_check_install']) && $config['mms_check_install'] < time() )
+		if (!empty($config['mms_check_install']) && $config['mms_check_install'] < time())
 		{
-/* 			if ( !class_exists('phpbb_db_tools') || !class_exists('dbal') )
+/* 			if (!class_exists('phpbb_db_tools') || !class_exists('dbal'))
 			{
 				include($phpbb_root_path . 'includes/db/db_tools.' . $phpEx);
 			}
@@ -193,18 +193,19 @@ class acp_mms
 
 			$filelist[] = 'style/acp_mms.html';
 			$filelist[] = 'includes/class_mms.' . $phpEx;
+			$filelist[] = 'includes/constants_mms.' . $phpEx;
 			$filelist[] = 'includes/acp/info/acp_mms.' . $phpEx;
 			$filelist[] = 'language/' .$config['default_lang']. '/mods/info_acp_mms.' . $phpEx;
 			$filelist[] = ($user->theme['template_path'] != $row_style['style_name']) ? 'styles/' .$row_style['style_name']. '/template/mms_body.html' : 'styles/' .$user->theme['template_path']. '/template/mms_body.html';
 			$filelist[] = ($user->theme['template_path'] != $row_style['style_name']) ? 'styles/' .$row_style['style_name']. '/template/search_body_mms.html' : 'styles/' .$user->theme['template_path']. '/template/search_body_mms.html';
 			$filelist[] = ($user->theme['template_path'] != $row_style['style_name']) ? 'styles/' .$row_style['style_name']. '/template/search_results_mms.html' : 'styles/' .$user->theme['template_path']. '/template/search_results_mms.html';
 			$filelist[] = ($user->theme['template_path'] != $row_style['style_name']) ? 'styles/' .$row_style['style_name']. '/theme/mms.css' : 'styles/' .$user->theme['template_path']. '/theme/mms.css';
-			/*if ( !$mms_db->sql_table_exists(MMS_TABLE) )
+			/*if (!$mms_db->sql_table_exists(MMS_TABLE))
 			{
 				$error .= sprintf($user->lang['MMS_INSTALL_NO_TABLE'] . '<br />', MMS_TABLE);
 				$error .= $user->lang['ACP_MMS_ERR_INSTALL'];
 				//Disable Mod: install not complete !!!
-				if ( $config['mms_mod_enable'] )
+				if ($config['mms_mod_enable'])
 				{
 					add_log('critical', 'ACP_MMS_LOG_OFF', $error);
 				}
@@ -214,7 +215,7 @@ class acp_mms
 			}*/
 			$columnlist = array ();
 
-			foreach ( $filelist as $key => $file )
+			foreach ( $filelist as $key => $file)
 			{
 				if (!file_exists($phpbb_root_path . $file) && $key > 0)
 				{
@@ -225,18 +226,18 @@ class acp_mms
 					$error .= sprintf($user->lang['MMS_INSTALL_NO_FILE'] . '<br />', $file);
 				}
 			}
-/* 			foreach ( $columnlist as $key => $column )
+/* 			foreach ( $columnlist as $key => $column)
 			{
 				if (!$mms_db->sql_column_exists(MMS_TABLE, $column))
 				{
 					$error .= sprintf($user->lang['MMS_INSTALL_NO_COLLUMN'] . '<br />', $column, MMS_TABLE);
 				}
 			} */
-			if ( $error )
+			if ($error)
 			{
 				$error .= $user->lang['ACP_MMS_ERR_INSTALL'];
 				//Disable Mod: install not complete !!!
-				if ( $config['mms_mod_enable'] )
+				if ($config['mms_mod_enable'])
 				{
 					add_log('critical', 'ACP_MMS_LOG_OFF', $error);
 				}

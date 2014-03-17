@@ -30,8 +30,7 @@
 	</header>
 	<action-group>
 		<copy>
-			<file from="root/language/fr/mods/info_acp_mms.php" to="language/fr/mods/info_acp_mms.php"/>
-			<file from="root/language/fr/mods/mms_search.php" to="language/fr/mods/mms_search.php"/>
+			<file from="root/language/fr/*.*" to="language/fr/*.*"/>
 		</copy>
 
 		<open src="language/fr/acp/permissions_phpbb.php">

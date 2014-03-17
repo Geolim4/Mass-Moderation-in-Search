@@ -49,12 +49,12 @@ $lang = array_merge($lang, array(
 	'MMS_ACTION_EXPLAIN'		=> 'Choose the target moderation action.
 								<br />Please note that setting will depend of your permissions in selected forums to search above.',
 	'MMS_ADDON_DISABLED'		=> 'Addon not available for now!',
-	'MMS_BAD_POST_MODE'			=> 'Bad post mode!',
-	'MMS_BAD_TOPIC_MODE'		=> 'Bad topic mode!',
-	'MMS_BAD_DATA_FORMAT'		=> 'Bad data format received!',
+	'MMS_BAD_POST_MODE'			=> 'Wrong post mode!',
+	'MMS_BAD_TOPIC_MODE'		=> 'Wrong topic mode!',
+	'MMS_BAD_DATA_FORMAT'		=> 'Wrong data format received!',
 	'MMS_CHAR_BOTTOM'			=> '▼',
 	'MMS_CHAR_TOP'				=> '▲',
-									//To translators: Do not replace/translate *m*,*s*,*q*,*p*,*t*,*f*,*d* !!Considerate these string as of %s string.
+									//To translators: Do not replace/translate *m*,*s*,*q*,*p*,*t*,*f*,*d*
 	'MMS_CHRONO_POSTS'			=> 'Operation completed in *m* minut(s) and *s* seconds, *q* SQL queries for *p* altered posts: *f* failed post(s) and *d* treated post(s)',
 	'MMS_CHRONO_TOPICS'			=> 'Operation completed in *m* minut(s) and *s* seconds, *q* SQL queries for *t* altered topics: *f* failed topic(s) and *d* treated topic(s)',
 	'MMS_CONNECTION_FAIL'		=> 'Something went wrong while sending data to the server! Try again?',
@@ -72,10 +72,10 @@ $lang = array_merge($lang, array(
 		'topic'						=> 'Any failed topic for now'
 	),
 	'MMS_FINAL_RESYNC'		=> array(
-			'F'				=> 'Forums resynchronised',
-			'T'				=> 'Topics resynchronised',
-			'S'					=> 'Statistics resynchronised',
-			'U'					=> 'Users resynchronised',
+			'F'				=> 'Forums resynchronized',
+			'T'				=> 'Topics resynchronized',
+			'S'					=> 'Statistics resynchronized',
+			'U'					=> 'Users resynchronized',
 	),
 	'MMS_FINAL_RESYNC_NEXT'		=> array(
 			'F'				=> 'Resynchronising forums',
@@ -108,13 +108,16 @@ $lang = array_merge($lang, array(
 	'MMS_LOADAVG'				=> 'System load',
 	'MMS_LOADAVG_EXP'			=> 'Because a server up to 10% of load average will never respond in time, the real progress bar is multiplied by 10.',
 
+	//Misc Logs
+	'MMS_LOG_AUTHED'			=> 'Authed in Mass Moderation Tool',
+
 	//Topics Logs
 	'MMS_LOG_TOPIC_LOCK'		=> '<strong>Locked topic </strong> <em>(via Mass Moderation Tool)</em><br />» %s',
 	'MMS_LOG_TOPIC_UNLOCK'		=> '<strong>Unlocked topic </strong> <em> (via Mass Moderation Tool)</em><br />» %s',
 	'MMS_LOG_TOPIC_FORK'		=> '<strong>Copied topic</strong> <em>(via Mass Moderation Tool)</em><br />» from %s',
 	'MMS_LOG_TOPIC_DELETE'		=> '<strong>Deleted topic “%1$s” written by</strong><br />» %2$s <em>(via Mass Moderation Tool)</em>',
 	'MMS_LOG_TOPIC_MOVE'		=> '<strong>Moved topic</strong> <em>(via Mass Moderation Tool)</em><br />» from %1$s to %2$s',
-	'MMS_LOG_TOPIC_RESYNC'		=> '<strong>Resynchronised topic counters</strong><br />» %s <em>(via Mass Moderation Tool)</em>',
+	'MMS_LOG_TOPIC_RESYNC'		=> '<strong>Resynchronized topic counters</strong><br />» %s <em>(via Mass Moderation Tool)</em>',
 	'MMS_LOG_TOPIC_MERGE'		=> '<strong>Merged topic « %1$s » written by</strong> %2$s <br />» <strong>to topic</strong> « %3$s » <em>(via Mass Moderation Tool)</em>',
 	'MMS_LOG_TOPIC_CHGICON'		=> '<strong>Modified topic icon</strong> <em>(via Mass Moderation Tool)</em><br />» %s',
 
@@ -130,6 +133,8 @@ $lang = array_merge($lang, array(
 	'MMS_LOG_POST_OPTIONS_DISABLE_SIG'	=> '<strong>Disabling signature from post written by</strong> %1$s <br />» <strong>into topic</strong> « %2$s » <em>(via Mass Moderation Tool)</em>',
 	'MMS_LOG_POST_OPTIONS_ENABLE_BBCODES'	=> '<strong>Enabling BBCODES from post written by</strong> %1$s <br />» <strong>into topic</strong> « %2$s » <em>(via Mass Moderation Tool)</em>',
 	'MMS_LOG_POST_OPTIONS_DISABLE_BBCODES'	=> '<strong>Disabling BBCODES from post written by</strong> %1$s <br />» <strong>into topic</strong> « %2$s » <em>(via Mass Moderation Tool)</em>',
+	'MMS_LOG_POST_OPTIONS_ENABLE_SMILIES'	=> '<strong>Enabling smilies from post written by</strong> %1$s <br />» <strong>into topic</strong> « %2$s » <em>(via Mass Moderation Tool)</em>',
+	'MMS_LOG_POST_OPTIONS_DISABLE_SMILIES'	=> '<strong>Disabling smilies from post written by</strong> %1$s <br />» <strong>into topic</strong> « %2$s » <em>(via Mass Moderation Tool)</em>',
 	'MMS_LOG_POST_OPTIONS_REMOVE_ATTACHMENT'	=> '<strong>Removing attachments from post written by</strong> %1$s <br />» <strong>into topic</strong> « %2$s » <em>(via Mass Moderation Tool)</em>',
 	//Posts Options Logs (Addons)
 	'MMS_LOG_POST_OPTIONS_ENABLE_HPIV'	=> '<strong>Hiding post’s profile written by</strong> %1$s <br />» <strong>into topic</strong> « %2$s » <em>(via Mass Moderation Tool)</em>',
@@ -173,7 +178,7 @@ $lang = array_merge($lang, array(
 	'MMS_PAGINATION_EXP'		=> 'This setting overwrite the default pagination configuration',
 	'MMS_PAGINATION_POSTS_TOPICS'=> 'posts/topics per page',
 	'MMS_PASSWORD'				=> 'Password confirmation',
-	'MMS_PASSWORD_BAD'			=> 'Bad password!',
+	'MMS_PASSWORD_BAD'			=> 'Wrong password!',
 	'MMS_PASSWORD_CONFIRM'		=> 'Please confirm your password',
 	'MMS_POST'					=> 'Post',
 	'MMS_POST_ALREADY_LOCKED'	=> 'The post has been already locked.',
@@ -243,8 +248,8 @@ $lang = array_merge($lang, array(
 	'MMS_PRIVATE'				=> 'Your are not authorized to read this post.',
 	'MMS_REASON'				=> 'Reason',
 	'MMS_REDIRECT'				=> 'You will be redirected to the forum index.',
-	'MMS_SAME_FORUM'			=> 'Origin forum is the same than the destination forum',
-	'MMS_SAME_TOPIC'			=> 'Origin topic is the same than the destination topic',
+	'MMS_SAME_FORUM'			=> 'Origin forum is the same than the target forum',
+	'MMS_SAME_TOPIC'			=> 'Origin topic is the same than the target topic',
 	'MMS_SAME_USERNAME'			=> 'Current username is the same than the new username',
 	'MMS_SEARCH_WARN'			=> 'You are going to show more than 1000 results simultaneously, this can increase substantially the load time of your server and your browser. Are you sure to continue ?',
 	'MMS_SELECTED'				=> 'selected',

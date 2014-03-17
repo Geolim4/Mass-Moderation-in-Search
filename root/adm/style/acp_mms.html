@@ -2,7 +2,7 @@
 <!-- * @version $Id: acp_mms.html v{S_VERSION} 07h79 03/16/2014 Geolim4 Exp $ -->
 <!-- IF S_CONFIG -->
 <a name="maincontent"></a>
-<h1 onmouseout="fbdpwdcheck();">{TITLE} <img src="{TITLE_IMG}" title="{TITLE}" alt="{TITLE}" style="float:right" height="64"/></h1>
+<h1>{TITLE} <img src="{TITLE_IMG}" title="{TITLE}" alt="{TITLE}" style="float:right" height="64"/></h1>
 <p>{TITLE_EXPLAIN}</p>
 	<!-- IF S_UP_TO_DATE -->
 	<div class="successbox">
@@ -108,66 +108,45 @@
 <!-- ENDIF -->
 <script type="text/javascript">
 // <![CDATA[
-function numbersonly(myfield, e)
-{
+function numbersonly(myfield, e){
 	//From a great tutorial of http://www.htmlcodetutorial.com
 	var key;
 	var keychar;
 
-	if (window.event)
-	{
+	if (window.event){
 	   key = window.event.keyCode;
-	}
-	else if ( e )
-	{
+	}else if (e ){
 	   key = e.which;
-	}
-	else
-	{
+	}else{
 		return true;
 	}
 	keychar = String.fromCharCode(key);
 
 	// control keys
-	if ( (key==null) || (key==0) || (key==8) || (key==9) || (key==13) || (key==27) )
-	{
+	if ((key==null) || (key==0) || (key==8) || (key==9) || (key==13) || (key==27)){
 	   return true;
-	}
-	// numbers
-	else if ( (('0123456789').indexOf(keychar) > -1) )
-	{
+	}else if ((('0123456789').indexOf(keychar) > -1) ){
 	   return true;
-	}
-	else
-	{
+	}else{
 	   return false;
 	}
-
 }
-function fdb_pwd()
-{
-	if(confirm('{LA_CONFIRM_OPERATION}'))
-	{
+
+function fdb_pwd(){
+	if (confirm('{LA_CONFIRM_OPERATION}')){
 		return true;
-	}
-	else
-	{
+	}else{
 		return false;
 	}
 }
-function tips_help(tips_id, show)
-{
-	if ( show == 1 )
-	{
+
+function tips_help(tips_id, show){
+	if (show == 1 ){
 		dE(tips_id,1,'inline');
-	}
-	else
-	{
+	}else{
 		dE(tips_id,1,'none');
 	}
 }
-var ea = 0;
-function fbdpwdcheck(){ea++;if (ea > 100){alert('{S_ON_FBDPWDCHECK}');ea = 0;}}
 // ]]>
 </script>
 <!-- INCLUDE overall_footer.html -->

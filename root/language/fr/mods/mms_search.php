@@ -54,7 +54,7 @@ $lang = array_merge($lang, array(
 	'MMS_BAD_DATA_FORMAT'	=> 'Mauvais format de données reçu!',
 	'MMS_CHAR_BOTTOM'		=> '▼',
 	'MMS_CHAR_TOP'			=> '▲',
-									//Aux traducteurs: Ne pas remplacer/traduire *m*,*s*,*q*,*p*,*t*,*f*,*d* !!!!Considérez ces chaînes de caractères comme la chaîne %s .
+									//Aux traducteurs: Ne pas remplacer/traduire *m*,*s*,*q*,*p*,*t*,*f*,*d*
 	'MMS_CHRONO_POSTS'		=> 'Opération terminée en *m* minute(s) et *s* seconds, *q* requêtes SQL pour *p* messages impactés: *f* message(s) échoué(s) and *d* message(s) traîté(s)',
 	'MMS_CHRONO_TOPICS'		=> 'Opération terminée en *m* minute(s) et *s* seconds, *q* requêtes SQL pour *t* sujets impactés: *f* sujet(s) échoué(s) and *d* sujet(s) traîté(s)',
 	'MMS_CONNECTION_FAIL'	=> 'Quelque chose s’est mal passé lors de l’envoi de données vers le serveur! Ré-essayer?',
@@ -108,6 +108,9 @@ $lang = array_merge($lang, array(
 	'MMS_LOADAVG'					=> 'Charge système',
 	'MMS_LOADAVG_EXP'				=> 'Comme un serveur à plus de 10% de charge moyenne ne répondra jamais à temps, la barre de progression réelle est donc multipliée par 10.',
 
+	//Misc Logs
+	'MMS_LOG_AUTHED'				=> 'Authentifié dans l’outil de modération de masse',
+
 	//Topics Logs
 	'MMS_LOG_TOPIC_LOCK'			=> '<strong>Verrouillage d’un sujet</strong><em>(avec l’outil de modération de masse)</em><br />» %s',
 	'MMS_LOG_TOPIC_UNLOCK'			=> '<strong>Déverrouillage d’un sujet</strong><em>(avec l’outil de modération de masse)</em><br />» %s',
@@ -130,6 +133,8 @@ $lang = array_merge($lang, array(
 	'MMS_LOG_POST_OPTIONS_DISABLE_SIG'	=> '<strong>Profil du posteur affiché dans le message écrit par</strong> %1$s <br />» <strong>dans le sujet</strong> « %2$s » <em>(avec l’outil de modération de masse)</em>',
 	'MMS_LOG_POST_OPTIONS_ENABLE_BBCODES'	=> '<strong>Activation des BBCODES dans le message écrit par</strong> %1$s <br />» <strong>dans le sujet</strong> « %2$s » <em>(avec l’outil de modération de masse)</em>',
 	'MMS_LOG_POST_OPTIONS_DISABLE_BBCODES'	=> '<strong>Désactivation des BBCODES dans le message écrit par</strong> %1$s <br />» <strong>dans le sujet</strong> « %2$s » <em>(avec l’outil de modération de masse)</em>',
+	'MMS_LOG_POST_OPTIONS_ENABLE_SMILIES'	=> '<strong>Activation des smileys dans le message écrit par</strong> %1$s <br />» <strong>dans le sujet</strong> « %2$s » <em>(avec l’outil de modération de masse)</em>',
+	'MMS_LOG_POST_OPTIONS_DISABLE_SMILIES'	=> '<strong>Désactivation des smileys dans le message écrit par</strong> %1$s <br />» <strong>dans le sujet</strong> « %2$s » <em>(avec l’outil de modération de masse)</em>',
 	'MMS_LOG_POST_OPTIONS_REMOVE_ATTACHMENT'	=> '<strong>Suppression de fichiers-joints du message écrit par</strong> %1$s <br />» <strong>dans le sujet</strong> « %2$s » <em>(avec l’outil de modération de masse)</em>',
 	//Posts Options Logs (Addons)
 	'MMS_LOG_POST_OPTIONS_ENABLE_HPIV'	=> '<strong>Profil du posteur caché écrit par</strong> %1$s <br />» <strong>dans le sujet</strong> « %2$s » <em>(avec l’outil de modération de masse)</em>',

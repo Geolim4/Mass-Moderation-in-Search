@@ -348,8 +348,8 @@ function mms_showAll(cat){
 	$("#mms_doc_loading").fadeIn(300, function(){
 		var loop = 0, toFirst = '';
 		$("#div_mms_" + cat).children('div:hidden').each(function(i) {
-			if(this.id.match('^div_row_id')){
-				if(loop === 0){
+			if (this.id.match('^div_row_id')){
+				if (loop === 0){
 					toFirst = this.id;
 				}
 				$('#' + this.id).show();
@@ -370,8 +370,8 @@ function mms_showReset(cat){
 	$("#mms_doc_loading").fadeIn(300, function(){
 		var loop = 0, toFirst = '';
 		$($("#div_mms_" + cat).children('div:visible').get().reverse()).each(function(i) {
-			if(this.id.match('^div_row_id')){
-				if(loop === 49){
+			if (this.id.match('^div_row_id')){
+				if (loop === 49){
 					toFirst = $("#" + this.id)
 					.prevAll('div:visible').eq(49)
 					.attr('id');
@@ -388,8 +388,8 @@ function mms_showReset(cat){
 function mms_showLess(cat){
 	var loop = 0, toFirst = '';
 	$($("#div_mms_" + cat).children('div:visible').get().reverse()).each(function(i) {
-		if(loop < 50 && this.id.match('^div_row_id')){
-			if(loop === 49){
+		if (loop < 50 && this.id.match('^div_row_id')){
+			if (loop === 49){
 				toFirst = $("#" + this.id)
 				.prevAll('div:visible').eq(49)
 				.attr('id');
@@ -411,8 +411,8 @@ function mms_showLess(cat){
 function mms_showMore(cat){
 	var loop = 0, toFirst = '';
 	$("#div_mms_" + cat).children('div:hidden').each(function(i) {
-		if(loop < 50 && this.id.match('^div_row_id')){
-			if(loop === 0){
+		if (loop < 50 && this.id.match('^div_row_id')){
+			if (loop === 0){
 				toFirst = this.id;
 			}
 			$('#' + this.id).show();
@@ -431,7 +431,7 @@ function mms_showMore(cat){
 
 function mms_stickMe(resize) {
 	var window_top = $(window).scrollTop(), div_top = $('#sticky-mms_tools').offset().top, $el = $('#mms_tools'), $pl = $('#sticky-mms_tools');
-	if(resize === true && window_top > div_top){
+	if (resize === true && window_top > div_top){
 		$('#mms_tools').css({'position': 'fixed', 'top': '0px', 'width' : $pl.css('width')});
 		return;
 	}
@@ -487,21 +487,21 @@ function ajax_init(){
 	mms_confirm(mmsLang['CONFIRM'], mmsLang['LEAVE_SHADOW'] + '<span class="ui-icon ui-icon-help mms_Qicon"></span>', false, 'mms_shadow=1;mms_forum_id = $("#mms_forum_id").val();mms_ajax();', 'mms_shadow=0;mms_forum_id = $("#mms_forum_id").val();mms_ajax();')
 	<!-- ELSEIF MMS_ACTION == 'fork' and S_MMS_TYPE == 'topic' -->
 	mms_forum_id = $("#mms_forum_id").val();
-	if(mms_forum_id){
+	if (mms_forum_id){
 		mms_ajax();
 	}else{
 		mms_info(mmsLang['INFORMATION'], mmsLang['NO_FORUM'], true, '');
 	}
 	<!-- ELSEIF MMS_ACTION == 'chgposter' and S_MMS_TYPE == 'post' -->
 	username = $("#mms_username").val();
-	if(username){
+	if (username){
 		mms_ajax();
 	}else{
 		mms_info(mmsLang['INFORMATION'], mmsLang['MMS_USERNAME_INVALID'], true, '');
 	}
 	<!-- ELSEIF (MMS_ACTION == 'move' and S_MMS_TYPE == 'post') or (MMS_ACTION == 'merge' and S_MMS_TYPE == 'topic') -->
 	mms_topic_id = $("#mms_topic_id").val();
-	if(mms_topic_id && is_int(mms_topic_id)){
+	if (mms_topic_id && is_int(mms_topic_id)){
 		mms_ajax();
 	}else{
 		mms_info(mmsLang['INFORMATION'], mmsLang['MMS_TOPIC_ID_INVALID'], true, '');
@@ -512,7 +512,7 @@ function ajax_init(){
 	mms_confirm(mmsLang['CONFIRM'], mmsLang['MMS_SHOW_POST_REASON'], false, 'reason=true;icon_id = $(".mms_icon_id:checked").val();mms_ajax();', 'reason=false;icon_id = $(".mms_icon_id:checked").val();mms_ajax();')
 	<!-- ELSEIF MMS_ACTION == 'attr' and S_MMS_TYPE == 'topic' -->
 	attr_id = $("#mms_addon_qte_id").val();
-	if(is_int(attr_id)){
+	if (is_int(attr_id)){
 		mms_ajax();
 	}else{
 		mms_info(mmsLang['INFORMATION'], mmsLang['QTE_ATTRIBUTE_UNSELECTED'], true, '');
@@ -523,7 +523,7 @@ function ajax_init(){
 }
 
 function stimer(){
-	if(snow == 60){
+	if (snow == 60){
 		mtimer();
 	}
 	snow++;
@@ -535,7 +535,7 @@ function mtimer(){
 }
 
 function is_int(n){
-	if( Math.floor(n) == n && $.isNumeric(n)){
+	if (Math.floor(n) == n && $.isNumeric(n)){
 		return true;
 	}else{
 		return false;
@@ -554,10 +554,10 @@ function mms_abort(){
 }
 
 function mms_ajax(errorback){
-	if(!errorback){
+	if (!errorback){
 		var post_data = {}, i = 0, a = '', b = '';
 		for(key in rowAry){
-			if(i<rowPackets){
+			if (i<rowPackets){
 				post_data[i] = key;
 				i++;
 			}else{
@@ -572,13 +572,13 @@ function mms_ajax(errorback){
 	}
 	for(key in post_data){
 		//mms_ids_sent
-		if(typeof(mms_ids_sent[post_data[key]]) == 'undefined'){
+		if (typeof(mms_ids_sent[post_data[key]]) == 'undefined'){
 			mms_ids_sent[post_data[key]] = 1;
 		}else{
 			//The server has too many times ignored that post/topic. Remove it from waiting list.
 			//That step will prevent infinite loops submitting, if the server is ignoring a post/topic without specified reason.
-			if(mms_ids_sent[post_data[key]] > ({S_MMS_MAX_ATTEMPTS} - 1)){
-				if(!mms_failed){
+			if (mms_ids_sent[post_data[key]] > ({S_MMS_MAX_ATTEMPTS} - 1)){
+				if (!mms_failed){
 					$("#mms_showTofailed").show();
 					$("#div_mms_failed").children("div:first").remove();
 				}
@@ -602,7 +602,7 @@ function mms_ajax(errorback){
 			}
 		}
 	}
-	if(i){
+	if (i){
 		ajaxmms = $.ajax({
 			type: 'POST',
 			url: '{S_MMS_ACTION}',
@@ -617,8 +617,8 @@ function mms_ajax(errorback){
 			},
 			timeout: rowTimeout,
 			success: function(data, textStts, errThrown) {
-				if(!mms_aborted){
-					if(typeof(data) == 'object'){
+				if (!mms_aborted){
+					if (typeof(data) == 'object'){
 						mms_ajax_callback(data);
 					}else{
 						$('#cp-main').children('div:first').effect('highlight', {color: 'orange'}, 1000);
@@ -637,20 +637,20 @@ function mms_ajax(errorback){
 						console.log(e);
 					}
 				}
-				if(!mms_aborted){
-					if(typeof(data['responseText']) != 'object' && data['status'] == 200){
+				if (!mms_aborted){
+					if (typeof(data['responseText']) != 'object' && data['status'] == 200){
 						$('#cp-main').children('div:first').effect('highlight', {color: 'orange'}, 1000);
 						$("#mms_statut").html('<span>' + mmsLang['MMS_STATUS'] + ': <strong style="color: darkorange;">' + mmsLang['MMS_DATA_INTERRUPTED'] + '</strong></span>');
 						var errorData = mmsLang['MMS_BAD_DATA_FORMAT'] + '<br />' + mmsLang['MMS_HTML_DUMP'] + ':<br /><textarea class="inputbox" tabindex="3" cols="70" rows="10" name="message" >' + ajaxmms.getAllResponseHeaders() + data['responseText'] + '</textarea>';
 						mms_confirm(mmsLang['INFORMATION'], mmsLang['MMS_CONNECTION_FAIL'], true, 'mms_ajax(fallback)', 'mms_abort()', false, false, errorData, true, true);
-					}else if(typeof(data['responseText']) == 'object' && data['status'] != 200){
+					}else if (typeof(data['responseText']) == 'object' && data['status'] != 200){
 						$('#cp-main').children('div:first').effect('highlight', {color: 'orange'}, 1000);
 						$("#mms_statut").html('<span>' + mmsLang['MMS_STATUS'] + ': <strong style="color: darkorange;">' + mmsLang['MMS_DATA_INTERRUPTED'] + '</strong></span>');
 						mms_info(data['responseText']['title'], data['responseText']['message'], true, 'mms_abort()');
 					}else{
 						$('#cp-main').children('div:first').effect('highlight', {color: 'orange'}, 1000);
 						$("#mms_statut").html('<span>' + mmsLang['MMS_STATUS'] + ': <strong style="color: darkorange;">' + mmsLang['MMS_DATA_INTERRUPTED'] + '</strong></span>');
-						if(textStts == 'error'){
+						if (textStts == 'error'){
 							var errorData = textStts + ': ' + data.status + ' ' + errThrown + '<br />' + mmsLang['MMS_HTML_DUMP'] + ':<br /><textarea class="inputbox" tabindex="3" cols="70" rows="10" name="message" >' + ajaxmms.getAllResponseHeaders() + data.responseText + '</textarea>';
 						} else {
 							var errorData = '118 ' + mmsLang['MMS_TIMEOUT'] + '<br />' + mmsLang['MMS_TIMEOUT_EXP'] + '<br />' + mmsLang['MMS_HTML_DUMP'] + ':<br />' + mmsLang['MMS_NOT_AVAILABLE'];
@@ -667,9 +667,9 @@ function mms_ajax(errorback){
 
 function mms_ajax_callback(data){
 	var keyIndex = '', ttaa = '';
-	if(data['error']){
-		if(data['continue']){
-			if(!data['pwd_confirm']){
+	if (data['error']){
+		if (data['continue']){
+			if (!data['pwd_confirm']){
 				if (data['final_eval']){
 					eval(data['final_eval']);
 				}
@@ -683,24 +683,24 @@ function mms_ajax_callback(data){
 			mms_abort();
 			<!-- IF (MMS_ACTION == 'move' or MMS_ACTION == 'fork') and S_MMS_TYPE == 'topic' -->$('#mms_forum_div').remove();<!-- ELSEIF MMS_ACTION == 'chgposter' -->$('#mms_username_div').remove();<!-- ELSEIF (MMS_ACTION == 'move' and S_MMS_TYPE == 'post') or (MMS_ACTION == 'merge' and S_MMS_TYPE == 'topic') -->$('#mms_topic_div').remove();<!-- ELSEIF MMS_ACTION == 'options' and S_MMS_TYPE == 'post' -->$('#mms_post_options_div').remove();<!-- ENDIF -->
 			mms_info(data['title'], data['message'], true, '');
-			if(data['redirect']){
+			if (data['redirect']){
 				setTimeout(function(){window.location.href = data['redirect']}, 5000);
 			 }
 		}
 	clearInterval(scounter);
 	clearInterval(mcounter);
 	}else{
-		if(data['pwd_confirm'])
+		if (data['pwd_confirm'])
 		{
 			pwd_confirmed = true;
 		}
 		mms_runTimer();
-		if(data['continue']){
+		if (data['continue']){
 		var post_data = new Array('rids_treated'), i = 0, a = 'rids_treated', b = '';
 			for(key in data['rids_treated']){
 				//post_data[key];
-				if(data['rids_treated'][key]){
-					if(!mms_treated){
+				if (data['rids_treated'][key]){
+					if (!mms_treated){
 						$("#mms_showTotreated").show();
 						$("#div_mms_treated").children("div:first").remove();
 					}
@@ -710,7 +710,7 @@ function mms_ajax_callback(data){
 					$('<br /><em>' + mmsLang['MMS_STATUS'] + ': ' + data['message'][key] + '</em>').appendTo($('#div_row_id' + key).children("div").children(".error"));
 					$('#spanli_left_count, #spandiv_left_count').html(' (' + mms_left + ')');
 					$('#spanli_treat_count, #spandiv_treated_count').html(' (' + mms_treated + ')');
-					if(data['fdata'] !== false){
+					if (data['fdata'] !== false){
 						for(key_ in data['fdata']['f']){
 							f_data['f'][data['fdata']['f'][key_]] = true;
 						}
@@ -723,7 +723,7 @@ function mms_ajax_callback(data){
 					}
 				<!-- IF MMS_ACTION == 'grabip' -->
 					keyIndex = data['rids_treated'][key];
-					if(typeof(grabebdIps[keyIndex]) == 'undefined'){
+					if (typeof(grabebdIps[keyIndex]) == 'undefined'){
 						ttaa = $('#grabbedip').val();
 						$('#grabbedip').val(ttaa + (ttaa ?"\n":'') + keyIndex).trigger('autosize.resize');
 						grabebdIps[keyIndex] = key;
@@ -735,7 +735,7 @@ function mms_ajax_callback(data){
 					}
 				<!-- ENDIF -->
 				}else{
-					if(!mms_failed){
+					if (!mms_failed){
 						$("#mms_showTofailed").show();
 						$("#div_mms_failed").children("div:first").remove();
 					}
@@ -758,7 +758,7 @@ function mms_ajax_callback(data){
 			}
 			if (typeof data['loadavg'] !== 'undefined'){
 				var loadAvgCnt = data['loadavg'] + '%';
-				if(data['loadavg'] > 3){
+				if (data['loadavg'] > 3){
 					loadAvgCnt += '<span class="ui-icon mmsLoadavgAlert ui-icon-alert" style="float: right"></span>';
 				}
 				$("#loadavgbar" ).parent('div').css('display', 'block');
@@ -782,7 +782,7 @@ function mms_ajax_callback(data){
 }
 
 function mms_runTimer(){
-	if(!timer_started)
+	if (!timer_started)
 	{
 		var percent = Math.round((((mms_failed + mms_treated) * 100) / {MMS_ROWS_COUNT}) * 10) / 10;
 
@@ -802,14 +802,14 @@ function mms_runTimer(){
 function final_resync(){
 	var action = '';
 	<!-- IF MMS_SYNC_NEEDED -->
-	if(!f_resync["f"]){
+	if (!f_resync["f"]){
 		action = "f";
 		$("#mms_statut").html('<span>' + mmsLang['MMS_STATUS'] + ': <strong style="color: green;">{S_RESYNC_NEXT_FORUMS}<img style="margin-bottom: -6px;" height="24" src="{T_THEME_PATH}/images/mms_loading.gif" alt=""/></strong></span>')
-	}else if(!f_resync["t"]){
+	}else if (!f_resync["t"]){
 		action = "t";
-	}else if(!f_resync["s"]){
+	}else if (!f_resync["s"]){
 		action = "s";
-	}else if(!f_resync["u"]){
+	}else if (!f_resync["u"]){
 		action = "u";
 	}else{
 	<!-- ENDIF -->
@@ -838,7 +838,7 @@ function final_resync(){
 			$('#cp-main').children('div:first').effect('highlight', {color: 'palegreen'}, 1500);
 	<!-- IF MMS_SYNC_NEEDED -->
 	}
-	if(action)
+	if (action)
 	{
 		$.ajax({
 			type: 'POST',
@@ -851,10 +851,10 @@ function final_resync(){
 			},
 			timeout: (rowTimeout * 100),//Huge timeout for statistics...
 			success: function(data, textStts, errThrown) {
-				if(!mms_aborted){
-					if(typeof(data) == 'object'){
-						if(!data['error']){
-							if(!data['pwd_confirm']){
+				if (!mms_aborted){
+					if (typeof(data) == 'object'){
+						if (!data['error']){
+							if (!data['pwd_confirm']){
 								if (data['final_eval']){
 									eval(data['final_eval']);
 								}
@@ -869,7 +869,7 @@ function final_resync(){
 								f_resync[data['action_done']] = true;
 								if (typeof data['loadavg'] !== 'undefined'){
 									var loadAvgCnt = data['loadavg'] + '%';
-									if(data['loadavg'] > 3){
+									if (data['loadavg'] > 3){
 										loadAvgCnt += '<span class="ui-icon mmsLoadavgAlert ui-icon-alert" style="float: right"></span>';
 									}
 									$("#loadavgbar" ).parent('div').css('display', 'block');
@@ -892,10 +892,10 @@ function final_resync(){
 				}
 			},
 			error: function(data, textStts, errThrown) {
-				if(!mms_aborted){
+				if (!mms_aborted){
 					$('#cp-main').children('div:first').effect('highlight', {color: 'orange'}, 1000);
 					$("#mms_statut").html('<span>' + mmsLang['MMS_STATUS'] + ': <strong style="color: darkorange;">' + mmsLang['MMS_DATA_INTERRUPTED'] + '</strong></span>');
-					if(textStts == 'error'){
+					if (textStts == 'error'){
 						var errorData = textStts + ': ' + data.status + ' ' + errThrown + '<br />' + mmsLang['MMS_HTML_DUMP'] + ':<br /><textarea class="inputbox" tabindex="3" cols="70" rows="10" name="message" >' + ajaxmms.getAllResponseHeaders() + data.responseText + '</textarea>';
 					} else {
 						var errorData = '118 ' + mmsLang['MMS_TIMEOUT'] + '<br />' + mmsLang['MMS_TIMEOUT_EXP'] + '<br />' + mmsLang['MMS_HTML_DUMP'] + ':<br />' + mmsLang['MMS_NOT_AVAILABLE'];
@@ -949,7 +949,7 @@ function mms_info(title, message, alert, callback){
 	btns = {};
 	btns[okBtn] = function () {
 		$(this).remove();
-		if(callback){
+		if (callback){
 			eval(callback);
 		}
 	};
@@ -964,7 +964,7 @@ function mms_info(title, message, alert, callback){
 }
 
 function mms_confirm(title, message, alert, btn_yes_callback, btn_no_callback, pwd_cfm, choice, mInfos, autoSize, btn_ignore){
-	if(pwd_cfm && !pwd_confirmed){
+	if (pwd_cfm && !pwd_confirmed){
 		field = '<br /><br /><span class="ui-icon ui-icon-key" style="float: left;"></span><input type="password" name="pwd_field" id="pwd_field" class="inputbox ui-widget-content ui-corner-all">';
 	}else{
 		field = '';
@@ -976,7 +976,7 @@ function mms_confirm(title, message, alert, btn_yes_callback, btn_no_callback, p
 	Ibtn = mmsLang['MMS_MORE_INFORMATIONS'];
 	btns = {};
 	btns[yesBtn] = function () {
-		if(btn_yes_callback){
+		if (btn_yes_callback){
 			user_pwd = $("#pwd_field").val();
 			eval(btn_yes_callback);
 		}
@@ -984,24 +984,24 @@ function mms_confirm(title, message, alert, btn_yes_callback, btn_no_callback, p
 	};
 	btns[noBtn] = function () {
 		$(this).remove();
-		if(btn_no_callback){
+		if (btn_no_callback){
 			eval(btn_no_callback);
 		}
 	};
-	if(btn_ignore)
+	if (btn_ignore)
 	{
 		//Ignore this loop, delete them so!
 		btns[ignoreBtn] = function () {
 			var i = 0, toDel = {};
 			for(key in rowAry){
-				if(i<rowPackets){
+				if (i<rowPackets){
 					toDel[key] = true;
 					i++;
 				}else{
 					break;
 				}
 			}
-			if(!mms_failed){
+			if (!mms_failed){
 				$("#mms_showTofailed").show();
 				$("#div_mms_failed").children("div:first").remove();
 			}
@@ -1023,7 +1023,7 @@ function mms_confirm(title, message, alert, btn_yes_callback, btn_no_callback, p
 			$(this).remove();
 		};
 	}
-	if(mInfos){
+	if (mInfos){
 		btns[Ibtn] = function () {
 			mms_info(mmsLang['MMS_MORE_INFORMATIONS'], '<span class="ui-icon ui-icon-info" style="float: left;"></span>' + mInfos);
 		};
@@ -1040,7 +1040,7 @@ function mms_confirm(title, message, alert, btn_yes_callback, btn_no_callback, p
 	//hack the submit key if we request a password...
 	$('#pwd_field').keyup(function(event) {
 		 if (event.which == 13) {
-			if(btn_yes_callback){
+			if (btn_yes_callback){
 				user_pwd = $("#pwd_field").val();
 				eval(btn_yes_callback);
 			}
