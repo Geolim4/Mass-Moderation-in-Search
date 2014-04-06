@@ -100,7 +100,7 @@ class acp_mms
 						'ERROR_MSG' => sprintf($user->lang['MMS_UNABLE_CONNECT'], $errstr),
 					));
 				}
-				else
+				else if (isset($info[0], $info[1], $info[2]))
 				{
 					$info 				= explode("\n", $info);
 					$latest_version 	= trim($info[0]);
